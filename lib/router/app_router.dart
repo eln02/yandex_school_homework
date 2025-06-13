@@ -34,10 +34,40 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: '/2',
-                  name: '2',
+                  path: '/income_path',
+                  name: 'income',
                   builder: (context, state) =>
-                      const Center(child: Text('2 страница')),
+                  const Center(child: Text('Тут доходы будут')),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/account_path',
+                  name: 'account',
+                  builder: (context, state) =>
+                  const Center(child: Text('Тут счет будет')),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/items_path',
+                  name: 'items',
+                  builder: (context, state) =>
+                  const Center(child: Text('Тут статьи будут')),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/settings_path',
+                  name: 'settings',
+                  builder: (context, state) =>
+                  const Center(child: Text('Тут настройки будут')),
                 ),
               ],
             ),

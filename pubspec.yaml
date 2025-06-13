@@ -19,6 +19,9 @@ dependencies:
   talker_flutter:
   talker_dio_logger:
   envied: ^1.1.1
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +30,18 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   envied_generator: ^1.1.1
   build_runner: 2.4.15
+  freezed: ^2.4.7
+  json_serializable: ^6.8.0
+  flutter_gen_runner: 5.10.0
+  flutter_gen: 5.10.0
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/icons/
+
+flutter_gen:
+  output: lib/gen/
+  integrations:
+    flutter_svg: true
