@@ -6,6 +6,12 @@ import 'package:yandex_school_homework/features/transactions/domain/entity/trans
 abstract interface class ITransactionsRepository with DiBaseRepo {
   Future<TransactionResponseEntity> fetchTransactionById(int id);
 
+  Future<List<TransactionResponseEntity>> fetchTransactionsByPeriod({
+    required int accountId,
+    required String startDate,
+    required String endDate,
+  });
+
   Future<TransactionEntity> createTransaction(
     TransactionRequestEntity transaction,
   );

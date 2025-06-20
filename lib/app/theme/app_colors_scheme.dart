@@ -5,6 +5,10 @@ extension AppColorsScheme on ColorScheme {
 
   Color get testColor => _isLight ? Colors.green : Colors.red;
 
+  Color get white => Colors.white;
+
+  Color get mainBackground => _isLight ? Colors.white : Colors.white;
+
   Color get surfaceContainer_ =>
       _isLight ? const Color(0xFFF3EDF7) : const Color(0xFFF3EDF7);
 
@@ -16,4 +20,15 @@ extension AppColorsScheme on ColorScheme {
 
   Color get lightFinanceGreen =>
       _isLight ? const Color(0xFFD4FAE6) : const Color(0xFFD4FAE6);
+
+  Color get transactionsDivider =>
+      _isLight ? const Color(0xFFCAC4D0) : const Color(0xFFCAC4D0);
+
+  Color get onSurfaceText =>
+      _isLight ? const Color(0xFF1D1B20) : const Color(0xFF1D1B20);
+
+  // withAlpha(77) = 30% прозрачность
+  Color get labelsTertiary => _isLight
+      ? const Color(0xFF3C3C43).withAlpha(77)
+      : const Color(0xFF3C3C43).withAlpha(77);
 }

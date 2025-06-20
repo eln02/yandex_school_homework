@@ -22,6 +22,9 @@ dependencies:
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0
   flutter_svg: ^2.0.7
+  equatable: ^2.0.7
+  flutter_bloc: ^9.1.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,7 @@ class TransactionResponseEntity extends Equatable {
   final int id;
   final AccountBriefEntity account;
   final CategoryEntity category;
-  final String amount;
+  final double amount;
   final DateTime transactionDate;
   final String? comment;
   final DateTime createdAt;
@@ -22,6 +22,9 @@ class TransactionResponseEntity extends Equatable {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  /// Форматированная сумма для ui
+  String get formattedAmount => amount.toStringAsFixed(0);
 
   @override
   List<Object?> get props => [

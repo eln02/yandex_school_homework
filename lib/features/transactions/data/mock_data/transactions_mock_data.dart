@@ -1,14 +1,101 @@
 abstract class TransactionsMockData {
-  static final transactionResponse = {
-    "id": 38,
-    "account": {"id": 1, "name": "", "balance": "5500.79", "currency": "RUB"},
-    "category": {"id": 1, "name": "Зарплата", "emoji": "💰", "isIncome": true},
-    "amount": "500.00",
-    "transactionDate": "2025-06-13T13:45:48.282Z",
-    "comment": "Зарплата за месяц",
-    "createdAt": "2025-06-13T13:46:12.946303Z",
-    "updatedAt": "2025-06-13T13:46:12.946303Z",
-  };
+  static final transactions = [
+    {
+      "id": 38,
+      "account": {
+        "id": 1,
+        "name": "Основной счёт",
+        "balance": "5500.79",
+        "currency": "RUB",
+      },
+      "category": {
+        "id": 1,
+        "name": "Зарплата",
+        "emoji": "💰",
+        "isIncome": true,
+      },
+      "amount": "500.00",
+      "transactionDate": "2025-06-13T13:45:48.282Z",
+      "comment": "Зарплата за месяц",
+      "createdAt": "2025-06-13T13:46:12.946303Z",
+      "updatedAt": "2025-06-13T13:46:12.946303Z",
+    },
+    {
+      "id": 39,
+      "account": {
+        "id": 1,
+        "name": "Основной счёт",
+        "balance": "6000.79",
+        "currency": "RUB",
+      },
+      "category": {
+        "id": 2,
+        "name": "Продукты",
+        "emoji": "🛒",
+        "isIncome": false,
+      },
+      "amount": "1000.00",
+      "transactionDate": "2025-06-14T10:20:00.000Z",
+      "comment": "Закупка продуктов на неделю",
+      "createdAt": "2025-06-14T10:25:00.000Z",
+      "updatedAt": "2025-06-14T10:25:00.000Z",
+    },
+    {
+      "id": 40,
+      "account": {
+        "id": 1,
+        "name": "Основной счёт",
+        "balance": "5000.79",
+        "currency": "RUB",
+      },
+      "category": {
+        "id": 3,
+        "name": "Транспорт",
+        "emoji": "🚗",
+        "isIncome": false,
+      },
+      "amount": "300.00",
+      "transactionDate": "2025-06-15T09:00:00.000Z",
+      "comment": "Такси до работы",
+      "createdAt": "2025-06-15T09:05:00.000Z",
+      "updatedAt": "2025-06-15T09:05:00.000Z",
+    },
+    {
+      "id": 41,
+      "account": {
+        "id": 1,
+        "name": "Основной счёт",
+        "balance": "4700.79",
+        "currency": "RUB",
+      },
+      "category": {"id": 4, "name": "Кафе", "emoji": "☕", "isIncome": false},
+      "amount": "250.00",
+      "transactionDate": "2025-06-16T18:30:00.000Z",
+      "comment": "Ужин в кафе",
+      "createdAt": "2025-06-16T18:35:00.000Z",
+      "updatedAt": "2025-06-16T18:35:00.000Z",
+    },
+    {
+      "id": 42,
+      "account": {
+        "id": 1,
+        "name": "Основной счёт",
+        "balance": "4450.79",
+        "currency": "RUB",
+      },
+      "category": {
+        "id": 5,
+        "name": "Развлечения",
+        "emoji": "🎮",
+        "isIncome": false,
+      },
+      "amount": "500.00",
+      "transactionDate": "2025-06-17T20:00:00.000Z",
+      "comment": "Подписка на игры",
+      "createdAt": "2025-06-17T20:05:00.000Z",
+      "updatedAt": "2025-06-17T20:05:00.000Z",
+    },
+  ];
 
   static final transaction = {
     "id": 42,

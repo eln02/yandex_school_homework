@@ -55,4 +55,21 @@ final class TransactionsRepository implements ITransactionsRepository {
     final Map<String, dynamic> data = response.data;
     return TransactionResponseDto.fromJson(data).toEntity();
   }
+
+  @override
+  Future<List<TransactionResponseEntity>> fetchTransactionsByPeriod({
+    required int accountId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final response = await httpClient.get(
+      '$transactions/account/$accountId/period',
+      queryParameters: {'startDate': startDate, 'endDate': endDate},
+    );
+
+    final List<dynamic> data = response.data;
+    return (data)
+        .map((item) => TransactionResponseDto.fromJson(item).toEntity())
+        .toList();
+  }
 }

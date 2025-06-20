@@ -9,7 +9,7 @@ extension TransactionResponseDtoMapper on TransactionResponseDto {
       id: id,
       account: account.toEntity(),
       category: category.toEntity(),
-      amount: amount,
+      amount: double.tryParse(amount) ?? 0.0,
       transactionDate: transactionDate,
       comment: comment,
       createdAt: createdAt,
