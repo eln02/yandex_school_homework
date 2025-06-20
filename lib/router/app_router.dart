@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/features/debug/debug_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_history_screen.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_screen.dart';
 import 'package:yandex_school_homework/router/root_screen.dart';
 
 class AppRouter {
@@ -9,7 +11,11 @@ class AppRouter {
 
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  static String get initialLocation => '/debug';
+  static String get initialLocation => '/expenses_path';
+
+  static String get expensesHistory => '/expenses_history_name';
+
+  static String get incomeHistory => '/income_history_name';
 
   static GoRouter createRouter(IDebugService debugService) {
     return GoRouter(
@@ -25,9 +31,17 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: '/debug',
-                  name: 'debug',
-                  builder: (context, state) => const DebugScreen(),
+                  path: initialLocation,
+                  name: 'expenses',
+                  builder: (context, state) => TransactionsScreen.expenses(),
+                  routes: [
+                    GoRoute(
+                      path: 'expenses_history',
+                      name: expensesHistory,
+                      builder: (context, state) =>
+                          TransactionsHistoryScreen.expenses(),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -36,8 +50,15 @@ class AppRouter {
                 GoRoute(
                   path: '/income_path',
                   name: 'income',
-                  builder: (context, state) =>
-                  const Center(child: Text('Тут доходы будут')),
+                  builder: (context, state) => TransactionsScreen.income(),
+                  routes: [
+                    GoRoute(
+                      path: 'income_history',
+                      name: incomeHistory,
+                      builder: (context, state) =>
+                          TransactionsHistoryScreen.income(),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -46,8 +67,7 @@ class AppRouter {
                 GoRoute(
                   path: '/account_path',
                   name: 'account',
-                  builder: (context, state) =>
-                  const Center(child: Text('Тут счет будет')),
+                  builder: (context, state) => const DebugScreen(),
                 ),
               ],
             ),
@@ -57,7 +77,7 @@ class AppRouter {
                   path: '/items_path',
                   name: 'items',
                   builder: (context, state) =>
-                  const Center(child: Text('Тут статьи будут')),
+                      const Center(child: Text('Тут статьи будут')),
                 ),
               ],
             ),
@@ -67,7 +87,7 @@ class AppRouter {
                   path: '/settings_path',
                   name: 'settings',
                   builder: (context, state) =>
-                  const Center(child: Text('Тут настройки будут')),
+                      const Center(child: Text('Тут настройки будут')),
                 ),
               ],
             ),

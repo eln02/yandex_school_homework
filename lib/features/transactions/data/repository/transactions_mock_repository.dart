@@ -16,7 +16,7 @@ final class TransactionsMockRepository implements ITransactionsRepository {
   Future<TransactionResponseEntity> fetchTransactionById(int id) async {
     await Future.delayed(const Duration(seconds: 1));
     final Map<String, dynamic> transaction =
-        TransactionsMockData.transactionResponse;
+        TransactionsMockData.transactions[0];
 
     return TransactionResponseDto.fromJson(transaction).toEntity();
   }
@@ -43,8 +43,37 @@ final class TransactionsMockRepository implements ITransactionsRepository {
   }) async {
     await Future.delayed(const Duration(seconds: 1));
     final Map<String, dynamic> transaction =
-        TransactionsMockData.transactionResponse;
+        TransactionsMockData.transactions[0];
 
     return TransactionResponseDto.fromJson(transaction).toEntity();
+  }
+
+  @override
+  Future<List<TransactionResponseEntity>> fetchTransactionsByPeriod({
+    required int accountId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1));
+
+    final start = DateTime.parse(startDate);
+    final end = DateTime.parse(endDate);
+
+    final filtered = TransactionsMockData.transactions.where((transaction) {
+      if ((transaction['account'] as Map<String, dynamic>?)?['id'] !=
+          accountId) {
+        return false;
+      }
+      final transactionDate = DateTime.parse(
+        transaction['transactionDate'] as String,
+      );
+      if (transactionDate.isBefore(start)) return false;
+      if (transactionDate.isAfter(end)) return false;
+      return true;
+    }).toList();
+
+    return filtered
+        .map((json) => TransactionResponseDto.fromJson(json).toEntity())
+        .toList();
   }
 }

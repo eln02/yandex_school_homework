@@ -9,4 +9,6 @@ extension AppContextExt on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
 
   ThemeNotifier get theme => read<ThemeNotifier>();
+
+  TextTheme get texts => Theme.of(this).textTheme;
 }
