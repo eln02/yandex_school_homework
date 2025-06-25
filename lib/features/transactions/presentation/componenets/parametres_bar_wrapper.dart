@@ -8,30 +8,35 @@ class ParametersBarWrapper extends StatelessWidget {
     super.key,
     required this.children,
     this.isLast = false,
+    this.onTap,
   });
 
   final List<Widget> children;
   final bool isLast;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: context.colors.lightFinanceGreen,
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(
-                  color: context.colors.transactionsDivider,
-                  width: 1,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 56,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: context.colors.lightFinanceGreen,
+          border: isLast
+              ? null
+              : Border(
+                  bottom: BorderSide(
+                    color: context.colors.transactionsDivider,
+                    width: 1,
+                  ),
                 ),
-              ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: children,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: children,
+        ),
       ),
     );
   }

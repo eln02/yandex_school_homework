@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yandex_school_homework/features/debug/debug_screen.dart';
+import 'package:yandex_school_homework/features/accounts/presentation/screens/account_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_history_screen.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_screen.dart';
@@ -67,7 +67,7 @@ class AppRouter {
                 GoRoute(
                   path: '/account_path',
                   name: 'account',
-                  builder: (context, state) => const DebugScreen(),
+                  builder: (context, state) => const AccountScreen(),
                 ),
               ],
             ),
