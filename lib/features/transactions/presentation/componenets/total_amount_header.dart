@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/texts_extension.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/componenets/parametres_bar_wrapper.dart';
+import 'package:yandex_school_homework/features/common/ui/parametres_bar_wrapper.dart';
 
 /// Раздел для отображения суммы
 class TotalAmountBar extends StatelessWidget {

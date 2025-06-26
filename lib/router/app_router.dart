@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/features/accounts/presentation/screens/account_screen.dart';
+import 'package:yandex_school_homework/features/categories/presentation/screens/categories_screen.dart';
+import 'package:yandex_school_homework/features/categories/presentation/screens/search_categories_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_history_screen.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_screen.dart';
@@ -16,6 +18,8 @@ class AppRouter {
   static String get expensesHistory => '/expenses_history_name';
 
   static String get incomeHistory => '/income_history_name';
+
+  static String get searchCategories => '/search_categories_name';
 
   static GoRouter createRouter(IDebugService debugService) {
     return GoRouter(
@@ -74,10 +78,17 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: '/items_path',
-                  name: 'items',
-                  builder: (context, state) =>
-                      const Center(child: Text('Тут статьи будут')),
+                  path: '/categories_path',
+                  name: 'categories',
+                  builder: (context, state) => const CategoriesScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'search_categories',
+                      name: searchCategories,
+                      builder: (context, state) =>
+                          const SearchCategoriesScreen(),
+                    ),
+                  ],
                 ),
               ],
             ),
