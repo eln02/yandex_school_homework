@@ -9,29 +9,29 @@ class TransactionsList extends StatelessWidget {
   const TransactionsList({
     super.key,
     required this.transactions,
-    required this.onRefresh,
+    this.onRefresh,
   });
 
   final List<TransactionResponseEntity> transactions;
-  final Future<void> Function() onRefresh;
+  final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      child: ListView.separated(
-        itemCount: transactions.length + 1,
-        separatorBuilder: (_, __) =>
-            Divider(height: 1, color: context.colors.transactionsDivider),
-        itemBuilder: (context, index) {
-          // добавление Divider под последним элементом
-          if (index == transactions.length) {
-            return const SizedBox.shrink();
-          }
-          return _TransactionTile(transaction: transactions[index]);
-        },
-      ),
+    final listView = ListView.separated(
+      itemCount: transactions.length + 1,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, color: context.colors.transactionsDivider),
+      itemBuilder: (context, index) {
+        if (index == transactions.length) {
+          return const SizedBox.shrink();
+        }
+        return _TransactionTile(transaction: transactions[index]);
+      },
     );
+
+    if (onRefresh == null) return listView;
+
+    return RefreshIndicator(onRefresh: onRefresh!, child: listView);
   }
 }
 
@@ -45,6 +45,7 @@ class _TransactionTile extends StatelessWidget {
     return Container(
       height: 70,
       padding: const EdgeInsets.symmetric(horizontal: 16),
+      color: context.colors.mainBackground,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

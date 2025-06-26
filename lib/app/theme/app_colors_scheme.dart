@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_school_homework/app/theme/theme_constants.dart';
 
 extension AppColorsScheme on ColorScheme {
   bool get _isLight => brightness == Brightness.light;
@@ -7,7 +8,8 @@ extension AppColorsScheme on ColorScheme {
 
   Color get white => Colors.white;
 
-  Color get mainBackground => _isLight ? Colors.white : Colors.white;
+  Color get mainBackground =>
+      _isLight ? AppColors.mainBackground : AppColors.mainBackground;
 
   Color get surfaceContainer_ =>
       _isLight ? const Color(0xFFF3EDF7) : const Color(0xFFF3EDF7);

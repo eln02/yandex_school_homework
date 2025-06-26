@@ -10,18 +10,23 @@ class TotalAmountBar extends StatelessWidget {
     required this.totalAmount,
     required this.currency,
     required this.title,
+    this.color,
+    this.isLast = true,
   });
 
   final String totalAmount;
   final String currency;
   final String title;
+  final Color? color;
+  final bool isLast;
 
   double get height => 56.0;
 
   @override
   Widget build(BuildContext context) {
     return ParametersBarWrapper(
-      isLast: true,
+      color: color,
+      isLast: isLast,
       children: [
         Text(title, style: context.texts.bodyLarge_),
         Text('$totalAmount $currency', style: context.texts.bodyLarge_),

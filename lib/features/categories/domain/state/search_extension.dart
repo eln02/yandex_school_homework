@@ -2,7 +2,7 @@ import 'package:fuzzy/fuzzy.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_state.dart';
 
-extension FuzzySearchOnLoadedState on CategoriesLoadedState {
+extension CategoriesSearchExt on CategoriesLoadedState {
   /// Отфильтрованные категории с использованием fuzzy-поиска
   List<CategoryEntity> filteredCategories(String query) {
     if (query.isEmpty) return categories;

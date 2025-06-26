@@ -5,7 +5,7 @@ import 'package:yandex_school_homework/features/categories/domain/state/categori
 import 'package:yandex_school_homework/features/categories/domain/state/categories_state.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/search_extension.dart';
 import 'package:yandex_school_homework/features/categories/presentation/components/categories_list.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/screens/app_error_screen.dart';
+import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 
 class SearchCategoriesScreen extends StatelessWidget {
   const SearchCategoriesScreen({super.key});
@@ -54,7 +54,8 @@ class _SearchCategoriesView extends StatelessWidget {
               builder: (context, query, _) {
                 return CategoriesList(
                   categories: state.filteredCategories(query),
-                  onRefresh: () => context.read<CategoriesCubit>().fetchCategories(),
+                  onRefresh: () =>
+                      context.read<CategoriesCubit>().fetchCategories(),
                 );
               },
             ),

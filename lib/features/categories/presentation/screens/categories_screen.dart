@@ -6,9 +6,9 @@ import 'package:yandex_school_homework/features/categories/domain/entity/categor
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_state.dart';
 import 'package:yandex_school_homework/features/categories/presentation/components/categories_list.dart';
+import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/common/ui/parametres_bar_wrapper.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/screens/app_error_screen.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 class CategoriesScreen extends StatelessWidget {

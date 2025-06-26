@@ -11,6 +11,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Icon? icon;
   final double extraHeight;
   final bool showBackButton;
+  final Color? color;
 
   const CustomAppBar({
     super.key,
@@ -20,6 +21,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.icon,
     this.extraHeight = 0,
     this.showBackButton = false,
+    this.color,
   });
 
   @override
@@ -28,7 +30,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: context.colors.financeGreen,
+      color: color ?? context.colors.financeGreen,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         children: [

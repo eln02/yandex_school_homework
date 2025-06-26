@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Экран ошибки загрузки
 // TODO: добавить дизайн
-// TODO: вынести глобально, если будет использоваться на других экранах
 class AppErrorScreen extends StatelessWidget {
   const AppErrorScreen({
     super.key,
