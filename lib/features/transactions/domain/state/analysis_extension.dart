@@ -4,44 +4,39 @@ import 'package:yandex_school_homework/features/transactions/domain/state/transa
 
 extension CategoriesAnalysisExt on TransactionsLoadedState {
   /// Общая сумма доходов
-  double get incomesSumDouble =>
-      incomes.fold(0.0, (sum, t) => sum + t.amount);
+  double get incomesSumDouble => incomes.fold(0.0, (sum, t) => sum + t.amount);
 
   /// Общая сумма расходов
   double get expensesSumDouble =>
       expenses.fold(0.0, (sum, t) => sum + t.amount);
 
-  /// Группировка доходов по категориям с агрегированными данными
-  Map<CategoryAnalysisEntity, List<TransactionResponseEntity>>
-  get incomeCategoryMap =>
+  /// Группировка доходов: id -> CategoryAnalysisEntity
+  Map<int, CategoryAnalysisEntity> get incomeCategoryMap =>
       _groupByCategory(incomes, total: incomesSumDouble);
 
-  /// Группировка расходов по категориям с агрегированными данными
-  Map<CategoryAnalysisEntity, List<TransactionResponseEntity>>
-  get expenseCategoryMap =>
+  /// Группировка расходов: id -> CategoryAnalysisEntity
+  Map<int, CategoryAnalysisEntity> get expenseCategoryMap =>
       _groupByCategory(expenses, total: expensesSumDouble);
 
-  /// Список группированных категорий для UI (сохранён порядок)
-  List<MapEntry<CategoryAnalysisEntity, List<TransactionResponseEntity>>>
-  get incomeCategoryEntries => incomeCategoryMap.entries.toList();
+  /// UI-friendly список (сохраняет порядок)
+  List<CategoryAnalysisEntity> get incomeCategoryList =>
+      incomeCategoryMap.values.toList();
 
-  List<MapEntry<CategoryAnalysisEntity, List<TransactionResponseEntity>>>
-  get expenseCategoryEntries => expenseCategoryMap.entries.toList();
+  List<CategoryAnalysisEntity> get expenseCategoryList =>
+      expenseCategoryMap.values.toList();
 
-  /// Приватная функция группировки транзакций по имени категории
-  Map<CategoryAnalysisEntity, List<TransactionResponseEntity>> _groupByCategory(
-      List<TransactionResponseEntity> txs, {
-        required double total,
-      }) {
-    final Map<String, List<TransactionResponseEntity>> grouped = {};
+  Map<int, CategoryAnalysisEntity> _groupByCategory(
+    List<TransactionResponseEntity> txs, {
+    required double total,
+  }) {
+    final Map<int, List<TransactionResponseEntity>> grouped = {};
 
     for (final tx in txs) {
-      final key = tx.category.name;
+      final key = tx.category.id;
       grouped.putIfAbsent(key, () => []).add(tx);
     }
 
-    final Map<CategoryAnalysisEntity, List<TransactionResponseEntity>> result =
-    {};
+    final Map<int, CategoryAnalysisEntity> result = {};
 
     for (final entry in grouped.entries) {
       final txList = entry.value;
@@ -55,15 +50,15 @@ extension CategoriesAnalysisExt on TransactionsLoadedState {
       final amount = txList.fold(0.0, (sum, t) => sum + t.amount);
       final percent = total == 0.0 ? 0.0 : (amount / total * 100);
 
-      final analysisEntity = CategoryAnalysisEntity(
+      result[category.id] = CategoryAnalysisEntity(
+        id: category.id,
         name: category.name,
         emoji: category.emoji,
         amount: amount,
         percent: percent,
         lastComment: lastComment,
+        transactions: txList,
       );
-
-      result[analysisEntity] = txList;
     }
 
     return result;

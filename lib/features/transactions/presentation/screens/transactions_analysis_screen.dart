@@ -7,8 +7,6 @@ import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
-import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
-import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/analysis_extension.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
@@ -144,6 +142,10 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final categories = isIncome
+        ? state.incomeCategoryList
+        : state.expenseCategoryList;
+
     return Scaffold(
       appBar: CustomAppBar(
         color: context.colors.mainBackground,
@@ -163,7 +165,6 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
               wrapData: true,
             ),
           ),
-
           TotalAmountBar(
             totalAmount: isIncome ? state.incomesSum : state.expensesSum,
             currency: state.currency,
@@ -174,18 +175,11 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
         ],
       ),
       body: ListView.separated(
-        itemCount: isIncome
-            ? state.incomeCategoryEntries.length
-            : state.expenseCategoryEntries.length,
+        itemCount: categories.length,
         separatorBuilder: (_, __) =>
             Divider(height: 1, color: context.colors.transactionsDivider),
         itemBuilder: (context, index) {
-          final entry = isIncome
-              ? state.incomeCategoryEntries[index]
-              : state.expenseCategoryEntries[index];
-
-          final CategoryAnalysisEntity category = entry.key;
-          final List<TransactionResponseEntity> transactions = entry.value;
+          final category = categories[index];
 
           return GestureDetector(
             onTap: () {
@@ -193,7 +187,10 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
                 isIncome
                     ? AppRouter.categoryTransactionsFromIncomes
                     : AppRouter.categoryTransactionsFromExpenses,
-                extra: {'category': category, 'transactions': transactions},
+                extra: {
+                  'category': category,
+                  'transactions': category.transactions,
+                },
               );
             },
             child: Container(
@@ -232,7 +229,6 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(width: 16),
                   Icon(
                     Icons.arrow_forward_ios,

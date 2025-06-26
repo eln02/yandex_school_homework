@@ -13,6 +13,7 @@ class TransactionsByCategoryScreen extends StatelessWidget {
     required this.transactions,
   });
 
+  // TODO: переделать на передачу только id категории в экран
   final CategoryAnalysisEntity category;
   final List<TransactionResponseEntity> transactions;
 
