@@ -26,6 +26,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
   sensors_plus: ^6.1.1
+  fuzzy: ^0.5.1
 
 dev_dependencies:
   flutter_test:

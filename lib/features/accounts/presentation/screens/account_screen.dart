@@ -10,8 +10,8 @@ import 'package:yandex_school_homework/features/accounts/domain/entity/account_e
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_state.dart';
 import 'package:yandex_school_homework/features/accounts/presentation/components/shimmer_text.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/componenets/custom_app_bar.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/componenets/parametres_bar_wrapper.dart';
+import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/common/ui/parametres_bar_wrapper.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/app_error_screen.dart';
 
 class AccountScreen extends StatelessWidget {
@@ -115,12 +115,9 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
     );
 
     return Scaffold(
-      appBar: CustomAppBar(
-        extraHeight: 0,
+      appBar: const CustomAppBar(
         title: 'Мой счет',
-        onNext: () {},
-        icon: const Icon(Icons.edit_outlined),
-        children: const [],
+        icon: Icon(Icons.edit_outlined),
       ),
       body: RefreshIndicator(
         onRefresh: () => context.read<AccountCubit>().fetchAccount(),
@@ -193,7 +190,6 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
     );
   }
 }
-
 
 enum Currency {
   rub('RUB', 'Рубль'),

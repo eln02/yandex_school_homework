@@ -9,11 +9,13 @@ class ParametersBarWrapper extends StatelessWidget {
     required this.children,
     this.isLast = false,
     this.onTap,
+    this.color,
   });
 
   final List<Widget> children;
   final bool isLast;
   final VoidCallback? onTap;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class ParametersBarWrapper extends StatelessWidget {
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: context.colors.lightFinanceGreen,
+          color: color ?? context.colors.lightFinanceGreen,
           border: isLast
               ? null
               : Border(

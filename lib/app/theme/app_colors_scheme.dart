@@ -31,4 +31,7 @@ extension AppColorsScheme on ColorScheme {
   Color get labelsTertiary => _isLight
       ? const Color(0xFF3C3C43).withAlpha(77)
       : const Color(0xFF3C3C43).withAlpha(77);
+
+  Color get surfaceContainer =>
+      _isLight ? const Color(0xFFECE6F0) : const Color(0xFFECE6F0);
 }
