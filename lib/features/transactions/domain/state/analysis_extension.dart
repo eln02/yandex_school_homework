@@ -2,6 +2,7 @@ import 'package:yandex_school_homework/features/transactions/domain/entity/categ
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 
+/// Расширение на TransactionsLoadedState для группировки транзакций по категориям
 extension CategoriesAnalysisExt on TransactionsLoadedState {
   /// Общая сумма доходов
   double get incomesSumDouble => incomes.fold(0.0, (sum, t) => sum + t.amount);
@@ -18,13 +19,16 @@ extension CategoriesAnalysisExt on TransactionsLoadedState {
   Map<int, CategoryAnalysisEntity> get expenseCategoryMap =>
       _groupByCategory(expenses, total: expensesSumDouble);
 
-  /// UI-friendly список (сохраняет порядок)
+  /// Список доходов для ui
   List<CategoryAnalysisEntity> get incomeCategoryList =>
       incomeCategoryMap.values.toList();
 
+  /// Список расходов для ui
   List<CategoryAnalysisEntity> get expenseCategoryList =>
       expenseCategoryMap.values.toList();
 
+  /// Приватный метод группировки транзакций
+  /// Возвращает Map c ключом из id категории и значением объектом анализа категории
   Map<int, CategoryAnalysisEntity> _groupByCategory(
     List<TransactionResponseEntity> txs, {
     required double total,
@@ -42,7 +46,6 @@ extension CategoriesAnalysisExt on TransactionsLoadedState {
       final txList = entry.value;
       if (txList.isEmpty) continue;
 
-      // Сортировка по дате (для получения последнего комментария)
       txList.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
       final lastComment = txList.first.comment;
 

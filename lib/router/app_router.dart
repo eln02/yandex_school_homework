@@ -6,7 +6,6 @@ import 'package:yandex_school_homework/features/categories/presentation/screens/
 import 'package:yandex_school_homework/features/debug/debug_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
-import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_analysis_screen.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_by_category_screen.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_history_screen.dart';
@@ -84,13 +83,9 @@ class AppRouter {
                                     state.extra as Map<String, Object>;
                                 final category =
                                     extra['category'] as CategoryAnalysisEntity;
-                                final transactions =
-                                    extra['transactions']
-                                        as List<TransactionResponseEntity>;
 
                                 return TransactionsByCategoryScreen(
                                   category: category,
-                                  transactions: transactions,
                                 );
                               },
                             ),
@@ -138,13 +133,9 @@ class AppRouter {
                                     state.extra as Map<String, Object>;
                                 final category =
                                     extra['category'] as CategoryAnalysisEntity;
-                                final transactions =
-                                    extra['transactions']
-                                        as List<TransactionResponseEntity>;
 
                                 return TransactionsByCategoryScreen(
                                   category: category,
-                                  transactions: transactions,
                                 );
                               },
                             ),

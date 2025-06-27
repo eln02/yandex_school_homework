@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
+import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_state.dart';
@@ -74,7 +75,10 @@ class _CategoriesSuccessScreen extends StatelessWidget {
           ParametersBarWrapper(
             color: context.colors.surfaceContainer,
             onTap: () => context.pushNamed(AppRouter.searchCategories),
-            children: const [Text('Найти статью'), Icon(Icons.search)],
+            children: [
+              Text('Найти статью', style: context.texts.bodyLarge_),
+              const Icon(Icons.search),
+            ],
           ),
         ],
       ),

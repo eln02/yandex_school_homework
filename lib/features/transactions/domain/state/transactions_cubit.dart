@@ -35,6 +35,8 @@ class TransactionsCubit extends Cubit<TransactionsState> {
     }
   }
 
+  /// Добавление новой транзакции
+  /// (чтобы не перезагружать весь список после создания новой транзакции)
   void addNewTransaction(TransactionResponseEntity transaction) {
     if (state is TransactionsLoadedState) {
       final currentState = state as TransactionsLoadedState;

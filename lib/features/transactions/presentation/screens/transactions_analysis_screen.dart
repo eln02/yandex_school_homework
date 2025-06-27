@@ -187,10 +187,7 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
                 isIncome
                     ? AppRouter.categoryTransactionsFromIncomes
                     : AppRouter.categoryTransactionsFromExpenses,
-                extra: {
-                  'category': category,
-                  'transactions': category.transactions,
-                },
+                extra: {'category': category},
               );
             },
             child: Container(

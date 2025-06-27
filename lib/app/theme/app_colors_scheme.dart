@@ -36,4 +36,7 @@ extension AppColorsScheme on ColorScheme {
 
   Color get surfaceContainer =>
       _isLight ? const Color(0xFFECE6F0) : const Color(0xFFECE6F0);
+
+  Color get modalLine =>
+      _isLight ? const Color(0xFF79747E) : const Color(0xFF79747E);
 }

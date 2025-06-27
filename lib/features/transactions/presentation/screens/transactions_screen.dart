@@ -10,6 +10,7 @@ import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart'
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/sorting_enum.dart';
+import 'package:yandex_school_homework/features/transactions/domain/state/transaction_operation/transaction_operation_state.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction_operation/transacton_operation_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
@@ -94,6 +95,8 @@ class _TransactionsSuccessScreen extends StatelessWidget {
   final TransactionsLoadedState state;
   final Future<void> Function() onRefresh;
 
+  /// Временный метод для создания сгенерированной
+  // TODO: заменить на переход на экран создания транзакции
   void _addTransaction(BuildContext context) async {
     final transaction = TransactionRequestEntity(
       accountId: 140,
@@ -111,7 +114,7 @@ class _TransactionsSuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<TransactionOperationCubit, TransactionOperationState>(
       listener: (context, state) {
-        if (state is TransactionOperationSuccess) {
+        if (state is TransactionOperationSuccessState) {
           if (isIncome == state.transaction.category.isIncome) {
             context.read<TransactionsCubit>().addNewTransaction(
               state.transaction,

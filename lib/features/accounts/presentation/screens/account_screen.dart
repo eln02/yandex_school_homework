@@ -6,14 +6,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
+import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_entity.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_state.dart';
+import 'package:yandex_school_homework/features/accounts/presentation/components/currency_bottom_sheet.dart';
+import 'package:yandex_school_homework/features/accounts/presentation/components/name_edit_bottom_sheet.dart';
 import 'package:yandex_school_homework/features/accounts/presentation/components/shimmer_text.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/common/ui/parametres_bar_wrapper.dart';
 
+/// Экран счета
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
@@ -36,6 +40,7 @@ class AccountScreen extends StatelessWidget {
   }
 }
 
+/// Экран счета после успешной загрузки
 class _AccountSuccessScreen extends StatefulWidget {
   const _AccountSuccessScreen({required this.account});
 
@@ -67,6 +72,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
     _accelerometerSub = accelerometerEventStream().listen(_handleAccelerometer);
   }
 
+  /// Метод определения поворота экрана и тряски
   void _handleAccelerometer(AccelerometerEvent event) {
     final now = DateTime.now();
 
@@ -95,6 +101,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
     }
   }
 
+  /// Метод переключения видисости баланса
   void _toggleBalanceVisibility() {
     setState(() => _isBalanceHidden = !_isBalanceHidden);
   }
@@ -111,13 +118,13 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
     final balanceText = '${account.balance} ${account.currency}';
     final balanceTextWidget = Text(
       balanceText,
-      style: const TextStyle(fontSize: 18),
+      style: context.texts.bodyLarge_,
     );
 
     return Scaffold(
       appBar: const CustomAppBar(
         title: 'Мой счет',
-        icon: Icon(Icons.edit_outlined),
+        icon: Icon(Icons.edit_rounded),
       ),
       body: RefreshIndicator(
         onRefresh: () => context.read<AccountCubit>().fetchAccount(),
@@ -125,7 +132,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
           children: [
             ParametersBarWrapper(
               children: [
-                const Text('Баланс'),
+                Text('Баланс', style: context.texts.bodyLarge_),
                 Row(
                   spacing: 22,
                   children: [
@@ -150,13 +157,13 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
               ],
             ),
             ParametersBarWrapper(
-              onTap: () => _showCurrencyBottomSheet(context, account),
+              onTap: () => showCurrencyBottomSheet(context, account),
               children: [
-                const Text('Валюта'),
+                Text('Валюта', style: context.texts.bodyLarge_),
                 Row(
                   spacing: 22,
                   children: [
-                    Text(account.currency),
+                    Text(account.currency, style: context.texts.bodyLarge_),
                     Icon(
                       Icons.arrow_forward_ios,
                       size: 14,
@@ -167,14 +174,14 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
               ],
             ),
             ParametersBarWrapper(
-              onTap: () => _showNameEditBottomSheet(context, account),
+              onTap: () => showNameEditBottomSheet(context, account),
               isLast: true,
               children: [
-                const Text('Название'),
+                Text('Название', style: context.texts.bodyLarge_),
                 Row(
                   spacing: 22,
                   children: [
-                    Text(account.name),
+                    Text(account.name, style: context.texts.bodyLarge_),
                     Icon(
                       Icons.arrow_forward_ios,
                       size: 14,
@@ -189,107 +196,4 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
       ),
     );
   }
-}
-
-enum Currency {
-  rub('RUB', 'Рубль'),
-  usd('USD', 'Доллар'),
-  eur('EUR', 'Евро');
-
-  final String code;
-  final String name;
-
-  const Currency(this.code, this.name);
-}
-
-void _showCurrencyBottomSheet(BuildContext context, AccountEntity account) {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              'Выберите валюту',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ...Currency.values.map((currency) {
-              return ListTile(
-                title: Text(currency.name),
-                trailing: account.currency == currency.code
-                    ? Icon(Icons.check, color: Theme.of(context).primaryColor)
-                    : null,
-                onTap: () {
-                  Navigator.pop(context);
-                  context.read<AccountCubit>().updateAccount(
-                    currency: currency.code,
-                  );
-                },
-              );
-            }),
-            const SizedBox(height: 16),
-          ],
-        ),
-      );
-    },
-  );
-}
-
-void _showNameEditBottomSheet(BuildContext context, AccountEntity account) {
-  final controller = TextEditingController(text: account.name);
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              'Изменить название',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  hintText: 'Название счета',
-                  border: OutlineInputBorder(),
-                ),
-                autofocus: true,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Отмена'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    final newName = controller.text.trim();
-                    if (newName.isNotEmpty && newName != account.name) {
-                      Navigator.pop(context);
-                      context.read<AccountCubit>().updateAccount(name: newName);
-                    }
-                  },
-                  child: const Text('Сохранить'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    },
-  );
 }
