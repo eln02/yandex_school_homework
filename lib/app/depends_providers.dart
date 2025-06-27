@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
+import 'package:yandex_school_homework/features/transactions/domain/state/transaction_operation/transacton_operation_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
 
 final class DependsProviders extends StatelessWidget {
@@ -29,6 +30,12 @@ final class DependsProviders extends StatelessWidget {
         BlocProvider(
           /// глобальный кубит транзакций для экрнов доходов и расходов
           create: (context) => TransactionsCubit(
+            diContainer.repositories.transactionsRepository,
+          ),
+        ),
+        BlocProvider(
+          /// кубит для создания транзакции
+          create: (_) => TransactionOperationCubit(
             diContainer.repositories.transactionsRepository,
           ),
         ),

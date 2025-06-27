@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,9 @@ import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
+import 'package:yandex_school_homework/features/transactions/domain/state/sorting_enum.dart';
+import 'package:yandex_school_homework/features/transactions/domain/state/transaction_operation/transacton_operation_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/total_amount_header.dart';
@@ -49,7 +54,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
     context.read<TransactionsCubit>().fetchTransactions(
       // TODO: размокать accountId когда появится логика аккаунтов
-      accountId: 1,
+      accountId: 140,
       startDate: formattedDate,
       endDate: formattedDate,
     );
@@ -89,32 +94,64 @@ class _TransactionsSuccessScreen extends StatelessWidget {
   final TransactionsLoadedState state;
   final Future<void> Function() onRefresh;
 
+  void _addTransaction(BuildContext context) async {
+    final transaction = TransactionRequestEntity(
+      accountId: 140,
+      categoryId: isIncome
+          ? [1, 2, 4, 5][Random().nextInt(4)]
+          : [10, 7, 8, 9][Random().nextInt(4)],
+      amount: (Random().nextDouble() * 1000).toStringAsFixed(2),
+      transactionDate: DateTime.now(),
+      comment: 'Транзакция ${UniqueKey()}',
+    );
+    context.read<TransactionOperationCubit>().createTransaction(transaction);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        extraHeight: 56,
-        title: '${isIncome ? 'Доходы' : 'Расходы'} сегодня',
-        onNext: () => context.pushNamed(
-          isIncome ? AppRouter.incomeHistory : AppRouter.expensesHistory,
+    return BlocListener<TransactionOperationCubit, TransactionOperationState>(
+      listener: (context, state) {
+        if (state is TransactionOperationSuccess) {
+          if (isIncome == state.transaction.category.isIncome) {
+            context.read<TransactionsCubit>().addNewTransaction(
+              state.transaction,
+            );
+          }
+        }
+
+        if (state is TransactionOperationFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+        }
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(
+          extraHeight: 56,
+          title: '${isIncome ? 'Доходы' : 'Расходы'} сегодня',
+          onNext: () => context.pushNamed(
+            isIncome ? AppRouter.incomeHistory : AppRouter.expensesHistory,
+          ),
+          icon: const Icon(Icons.history),
+          children: [
+            TotalAmountBar(
+              totalAmount: isIncome ? state.incomesSum : state.expensesSum,
+              currency: state.currency,
+              title: 'Всего',
+            ),
+          ],
         ),
-        icon: const Icon(Icons.history),
-        children: [
-          TotalAmountBar(
-            totalAmount: isIncome ? state.incomesSum : state.expensesSum,
-            currency: state.currency,
-            title: 'Всего',
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          TransactionsList(
-            transactions: isIncome ? state.incomes : state.expenses,
-            onRefresh: onRefresh,
-          ),
-          _FloatingButton(onTap: () {}),
-        ],
+        body: Stack(
+          children: [
+            TransactionsList(
+              transactions: isIncome
+                  ? state.sortedIncomes(SortingType.dateNewestFirst)
+                  : state.sortedExpenses(SortingType.dateNewestFirst),
+              onRefresh: onRefresh,
+            ),
+            _FloatingButton(onTap: () => _addTransaction(context)),
+          ],
+        ),
       ),
     );
   }

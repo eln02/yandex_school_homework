@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/features/accounts/presentation/screens/account_screen.dart';
 import 'package:yandex_school_homework/features/categories/presentation/screens/categories_screen.dart';
 import 'package:yandex_school_homework/features/categories/presentation/screens/search_categories_screen.dart';
+import 'package:yandex_school_homework/features/debug/debug_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
-import 'package:yandex_school_homework/features/debug/transactions_debug_screen.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_analysis_screen.dart';
@@ -187,7 +187,7 @@ class AppRouter {
                 GoRoute(
                   path: '/settings_path',
                   name: 'settings',
-                  builder: (context, state) => const TransactionsDebugScreen(),
+                  builder: (context, state) => const DebugScreen(),
                 ),
               ],
             ),

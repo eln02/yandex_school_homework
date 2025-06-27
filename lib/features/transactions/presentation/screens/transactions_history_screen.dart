@@ -69,7 +69,7 @@ class _TransactionsHistoryViewState extends State<_TransactionsHistoryView> {
     final dateNotifier = context.read<DateRangeNotifier>();
     context.read<TransactionsCubit>().fetchTransactions(
       // TODO: размокать accountId когда появится логика аккаунтов
-      accountId: 1,
+      accountId: 140,
       startDate: dateNotifier.apiFormattedStartDate,
       endDate: dateNotifier.apiFormattedEndDate,
     );
@@ -110,7 +110,9 @@ class _TransactionsHistorySuccessScreen extends StatelessWidget {
   final Future<void> Function() onRefresh;
 
   /// ValueNotifier для определения типа сортировки
-  final sortingTypeNotifier = ValueNotifier<SortingType>(SortingType.none);
+  final sortingTypeNotifier = ValueNotifier<SortingType>(
+    SortingType.dateNewestFirst,
+  );
 
   @override
   Widget build(BuildContext context) {

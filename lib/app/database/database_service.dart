@@ -99,26 +99,73 @@ class DatabaseService implements IDatabaseService {
     }
   }
 
-  /// Метод получения всех транзакций
+  /// Метод получения всех транзакций с фильтрацией по счету и периоду
   /// Связанные сущности аккаунта и категории подтягиваются по id
   @override
-  Future<List<TransactionResponseEntity>> getAllTransactions() async {
+  Future<List<TransactionResponseEntity>> getAllTransactions({
+    required int accountId,
+    required String startDate,
+    required String endDate,
+  }) async {
     final db = await _db;
-    final transactions = await db.query(tableTransactions);
-    final accounts = await db.query(tableAccounts);
+
+    // Парсим даты и устанавливаем время
+    late DateTime start;
+    late DateTime end;
+
+    try {
+      start = DateTime.parse(
+        startDate,
+      ).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+
+      end = DateTime.parse(endDate).copyWith(
+        hour: 23,
+        minute: 59,
+        second: 59,
+        millisecond: 999,
+        microsecond: 999,
+      );
+    } catch (e) {
+      throw const FormatException('Invalid date format. Use "yyyy-mm-dd"');
+    }
+
+    // Получаем транзакции с учетом полного дня
+    final transactions = await db.query(
+      tableTransactions,
+      where: 'accountId = ? AND transactionDate BETWEEN ? AND ?',
+      whereArgs: [
+        accountId,
+        start.millisecondsSinceEpoch,
+        end.millisecondsSinceEpoch,
+      ],
+      orderBy: 'transactionDate DESC',
+    );
+
+    // Получаем связанные данные (аккаунт и категории)
+    final account = await db.query(
+      tableAccounts,
+      where: 'id = ?',
+      whereArgs: [accountId],
+      limit: 1,
+    );
+    if (account.isEmpty) throw Exception('Account not found');
+
     final categories = await db.query(tableCategories);
 
+    // Маппинг результатов
     return transactions.map((t) {
-      final account = accounts.firstWhere((a) => a['id'] == t['accountId']);
-      final category = categories.firstWhere((c) => c['id'] == t['categoryId']);
+      final category = categories.firstWhere(
+        (c) => c['id'] == t['categoryId'],
+        orElse: () => throw Exception('Category not found'),
+      );
 
       return TransactionResponseEntity(
         id: t['id'] as int,
         account: AccountBriefEntity(
-          id: account['id'] as int,
-          name: account['name'] as String,
-          balance: account['balance'] as String,
-          currency: account['currency'] as String,
+          id: account.first['id'] as int,
+          name: account.first['name'] as String,
+          balance: account.first['balance'] as String,
+          currency: account.first['currency'] as String,
         ),
         category: CategoryEntity(
           id: category['id'] as int,

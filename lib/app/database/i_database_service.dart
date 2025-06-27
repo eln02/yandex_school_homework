@@ -4,7 +4,11 @@ import 'package:yandex_school_homework/features/transactions/domain/entity/trans
 /// Сервис для работы с базой данных
 abstract class IDatabaseService {
   /// Метод получения всех транзакций
-  Future<List<TransactionResponseEntity>> getAllTransactions();
+  Future<List<TransactionResponseEntity>> getAllTransactions({
+    required int accountId,
+    required String startDate,
+    required String endDate,
+  });
 
   /// Метод создания транзакции
   Future<TransactionResponseEntity> createTransaction(

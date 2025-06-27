@@ -8,8 +8,8 @@ import 'package:yandex_school_homework/features/accounts/data/repository/account
 import 'package:yandex_school_homework/features/categories/data/repository/categories_mock_repository.dart';
 import 'package:yandex_school_homework/features/categories/data/repository/categories_repository.dart';
 import 'package:yandex_school_homework/features/categories/domain/repository/i_categories_repository.dart';
+import 'package:yandex_school_homework/features/transactions/data/repository/transactions_local_repository.dart';
 import 'package:yandex_school_homework/features/transactions/data/repository/transactions_mock_repository.dart';
-import 'package:yandex_school_homework/features/transactions/data/repository/transactions_repository.dart';
 import 'package:yandex_school_homework/features/transactions/domain/repository/i_transactions_repository.dart';
 
 final class DiRepositories {
@@ -56,7 +56,8 @@ final class DiRepositories {
       transactionsRepository = _lazyInitRepo<ITransactionsRepository>(
         mockFactory: TransactionsMockRepository.new,
         mainFactory: () =>
-            TransactionsRepository(httpClient: diContainer.httpClient),
+            //TransactionsRepository(httpClient: diContainer.httpClient),
+            TransactionsLocalRepository(databaseService: diContainer.databaseService),
       );
       onProgress(transactionsRepository.name);
     } on Object catch (error, stackTrace) {
