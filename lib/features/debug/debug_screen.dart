@@ -44,12 +44,12 @@ class _DebugScreenState extends State<DebugScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final repository =
+               /* final repository =
                     context.di.repositories.transactionsRepository;
                 final result = await repository.fetchTransactionById(40);
                 setState(() {
                   _resultText = _formatResult(result);
-                });
+                });*/
               },
               child: const Text('Получить данные транзакций'),
             ),
