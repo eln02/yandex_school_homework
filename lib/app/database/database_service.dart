@@ -1,34 +1,43 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_brief_entity.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 
-class DatabaseHelper {
-  static const _databaseName = 'finance_app.db';
-  static const _databaseVersion = 1;
+/// Сервис для работы с базой данных
+class DatabaseService implements IDatabaseService {
+  final String databaseName;
+  final int databaseVersion;
+  Database? _database;
 
   // Таблицы и колонки
   static const tableTransactions = 'transactions';
   static const tableCategories = 'categories';
   static const tableAccounts = 'accounts';
 
-  // Singleton
-  DatabaseHelper._privateConstructor();
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+  DatabaseService({
+    this.databaseName = 'finance_app.db',
+    this.databaseVersion = 1,
+  });
 
-  static Database? _database;
-  Future<Database> get database async => _database ??= await _initDatabase();
+  Future<Database> get _db async {
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
+  }
 
+  /// Иницаилизация базы данных
   Future<Database> _initDatabase() async {
-    final path = join(await getDatabasesPath(), _databaseName);
+    final path = join(await getDatabasesPath(), databaseName);
     return await openDatabase(
       path,
-      version: _databaseVersion,
+      version: databaseVersion,
       onCreate: _onCreate,
     );
   }
 
+  /// Метод для создания таблиц
   Future _onCreate(Database db, int version) async {
     // Таблица категорий
     await db.execute('''
@@ -66,10 +75,11 @@ class DatabaseHelper {
       )
     ''');
 
-    // Заполняем начальными данными
     await _insertInitialData(db);
   }
 
+  /// Метод добавления данных категорий и аккаунтов
+  // TODO: сделать при инициализации заполнение реальными данными из апи
   Future<void> _insertInitialData(Database db) async {
     // Основные категории расходов
     const expenseCategories = [
@@ -91,8 +101,8 @@ class DatabaseHelper {
 
     // Основные аккаунты
     const accounts = [
-      {'id': 1, 'name': 'Main Account', 'balance': 5000.0, 'currency': 'USD'},
-      {'id': 2, 'name': 'Savings', 'balance': 10000.0, 'currency': 'USD'},
+      {'id': 1, 'name': 'Main Account', 'balance': '5000.0', 'currency': 'USD'},
+      {'id': 2, 'name': 'Savings', 'balance': '10000.0', 'currency': 'USD'},
     ];
 
     // Добавляем аккаунты
@@ -101,14 +111,17 @@ class DatabaseHelper {
     }
   }
 
-  // Transaction CRUD operations
+  /// Метод добавления транзакции
+  @override
   Future<int> insertTransaction(TransactionResponseEntity transaction) async {
-    final db = await database;
+    final db = await _db;
     return await db.insert(tableTransactions, _transactionToMap(transaction));
   }
 
+  /// Метод получения всех транзакций
+  @override
   Future<List<TransactionResponseEntity>> getAllTransactions() async {
-    final db = await database;
+    final db = await _db;
     final transactions = await db.query(tableTransactions);
     final accounts = await db.query(tableAccounts);
     final categories = await db.query(tableCategories);
@@ -132,7 +145,9 @@ class DatabaseHelper {
           isIncome: (category['isIncome'] as int) == 1,
         ),
         amount: t['amount'] as double,
-        transactionDate: DateTime.fromMillisecondsSinceEpoch(t['transactionDate'] as int),
+        transactionDate: DateTime.fromMillisecondsSinceEpoch(
+          t['transactionDate'] as int,
+        ),
         comment: t['comment'] as String?,
         createdAt: DateTime.fromMillisecondsSinceEpoch(t['createdAt'] as int),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(t['updatedAt'] as int),
@@ -140,7 +155,9 @@ class DatabaseHelper {
     }).toList();
   }
 
-  Map<String, dynamic> _transactionToMap(TransactionResponseEntity transaction) {
+  Map<String, dynamic> _transactionToMap(
+    TransactionResponseEntity transaction,
+  ) {
     return {
       'id': transaction.id,
       'accountId': transaction.account.id,
@@ -153,12 +170,21 @@ class DatabaseHelper {
     };
   }
 
-  // Для очистки базы (для отладки)
+  /// Метод очистки базы данных
+  @override
   Future<void> clearDatabase() async {
-    final db = await database;
+    final db = await _db;
     await db.delete(tableTransactions);
     await db.delete(tableCategories);
     await db.delete(tableAccounts);
     await _insertInitialData(db);
+  }
+
+  @override
+  Future<void> close() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
   }
 }

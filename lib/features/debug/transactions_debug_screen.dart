@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_brief_entity.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
-import 'package:yandex_school_homework/features/transactions/data/database/database_helper.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_list.dart';
 
@@ -14,58 +14,52 @@ class TransactionsDebugScreen extends StatefulWidget {
 }
 
 class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   List<TransactionResponseEntity> _transactions = [];
   bool _isLoading = false;
-  List<Map<String, dynamic>> _accounts = [];
-  List<Map<String, dynamic>> _categories = [];
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
-  }
-
-  Future<void> _loadInitialData() async {
-    setState(() => _isLoading = true);
-
-    final db = await _dbHelper.database;
-    _accounts = await db.query(DatabaseHelper.tableAccounts);
-    _categories = await db.query(DatabaseHelper.tableCategories);
-
-    await _loadTransactions();
+    _loadTransactions();
   }
 
   Future<void> _loadTransactions() async {
-    final transactions = await _dbHelper.getAllTransactions();
-    setState(() {
-      _transactions = transactions;
-      _isLoading = false;
-    });
+    if (!mounted) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final transactions = await context.di.databaseService
+          .getAllTransactions();
+      // Сортируем по дате в обратном порядке (новые сверху)
+      transactions.sort(
+        (a, b) => b.transactionDate.compareTo(a.transactionDate),
+      );
+      if (mounted) {
+        setState(() => _transactions = transactions);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   Future<void> _addTestTransaction(bool isIncome) async {
-    if (_accounts.isEmpty || _categories.isEmpty) return;
-
     final now = DateTime.now();
-    final category = _categories.firstWhere(
-      (c) => (c['isIncome'] as int) == (isIncome ? 1 : 0),
-      orElse: () => _categories.first,
-    );
-
     final testTransaction = TransactionResponseEntity(
       id: now.millisecondsSinceEpoch,
       account: AccountBriefEntity(
-        id: _accounts.first['id'] as int,
-        name: _accounts.first['name'] as String,
-        balance: _accounts.first['balance'] as String,
-        currency: _accounts.first['currency'] as String,
+        id: 1,
+        name: 'Main Account',
+        balance: '5000.0',
+        currency: 'USD',
       ),
       category: CategoryEntity(
-        id: category['id'] as int,
-        name: category['name'] as String,
-        emoji: category['emoji'] as String,
-        isIncome: (category['isIncome'] as int) == 1,
+        id: isIncome ? 4 : 1,
+        name: isIncome ? 'Salary' : 'Food',
+        emoji: isIncome ? '💰' : '🍕',
+        isIncome: isIncome,
       ),
       amount: isIncome ? 500.0 : 100.0,
       transactionDate: now,
@@ -74,13 +68,19 @@ class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
       updatedAt: now,
     );
 
-    await _dbHelper.insertTransaction(testTransaction);
-    await _loadTransactions();
+    await context.di.databaseService.insertTransaction(testTransaction);
+
+    // Оптимизированное обновление - добавляем новую транзакцию в начало списка
+    if (mounted) {
+      setState(() {
+        _transactions.insert(0, testTransaction);
+      });
+    }
   }
 
   Future<void> _clearDatabase() async {
-    await _dbHelper.clearDatabase();
-    await _loadInitialData();
+    await context.di.databaseService.clearDatabase();
+    _refreshIndicatorKey.currentState?.show();
   }
 
   @override
@@ -92,33 +92,37 @@ class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
           IconButton(icon: const Icon(Icons.delete), onPressed: _clearDatabase),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => _addTestTransaction(false),
-                      child: const Text('Add Expense'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _addTestTransaction(true),
-                      child: const Text('Add Income'),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: _transactions.isEmpty
-                      ? const Center(child: Text('No transactions yet'))
-                      : TransactionsList(
-                          transactions: _transactions,
-                          onRefresh: _loadTransactions,
-                        ),
-                ),
-              ],
-            ),
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () => _addTestTransaction(false),
+                child: const Text('Add Expense'),
+              ),
+              ElevatedButton(
+                onPressed: () => _addTestTransaction(true),
+                child: const Text('Add Income'),
+              ),
+            ],
+          ),
+          Expanded(
+            child: _isLoading && _transactions.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    key: _refreshIndicatorKey,
+                    onRefresh: _loadTransactions,
+                    child: _transactions.isEmpty
+                        ? const Center(child: Text('No transactions yet'))
+                        : TransactionsList(
+                            transactions: _transactions,
+                            onRefresh: _loadTransactions,
+                          ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
