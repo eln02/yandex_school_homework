@@ -1,10 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
-import 'package:yandex_school_homework/features/accounts/domain/entity/account_brief_entity.dart';
-import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
+import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_list.dart';
 
+/// Тестовый экран для демонстрации работы базы данных
+/// да, тут сервис прям в ui вызывается. Не надо ревьюить))
 class TransactionsDebugScreen extends StatefulWidget {
   const TransactionsDebugScreen({super.key});
 
@@ -31,7 +35,6 @@ class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
     try {
       final transactions = await context.di.databaseService
           .getAllTransactions();
-      // Сортируем по дате в обратном порядке (новые сверху)
       transactions.sort(
         (a, b) => b.transactionDate.compareTo(a.transactionDate),
       );
@@ -45,37 +48,22 @@ class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
     }
   }
 
-  Future<void> _addTestTransaction(bool isIncome) async {
-    final now = DateTime.now();
-    final testTransaction = TransactionResponseEntity(
-      id: now.millisecondsSinceEpoch,
-      account: AccountBriefEntity(
-        id: 1,
-        name: 'Main Account',
-        balance: '5000.0',
-        currency: 'USD',
-      ),
-      category: CategoryEntity(
-        id: isIncome ? 4 : 1,
-        name: isIncome ? 'Salary' : 'Food',
-        emoji: isIncome ? '💰' : '🍕',
-        isIncome: isIncome,
-      ),
-      amount: isIncome ? 500.0 : 100.0,
-      transactionDate: now,
-      comment: isIncome ? 'Monthly salary' : 'Grocery shopping',
-      createdAt: now,
-      updatedAt: now,
+  Future<void> _addTransaction() async {
+    final request = TransactionRequestEntity(
+      accountId: 140,
+      categoryId: 1 + Random().nextInt(24),
+      amount: (Random().nextDouble() * 1000).toString(),
+      transactionDate: DateTime.now(),
+      comment: UniqueKey().toString(),
     );
 
-    await context.di.databaseService.insertTransaction(testTransaction);
+    final transaction = await context.di.databaseService.createTransaction(
+      request,
+    );
 
-    // Оптимизированное обновление - добавляем новую транзакцию в начало списка
-    if (mounted) {
-      setState(() {
-        _transactions.insert(0, testTransaction);
-      });
-    }
+    setState(() {
+      _transactions.insert(0, transaction);
+    });
   }
 
   Future<void> _clearDatabase() async {
@@ -86,26 +74,17 @@ class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transactions Debug'),
-        actions: [
-          IconButton(icon: const Icon(Icons.delete), onPressed: _clearDatabase),
-        ],
+      appBar: CustomAppBar(
+        title: 'Экран теста DatabaseService',
+        icon: const Icon(Icons.delete),
+        onNext: _clearDatabase,
       ),
       body: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () => _addTestTransaction(false),
-                child: const Text('Add Expense'),
-              ),
-              ElevatedButton(
-                onPressed: () => _addTestTransaction(true),
-                child: const Text('Add Income'),
-              ),
-            ],
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () => _addTransaction(),
+            child: const Text('Сгенерировать транзакцию'),
           ),
           Expanded(
             child: _isLoading && _transactions.isEmpty
@@ -114,7 +93,7 @@ class _TransactionsDebugScreenState extends State<TransactionsDebugScreen> {
                     key: _refreshIndicatorKey,
                     onRefresh: _loadTransactions,
                     child: _transactions.isEmpty
-                        ? const Center(child: Text('No transactions yet'))
+                        ? const Center(child: Text('Пока нет транзакций'))
                         : TransactionsList(
                             transactions: _transactions,
                             onRefresh: _loadTransactions,

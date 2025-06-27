@@ -11,6 +11,10 @@ abstract class AccountsMockData {
     },
   ];
 
+  static final briefAccounts = [
+    {"id": 140, "name": "", "balance": "0.00", "currency": "RUB"},
+  ];
+
   /*static Map<String, dynamic> getAccountById(int id) =>
       accounts.where((account) => account['id'] == id).toList()[0];*/
 }

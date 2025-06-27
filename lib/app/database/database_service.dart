@@ -1,8 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:yandex_school_homework/app/database/i_database_service.dart';
+import 'package:yandex_school_homework/features/accounts/data/mock_data/accounts_mock_data.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_brief_entity.dart';
+import 'package:yandex_school_homework/features/categories/data/mock_data/categories_mock_data.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
+import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 
 /// Сервис для работы с базой данных
@@ -39,7 +42,7 @@ class DatabaseService implements IDatabaseService {
 
   /// Метод для создания таблиц
   Future _onCreate(Database db, int version) async {
-    // Таблица категорий
+    /// Таблица категорий (соответствует сущности CategoryEntity)
     await db.execute('''
       CREATE TABLE $tableCategories (
         id INTEGER PRIMARY KEY,
@@ -49,7 +52,7 @@ class DatabaseService implements IDatabaseService {
       )
     ''');
 
-    // Таблица аккаунтов
+    /// Таблица аккаунтов (соответствует сущности AccountBriefEntity)
     await db.execute('''
       CREATE TABLE $tableAccounts (
         id INTEGER PRIMARY KEY,
@@ -59,7 +62,7 @@ class DatabaseService implements IDatabaseService {
       )
     ''');
 
-    // Таблица транзакций
+    /// Таблица транзакций (соответствует сущности TransactionEntity)
     await db.execute('''
       CREATE TABLE $tableTransactions (
         id INTEGER PRIMARY KEY,
@@ -78,32 +81,17 @@ class DatabaseService implements IDatabaseService {
     await _insertInitialData(db);
   }
 
-  /// Метод добавления данных категорий и аккаунтов
+  /// Метод добавления данных категорий и аккаунтов из моковых данных
   // TODO: сделать при инициализации заполнение реальными данными из апи
   Future<void> _insertInitialData(Database db) async {
-    // Основные категории расходов
-    const expenseCategories = [
-      {'id': 1, 'name': 'Food', 'emoji': '🍕', 'isIncome': 0},
-      {'id': 2, 'name': 'Transport', 'emoji': '🚕', 'isIncome': 0},
-      {'id': 3, 'name': 'Shopping', 'emoji': '🛍️', 'isIncome': 0},
-    ];
-
-    // Основные категории доходов
-    const incomeCategories = [
-      {'id': 4, 'name': 'Salary', 'emoji': '💰', 'isIncome': 1},
-      {'id': 5, 'name': 'Gift', 'emoji': '🎁', 'isIncome': 1},
-    ];
+    // Моковые данные
+    final categories = CategoriesMockData.categories;
+    final accounts = AccountsMockData.briefAccounts;
 
     // Добавляем категории
-    for (var category in [...expenseCategories, ...incomeCategories]) {
+    for (var category in categories) {
       await db.insert(tableCategories, category);
     }
-
-    // Основные аккаунты
-    const accounts = [
-      {'id': 1, 'name': 'Main Account', 'balance': '5000.0', 'currency': 'USD'},
-      {'id': 2, 'name': 'Savings', 'balance': '10000.0', 'currency': 'USD'},
-    ];
 
     // Добавляем аккаунты
     for (var account in accounts) {
@@ -111,14 +99,8 @@ class DatabaseService implements IDatabaseService {
     }
   }
 
-  /// Метод добавления транзакции
-  @override
-  Future<int> insertTransaction(TransactionResponseEntity transaction) async {
-    final db = await _db;
-    return await db.insert(tableTransactions, _transactionToMap(transaction));
-  }
-
   /// Метод получения всех транзакций
+  /// Связанные сущности аккаунта и категории подтягиваются по id
   @override
   Future<List<TransactionResponseEntity>> getAllTransactions() async {
     final db = await _db;
@@ -155,10 +137,57 @@ class DatabaseService implements IDatabaseService {
     }).toList();
   }
 
-  Map<String, dynamic> _transactionToMap(
-    TransactionResponseEntity transaction,
-  ) {
-    return {
+  /// Метод создания транзакции
+  /// Связанные сущности аккаунта и категории подтягиваются по id
+  @override
+  Future<TransactionResponseEntity> createTransaction(
+    TransactionRequestEntity request,
+  ) async {
+    final db = await _db;
+
+    // Получаем аккаунт из базы
+    final accounts = await db.query(
+      'accounts',
+      where: 'id = ?',
+      whereArgs: [request.accountId],
+      limit: 1,
+    );
+    if (accounts.isEmpty) throw Exception('Account not found');
+
+    // Получаем категорию из базы
+    final categories = await db.query(
+      'categories',
+      where: 'id = ?',
+      whereArgs: [request.categoryId],
+      limit: 1,
+    );
+    if (categories.isEmpty) throw Exception('Category not found');
+
+    // Создаем TransactionResponseEntity
+    final now = DateTime.now();
+    final transaction = TransactionResponseEntity(
+      id: now.millisecondsSinceEpoch,
+      account: AccountBriefEntity(
+        id: accounts.first['id'] as int,
+        name: accounts.first['name'] as String,
+        balance: accounts.first['balance'] as String,
+        currency: accounts.first['currency'] as String,
+      ),
+      category: CategoryEntity(
+        id: categories.first['id'] as int,
+        name: categories.first['name'] as String,
+        emoji: categories.first['emoji'] as String,
+        isIncome: (categories.first['isIncome'] as int) == 1,
+      ),
+      amount: double.parse(request.amount),
+      transactionDate: request.transactionDate,
+      comment: request.comment,
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    // Сохраняем в базу
+    await db.insert('transactions', {
       'id': transaction.id,
       'accountId': transaction.account.id,
       'categoryId': transaction.category.id,
@@ -167,7 +196,9 @@ class DatabaseService implements IDatabaseService {
       'comment': transaction.comment,
       'createdAt': transaction.createdAt.millisecondsSinceEpoch,
       'updatedAt': transaction.updatedAt.millisecondsSinceEpoch,
-    };
+    });
+
+    return transaction;
   }
 
   /// Метод очистки базы данных
@@ -180,6 +211,7 @@ class DatabaseService implements IDatabaseService {
     await _insertInitialData(db);
   }
 
+  /// Метод закрытия соединения с базой данных
   @override
   Future<void> close() async {
     if (_database != null) {
