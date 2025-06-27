@@ -3,6 +3,8 @@ import 'package:yandex_school_homework/features/transactions/domain/entity/trans
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/repository/i_transactions_repository.dart';
 
+/// Локальный репозитори для работы с транзакциями
+/// Работает только с базой данных
 final class TransactionsLocalRepository implements ITransactionsRepository {
   TransactionsLocalRepository({required this.databaseService});
 
@@ -11,6 +13,7 @@ final class TransactionsLocalRepository implements ITransactionsRepository {
   @override
   String get name => 'TransactionsLocalRepository';
 
+  /// Метод создания транзакции
   @override
   Future<TransactionResponseEntity> createTransaction(
     TransactionRequestEntity transaction,
@@ -20,6 +23,7 @@ final class TransactionsLocalRepository implements ITransactionsRepository {
     return data;
   }
 
+  /// Метод получения транзакций за период
   @override
   Future<List<TransactionResponseEntity>> fetchTransactionsByPeriod({
     required int accountId,
@@ -35,6 +39,7 @@ final class TransactionsLocalRepository implements ITransactionsRepository {
     return data;
   }
 
+  // TODO: добавить остальные методы
   @override
   Future<void> deleteTransactionById(int id) {
     // TODO: implement deleteTransactionById

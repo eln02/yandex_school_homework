@@ -39,4 +39,7 @@ extension AppColorsScheme on ColorScheme {
 
   Color get modalLine =>
       _isLight ? const Color(0xFF79747E) : const Color(0xFF79747E);
+
+  Color get shimmerContainer =>
+      _isLight ? const Color(0XFFB8F5D5) : const Color(0XFFB8F5D5);
 }

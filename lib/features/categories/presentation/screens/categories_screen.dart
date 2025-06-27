@@ -12,6 +12,7 @@ import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/common/ui/parametres_bar_wrapper.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
+/// Экран категорий
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
@@ -60,6 +61,7 @@ class _CategoriesScreenViewState extends State<_CategoriesScreenView> {
   }
 }
 
+/// Экран успешной загрузки категорий
 class _CategoriesSuccessScreen extends StatelessWidget {
   const _CategoriesSuccessScreen({required this.categories});
 

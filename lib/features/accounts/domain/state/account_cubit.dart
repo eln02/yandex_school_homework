@@ -3,13 +3,13 @@ import 'package:yandex_school_homework/features/Accounts/domain/repository/i_Acc
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_update_request_entity.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_state.dart';
 
-/// Кубит для работы с
+/// Кубит для работы с аккаунтом
 class AccountCubit extends Cubit<AccountState> {
   AccountCubit(this.repository) : super(const AccountLoadingState());
 
   final IAccountsRepository repository;
 
-  /// Метод получения
+  /// Метод получения аккаунта
   Future<void> fetchAccount() async {
     emit(const AccountLoadingState());
 

@@ -4,6 +4,7 @@ import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_entity.dart';
 
+/// Модальное окно для редактирования названия счета
 void showNameEditBottomSheet(BuildContext context, AccountEntity account) {
   final controller = TextEditingController(text: account.name);
 

@@ -4,6 +4,7 @@ import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
 
+/// Виджет списка категорий
 class CategoriesList extends StatelessWidget {
   const CategoriesList({
     super.key,
@@ -34,6 +35,7 @@ class CategoriesList extends StatelessWidget {
   }
 }
 
+/// Тайл категории
 class _CategoryTile extends StatelessWidget {
   const _CategoryTile({required this.category});
 

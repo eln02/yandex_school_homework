@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_school_homework/app/app_context_ext.dart';
+import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 
+/// Виджет шиммерного контейнера для скрытия баланса
 class ShimmerText extends StatefulWidget {
   const ShimmerText({
     super.key,
     required this.child,
-    this.baseColor = const Color(0XFFB8F5D5),
+    this.baseColor,
     this.highlightColor = Colors.white,
   });
 
   final Text child;
-  final Color baseColor;
+  final Color? baseColor;
   final Color highlightColor;
 
   @override
@@ -26,22 +29,19 @@ class _ShimmerTextState extends State<ShimmerText>
   void initState() {
     super.initState();
     _calculateTextSize();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.forward(from: 0);
-      }
-    })..forward();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              _controller.forward(from: 0);
+            }
+          })
+          ..forward();
   }
 
   void _calculateTextSize() {
     final textPainter = TextPainter(
-      text: TextSpan(
-        text: widget.child.data,
-        style: widget.child.style,
-      ),
+      text: TextSpan(text: widget.child.data, style: widget.child.style),
       maxLines: widget.child.maxLines,
       textDirection: TextDirection.ltr,
     )..layout();
@@ -88,9 +88,9 @@ class _ShimmerTextState extends State<ShimmerText>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        widget.baseColor,
+                        widget.baseColor ?? context.colors.shimmerContainer,
                         widget.highlightColor.withAlpha((255 * 0.8).round()),
-                        widget.baseColor,
+                        widget.baseColor ?? context.colors.shimmerContainer,
                       ],
                     ),
                   ),
