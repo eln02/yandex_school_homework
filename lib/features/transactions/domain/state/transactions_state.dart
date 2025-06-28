@@ -69,8 +69,6 @@ final class TransactionsLoadedState extends TransactionsState {
         return [...txs]..sort((a, b) => b.amount.compareTo(a.amount));
       case SortingType.amountLowToHigh:
         return [...txs]..sort((a, b) => a.amount.compareTo(b.amount));
-      case SortingType.none:
-        return txs;
     }
   }
 

@@ -12,7 +12,7 @@ _$TransactionRequestDtoImpl _$$TransactionRequestDtoImplFromJson(
   accountId: (json['accountId'] as num).toInt(),
   categoryId: (json['categoryId'] as num).toInt(),
   amount: json['amount'] as String,
-  transactionDate: DateTime.parse(json['transactionDate'] as String),
+  transactionDate: json['transactionDate'] as String,
   comment: json['comment'] as String?,
 );
 
@@ -22,6 +22,6 @@ Map<String, dynamic> _$$TransactionRequestDtoImplToJson(
   'accountId': instance.accountId,
   'categoryId': instance.categoryId,
   'amount': instance.amount,
-  'transactionDate': instance.transactionDate.toIso8601String(),
+  'transactionDate': instance.transactionDate,
   'comment': instance.comment,
 };
