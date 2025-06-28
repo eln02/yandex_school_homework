@@ -6,14 +6,29 @@ class DateRangeNotifier extends ChangeNotifier {
   DateTime _startDate;
   DateTime _endDate;
 
-  /// Инициализация: последний месяц
-  DateRangeNotifier()
-    : _endDate = DateTime.now(),
-      _startDate = DateTime(
-        DateTime.now().year,
-        DateTime.now().month - 1,
-        DateTime.now().day,
-      );
+  /// Основной конструктор
+  DateRangeNotifier({required startDate, required DateTime endDate})
+    : _startDate = startDate,
+      _endDate = endDate;
+
+  /// Фабричный конструктор для последнего месяца
+  factory DateRangeNotifier.lastMonth() {
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1, now.day);
+    return DateRangeNotifier(startDate: lastMonth, endDate: now);
+  }
+
+  /// Конструктор из строковых значений
+  factory DateRangeNotifier.fromStrings({
+    required String startDate,
+    required String endDate,
+  }) {
+    final formatter = DateFormat('dd.MM.yyyy');
+    return DateRangeNotifier(
+      startDate: formatter.parse(startDate),
+      endDate: formatter.parse(endDate),
+    );
+  }
 
   /// Геттеры для доступа к датам
   DateTime get startDate => _startDate;

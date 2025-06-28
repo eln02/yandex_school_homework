@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/repository/i_transactions_repository.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 
@@ -29,6 +30,19 @@ class TransactionsCubit extends Cubit<TransactionsState> {
         TransactionsErrorState(
           stackTrace,
           errorMessage: "Не удалось загрузить транзакции",
+        ),
+      );
+    }
+  }
+
+  /// Добавление новой транзакции
+  /// (чтобы не перезагружать весь список после создания новой транзакции)
+  void addNewTransaction(TransactionResponseEntity transaction) {
+    if (state is TransactionsLoadedState) {
+      final currentState = state as TransactionsLoadedState;
+      emit(
+        TransactionsLoadedState(
+          transactions: [transaction, ...currentState.transactions],
         ),
       );
     }

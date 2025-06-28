@@ -1,6 +1,5 @@
 /// Перечесление вариантов сортировок
 enum SortingType {
-  none,
   dateNewestFirst,
   dateOldestFirst,
   amountHighToLow,
@@ -15,7 +14,6 @@ extension SortingTypeExtension on SortingType {
       SortingType.dateOldestFirst => 'По дате (сначала старые)',
       SortingType.amountHighToLow => 'По сумме (по убыванию)',
       SortingType.amountLowToHigh => 'По сумме (по возрастанию)',
-      SortingType.none => 'Без сортировки',
     };
   }
 }
