@@ -132,7 +132,7 @@ class _TransactionsHistorySuccessScreen extends StatelessWidget {
           );
         },
         // TODO: скачать иконку с макета
-        icon: const Icon(Icons.assignment_outlined),
+        nextIcon: const Icon(Icons.assignment_outlined),
         extraHeight: 56 * 4,
         children: [
           Consumer<DateRangeNotifier>(

@@ -2,40 +2,40 @@ import 'package:equatable/equatable.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 
 /// Состояние транзакции
-sealed class TransactionOperationState extends Equatable {
-  const TransactionOperationState();
+sealed class TransactionState extends Equatable {
+  const TransactionState();
 
   @override
   List<Object?> get props => [];
 }
 
 /// Начальное состояние транзакции
-class TransactionOperationInitialState extends TransactionOperationState {
-  const TransactionOperationInitialState();
+class TransactionInitialState extends TransactionState {
+  const TransactionInitialState();
 }
 
 /// Состояние загрузки отправки транзакции
-class TransactionOperationLoadingState extends TransactionOperationState {
-  const TransactionOperationLoadingState();
+class TransactionLoadingState extends TransactionState {
+  const TransactionLoadingState();
 }
 
 /// Состояние после успешной отправки транзакции
-class TransactionOperationSuccessState extends TransactionOperationState {
+class TransactionSuccessState extends TransactionState {
   final TransactionResponseEntity transaction;
 
   /// транзакция
-  const TransactionOperationSuccessState({required this.transaction});
+  const TransactionSuccessState({required this.transaction});
 
   @override
   List<Object?> get props => [transaction];
 }
 
 /// Состояние ошибки отправки транзакции
-class TransactionOperationFailure extends TransactionOperationState {
+class TransactionFailure extends TransactionState {
   final dynamic error;
   final StackTrace stackTrace;
 
-  const TransactionOperationFailure({
+  const TransactionFailure({
     required this.error,
     required this.stackTrace,
   });

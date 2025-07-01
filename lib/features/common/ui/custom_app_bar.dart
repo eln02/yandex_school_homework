@@ -8,7 +8,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onNext;
   final List<Widget> children;
-  final Icon? icon;
+  final Icon? nextIcon;
+  final Icon? backIcon;
   final double extraHeight;
   final bool showBackButton;
   final Color? color;
@@ -18,7 +19,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.onNext,
     this.children = const [],
-    this.icon,
+    this.nextIcon,
+    this.backIcon,
     this.extraHeight = 0,
     this.showBackButton = false,
     this.color,
@@ -41,14 +43,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 if (showBackButton)
                   IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => context.pop(),
+                    icon: backIcon ?? const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      context.pop();
+                    },
                   )
                 else
                   const SizedBox(width: 48),
                 Text(title, style: context.texts.titleLarge_),
-                if (icon != null)
-                  IconButton(icon: icon!, onPressed: onNext)
+                if (nextIcon != null)
+                  IconButton(icon: nextIcon!, onPressed: onNext)
                 else
                   const SizedBox(width: 48),
               ],

@@ -124,7 +124,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
     return Scaffold(
       appBar: const CustomAppBar(
         title: 'Мой счет',
-        icon: Icon(Icons.edit_rounded),
+        nextIcon: Icon(Icons.edit_rounded),
       ),
       body: RefreshIndicator(
         onRefresh: () => context.read<AccountCubit>().fetchAccount(),
