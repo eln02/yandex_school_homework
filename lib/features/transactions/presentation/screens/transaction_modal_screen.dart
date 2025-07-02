@@ -14,78 +14,16 @@ import 'package:yandex_school_homework/features/categories/domain/state/categori
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/state/transaction_notifier.dart';
 
-class TransactionEditNotifier extends ChangeNotifier {
-  final TransactionResponseEntity _originalTransaction;
+/// Режим редактирования/создания транзакции
+enum TransactionEditMode { create, edit }
 
-  int _accountId;
-  int _categoryId;
-  String _amount;
-  DateTime _transactionDate;
-  String? _comment;
-
-  TransactionEditNotifier(this._originalTransaction)
-    : _accountId = _originalTransaction.account.id,
-      _categoryId = _originalTransaction.category.id,
-      _amount = _originalTransaction.amount.toString(),
-      _transactionDate = _originalTransaction.transactionDate,
-      _comment = _originalTransaction.comment;
-
-  int get accountId => _accountId;
-
-  int get categoryId => _categoryId;
-
-  String get amount => _amount;
-
-  DateTime get transactionDate => _transactionDate.toLocal();
-
-  String? get comment => _comment;
-
-  String get formattedDate =>
-      DateFormat('dd.MM.yyyy').format(_transactionDate.toLocal());
-
-  String get formattedTime =>
-      DateFormat('HH:mm').format(_transactionDate.toLocal());
-
-  void updateAccount(int id) {
-    _accountId = id;
-    notifyListeners();
-  }
-
-  void updateCategory(int id) {
-    _categoryId = id;
-    notifyListeners();
-  }
-
-  void updateAmount(String value) {
-    _amount = value;
-    notifyListeners();
-  }
-
-  void updateDate(DateTime date) {
-    _transactionDate = date;
-    notifyListeners();
-  }
-
-  void updateComment(String? value) {
-    _comment = value;
-    notifyListeners();
-  }
-
-  TransactionRequestEntity buildRequest() {
-    return TransactionRequestEntity(
-      accountId: _accountId,
-      categoryId: _categoryId,
-      amount: _amount,
-      transactionDate: _transactionDate,
-      comment: _comment,
-    );
-  }
-}
-
+/// Функция вызова модального окна редактирования/создания транзакции
 Future<TransactionRequestEntity?> showTransactionEditModal({
   required BuildContext context,
-  required TransactionResponseEntity transaction,
+  TransactionResponseEntity? transaction,
+  bool? isIncome,
 }) async {
   return await showModalBottomSheet<TransactionRequestEntity>(
     context: context,
@@ -93,20 +31,54 @@ Future<TransactionRequestEntity?> showTransactionEditModal({
     useSafeArea: true,
     backgroundColor: context.colors.mainBackground,
     builder: (context) => ChangeNotifierProvider(
-      create: (_) => TransactionEditNotifier(transaction),
+      create: (_) => transaction != null
+          ? TransactionNotifier.edit(transaction)
+          : TransactionNotifier.create(isIncome: isIncome),
       child: Builder(
         builder: (innerContext) => TransactionEditModal(
-          notifier: innerContext.read<TransactionEditNotifier>(),
+          notifier: innerContext.read<TransactionNotifier>(),
+          mode: transaction != null
+              ? TransactionEditMode.edit
+              : TransactionEditMode.create,
         ),
       ),
     ),
   );
 }
 
+/// Модальное окно редактирования/создания транзакции
 class TransactionEditModal extends StatelessWidget {
-  final TransactionEditNotifier notifier;
+  final TransactionNotifier notifier;
+  final TransactionEditMode mode;
 
-  const TransactionEditModal({super.key, required this.notifier});
+  const TransactionEditModal({
+    super.key,
+    required this.notifier,
+    this.mode = TransactionEditMode.edit,
+  });
+
+  /// Метод показа диалогового окна валидации
+  Future<void> _showValidationDialog(
+    BuildContext context,
+    List<String> errors,
+  ) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Не все поля заполнены'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: errors.map((error) => Text('• $error')).toList(),
+          ),
+          actions: <Widget>[
+            TextButton(child: const Text('OK'), onPressed: () => context.pop()),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,14 +86,35 @@ class TransactionEditModal extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         CustomAppBar(
-          title: 'Редактирование',
+          title: mode == TransactionEditMode.edit
+              ? 'Редактирование'
+              : 'Новая транзакция',
           nextIcon: const Icon(Icons.check),
           backIcon: const Icon(Icons.close),
-          onNext: () => context.pop(notifier.buildRequest()),
+          onNext: () async {
+            /// дебаунс при отсутсвии измений - просто закрытие
+            if (mode == TransactionEditMode.edit && !notifier.hasChanges) {
+              if (context.mounted) context.pop();
+              return;
+            }
+
+            /// валидация формы
+            final errors = notifier.validateForm();
+            if (errors.isNotEmpty) {
+              await _showValidationDialog(context, errors);
+              return;
+            }
+
+            /// создание сущности и возврат ее на прошлый экран, если все успешно
+            final request = notifier.buildRequest();
+            if (request != null && context.mounted) {
+              context.pop(request);
+            }
+          },
           showBackButton: true,
         ),
         Expanded(
-          child: Consumer<TransactionEditNotifier>(
+          child: Consumer<TransactionNotifier>(
             builder: (context, notifier, _) {
               return ListView(
                 children: [
@@ -131,7 +124,7 @@ class TransactionEditModal extends StatelessWidget {
                   ),
                   _CategoryField(
                     categoryId: notifier.categoryId,
-                    isIncome: notifier._originalTransaction.category.isIncome,
+                    isIncome: notifier.isIncome,
                     onChanged: notifier.updateCategory,
                   ),
                   _AmountField(
@@ -160,6 +153,7 @@ class TransactionEditModal extends StatelessWidget {
   }
 }
 
+/// Раздел редактирования даты
 class _DateField extends StatelessWidget {
   final DateTime date;
   final ValueChanged<DateTime> onChanged;
@@ -217,6 +211,7 @@ class _DateField extends StatelessWidget {
   }
 }
 
+/// Раздел редактирования времени
 class _TimeField extends StatelessWidget {
   final DateTime time;
   final ValueChanged<DateTime> onChanged;
@@ -272,9 +267,10 @@ class _TimeField extends StatelessWidget {
   }
 }
 
+/// Раздел выбора счета
 class _AccountField extends StatelessWidget {
-  final int accountId;
-  final ValueChanged<int> onChanged;
+  final int? accountId;
+  final ValueChanged<int?> onChanged;
 
   const _AccountField({required this.accountId, required this.onChanged});
 
@@ -288,29 +284,17 @@ class _AccountField extends StatelessWidget {
             case AccountLoadedState():
               final accounts = state.accounts;
 
-              return DropdownButton<int>(
+              return DropdownButton<int?>(
                 alignment: Alignment.centerRight,
                 value: accountId,
-                items: accounts.map((account) {
-                  return DropdownMenuItem<int>(
-                    value: account.id,
-                    child: Text(
-                      account.name,
-                      style: context.texts.bodyLarge_.copyWith(
-                        color: context.colors.onSurfaceText,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) onChanged(value);
-                },
-                isExpanded: true,
-                underline: Container(),
-                selectedItemBuilder: (context) {
-                  return accounts.map((account) {
-                    return Align(
-                      alignment: Alignment.centerRight,
+                items: [
+                  const DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text('Выберите счет'),
+                  ),
+                  ...accounts.map((account) {
+                    return DropdownMenuItem<int?>(
+                      value: account.id,
                       child: Text(
                         account.name,
                         style: context.texts.bodyLarge_.copyWith(
@@ -318,7 +302,34 @@ class _AccountField extends StatelessWidget {
                         ),
                       ),
                     );
-                  }).toList();
+                  }),
+                ],
+                onChanged: onChanged,
+                isExpanded: true,
+                underline: Container(),
+                selectedItemBuilder: (context) {
+                  return [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Выберите счет',
+                        style: context.texts.bodyLarge_.copyWith(
+                          color: context.colors.onSurfaceText,
+                        ),
+                      ),
+                    ),
+                    ...accounts.map((account) {
+                      return Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          account.name,
+                          style: context.texts.bodyLarge_.copyWith(
+                            color: context.colors.onSurfaceText,
+                          ),
+                        ),
+                      );
+                    }),
+                  ];
                 },
               );
 
@@ -343,10 +354,11 @@ class _AccountField extends StatelessWidget {
   }
 }
 
+/// Раздел выбора категории
 class _CategoryField extends StatelessWidget {
-  final int categoryId;
-  final bool isIncome;
-  final ValueChanged<int> onChanged;
+  final int? categoryId;
+  final bool? isIncome;
+  final ValueChanged<int?> onChanged;
 
   const _CategoryField({
     required this.categoryId,
@@ -362,33 +374,30 @@ class _CategoryField extends StatelessWidget {
         builder: (context, state) {
           switch (state) {
             case CategoriesLoadedState():
-              final categories = isIncome
+              if (isIncome == null) {
+                return Text(
+                  'Сначала выберите тип транзакции',
+                  style: context.texts.bodyLarge_.copyWith(
+                    color: context.colors.onSurfaceText,
+                  ),
+                );
+              }
+
+              final categories = isIncome!
                   ? state.incomeCategories
                   : state.expenseCategories;
 
-              return DropdownButton<int>(
+              return DropdownButton<int?>(
                 alignment: Alignment.centerRight,
                 value: categoryId,
-                items: categories.map((category) {
-                  return DropdownMenuItem<int>(
-                    value: category.id,
-                    child: Text(
-                      category.name,
-                      style: context.texts.bodyLarge_.copyWith(
-                        color: context.colors.onSurfaceText,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) onChanged(value);
-                },
-                isExpanded: true,
-                underline: Container(),
-                selectedItemBuilder: (context) {
-                  return categories.map((category) {
-                    return Align(
-                      alignment: Alignment.centerRight,
+                items: [
+                  const DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text('Выберите категорию'),
+                  ),
+                  ...categories.map((category) {
+                    return DropdownMenuItem<int?>(
+                      value: category.id,
                       child: Text(
                         category.name,
                         style: context.texts.bodyLarge_.copyWith(
@@ -396,7 +405,34 @@ class _CategoryField extends StatelessWidget {
                         ),
                       ),
                     );
-                  }).toList();
+                  }),
+                ],
+                onChanged: onChanged,
+                isExpanded: true,
+                underline: Container(),
+                selectedItemBuilder: (context) {
+                  return [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Выберите категорию',
+                        style: context.texts.bodyLarge_.copyWith(
+                          color: context.colors.onSurfaceText,
+                        ),
+                      ),
+                    ),
+                    ...categories.map((category) {
+                      return Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          category.name,
+                          style: context.texts.bodyLarge_.copyWith(
+                            color: context.colors.onSurfaceText,
+                          ),
+                        ),
+                      );
+                    }),
+                  ];
                 },
               );
 
@@ -421,6 +457,7 @@ class _CategoryField extends StatelessWidget {
   }
 }
 
+/// Раздел редактирования даты
 class _AmountField extends StatelessWidget {
   final String amount;
   final ValueChanged<String> onChanged;
@@ -453,6 +490,7 @@ class _AmountField extends StatelessWidget {
   }
 }
 
+/// Раздел редактирования комментария
 class _CommentField extends StatelessWidget {
   final String? comment;
   final ValueChanged<String?> onChanged;
@@ -479,6 +517,7 @@ class _CommentField extends StatelessWidget {
   }
 }
 
+/// Виджет-обертка для одинакового стиля всех разделов
 class _FieldWrapper extends StatelessWidget {
   final String? label;
   final Widget child;
