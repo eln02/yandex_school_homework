@@ -7,10 +7,12 @@ import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/analysis_extension.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/date_filter_bar.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/componenets/diagram.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/total_amount_header.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/state/date_range_notifier.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
@@ -129,7 +131,7 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
   }
 }
 
-class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
+class _TransactionsAnalysisSuccessScreen extends StatefulWidget {
   const _TransactionsAnalysisSuccessScreen({
     required this.isIncome,
     required this.state,
@@ -141,17 +143,35 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
   final Future<void> Function() onRefresh;
 
   @override
+  State<_TransactionsAnalysisSuccessScreen> createState() =>
+      _TransactionsAnalysisSuccessScreenState();
+}
+
+class _TransactionsAnalysisSuccessScreenState
+    extends State<_TransactionsAnalysisSuccessScreen> {
+  List<CategoryAnalysisEntity> _previousCategories = [];
+
+  @override
+  void didUpdateWidget(covariant _TransactionsAnalysisSuccessScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Всегда сохраняем предыдущее состояние категорий
+    _previousCategories = oldWidget.isIncome
+        ? oldWidget.state.incomeCategoryList
+        : oldWidget.state.expenseCategoryList;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final categories = isIncome
-        ? state.incomeCategoryList
-        : state.expenseCategoryList;
+    final currentCategories = widget.isIncome
+        ? widget.state.incomeCategoryList
+        : widget.state.expenseCategoryList;
 
     return Scaffold(
       appBar: CustomAppBar(
         color: context.colors.mainBackground,
-        title: 'Анализ ${isIncome ? 'доходов' : 'расходов'}',
+        title: 'Анализ ${widget.isIncome ? 'доходов' : 'расходов'}',
         showBackButton: true,
-        extraHeight: 56 * 3,
+        extraHeight: 56 * 3 + 250,
         children: [
           Consumer<DateRangeNotifier>(
             builder: (context, notifier, _) => DateFilterBar(
@@ -159,32 +179,40 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
               endDate: notifier.endDate,
               onDatesChanged: (start, end) {
                 notifier.updateDateRange(startDate: start, endDate: end);
-                onRefresh();
+                widget.onRefresh();
               },
               color: context.colors.mainBackground,
               wrapData: true,
             ),
           ),
           TotalAmountBar(
-            totalAmount: isIncome ? state.incomesSum : state.expensesSum,
-            currency: state.currency,
+            totalAmount: widget.isIncome
+                ? widget.state.incomesSum
+                : widget.state.expensesSum,
+            currency: widget.state.currency,
             title: 'Сумма',
             color: context.colors.mainBackground,
             isLast: false,
           ),
+          SizedBox(
+            height: 250,
+            child: AnimatedPieChartSwitcher(
+              oldData: _previousCategories,
+              newData: currentCategories,
+            ),
+          ),
         ],
       ),
       body: ListView.separated(
-        itemCount: categories.length,
+        itemCount: currentCategories.length,
         separatorBuilder: (_, __) =>
             Divider(height: 1, color: context.colors.transactionsDivider),
         itemBuilder: (context, index) {
-          final category = categories[index];
-
+          final category = currentCategories[index];
           return GestureDetector(
             onTap: () {
               context.pushNamed(
-                isIncome
+                widget.isIncome
                     ? AppRouter.categoryTransactionsFromIncomes
                     : AppRouter.categoryTransactionsFromExpenses,
                 extra: {'category': category},
@@ -195,7 +223,6 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               color: context.colors.mainBackground,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(category.emoji, style: context.texts.emoji),
                   const SizedBox(width: 16),
@@ -222,7 +249,7 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
                     children: [
                       Text('${category.percent.toStringAsFixed(0)}%'),
                       Text(
-                        '${category.amount.toStringAsFixed(0)} ${state.currency}',
+                        '${category.amount.toStringAsFixed(0)} ${widget.state.currency}',
                       ),
                     ],
                   ),
@@ -241,3 +268,4 @@ class _TransactionsAnalysisSuccessScreen extends StatelessWidget {
     );
   }
 }
+

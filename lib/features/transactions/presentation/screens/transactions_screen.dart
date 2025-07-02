@@ -93,20 +93,6 @@ class _TransactionsSuccessScreen extends StatelessWidget {
   final TransactionsLoadedState state;
   final Future<void> Function() onRefresh;
 
-  /*/// Временный метод для создания сгенерированной
-  void _addTransaction(BuildContext context) async {
-    final transaction = TransactionRequestEntity(
-      accountId: 140,
-      categoryId: isIncome
-          ? [1, 2, 4, 5][Random().nextInt(4)]
-          : [10, 7, 8, 9][Random().nextInt(4)],
-      amount: (Random().nextDouble() * 1000).toStringAsFixed(2),
-      transactionDate: DateTime.now().toUtc(),
-      comment: 'Транзакция ${UniqueKey()}',
-    );
-    context.read<TransactionCubit>().createTransaction(transaction);
-  }*/
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<TransactionCubit, TransactionState>(
