@@ -7,7 +7,7 @@ extension TransactionRequestDtoMapper on TransactionRequestDto {
       accountId: entity.accountId,
       categoryId: entity.categoryId,
       amount: entity.amount,
-      transactionDate: '${entity.transactionDate.toIso8601String()}Z',
+      transactionDate: entity.transactionDate.toUtc(),
       comment: entity.comment,
     );
   }

@@ -9,22 +9,14 @@ class AccountCubit extends Cubit<AccountState> {
 
   final IAccountsRepository repository;
 
-  /// Метод получения аккаунта
+  /// Метод получения аккаунтов
   Future<void> fetchAccount() async {
     emit(const AccountLoadingState());
 
     try {
       final accounts = await repository.fetchAccounts();
 
-      // TODO: переделать логику, если появится функционал выбора счета
-      // пока по дефолту берется первый счет
-      final account = accounts.firstOrNull;
-
-      if (account == null) {
-        throw StateError('Нет счета');
-      }
-
-      emit(AccountLoadedState(account: account));
+      emit(AccountLoadedState(accounts: accounts));
     } on Object catch (error, stackTrace) {
       emit(
         AccountErrorState(
@@ -60,7 +52,11 @@ class AccountCubit extends Cubit<AccountState> {
           account: accountRequest,
         );
 
-        emit(AccountLoadedState(account: updatedAccount));
+        final updatedAccounts = currentState.accounts.map((account) {
+          return account.id == updatedAccount.id ? updatedAccount : account;
+        }).toList();
+
+        emit(AccountLoadedState(accounts: updatedAccounts));
       } on Object catch (error, stackTrace) {
         emit(
           AccountErrorState(
@@ -68,6 +64,7 @@ class AccountCubit extends Cubit<AccountState> {
             errorMessage: "Не удалось обновить счет",
           ),
         );
+        emit(currentState);
       }
     }
   }

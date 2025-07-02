@@ -30,15 +30,23 @@ class TransactionSuccessState extends TransactionState {
   List<Object?> get props => [transaction];
 }
 
+/// Состояние после успешного редактирования транзакции
+class TransactionUpdateState extends TransactionState {
+  final TransactionResponseEntity transaction;
+
+  /// транзакция
+  const TransactionUpdateState({required this.transaction});
+
+  @override
+  List<Object?> get props => [transaction];
+}
+
 /// Состояние ошибки отправки транзакции
 class TransactionFailure extends TransactionState {
   final dynamic error;
   final StackTrace stackTrace;
 
-  const TransactionFailure({
-    required this.error,
-    required this.stackTrace,
-  });
+  const TransactionFailure({required this.error, required this.stackTrace});
 
   @override
   List<Object?> get props => [error, stackTrace];

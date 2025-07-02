@@ -74,7 +74,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
 
   /// Метод определения поворота экрана и тряски
   void _handleAccelerometer(AccelerometerEvent event) {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
 
     // Проверка debounce
     if (_lastShakeTime != null &&

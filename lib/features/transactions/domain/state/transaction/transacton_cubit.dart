@@ -20,4 +20,22 @@ class TransactionCubit extends Cubit<TransactionState> {
       emit(TransactionFailure(error: error, stackTrace: stackTrace));
     }
   }
+
+  /// Метод редактирования транзакции
+  Future<void> updateTransaction({
+    required TransactionRequestEntity transaction,
+    required int transactionId,
+  }) async {
+    emit(const TransactionLoadingState());
+
+    try {
+      final newTransaction = await repository.updateTransaction(
+        transaction: transaction,
+        id: transactionId,
+      );
+      emit(TransactionUpdateState(transaction: newTransaction));
+    } catch (error, stackTrace) {
+      emit(TransactionFailure(error: error, stackTrace: stackTrace));
+    }
+  }
 }

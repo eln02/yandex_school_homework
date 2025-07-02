@@ -13,7 +13,7 @@ class DateRangeNotifier extends ChangeNotifier {
 
   /// Фабричный конструктор для последнего месяца
   factory DateRangeNotifier.lastMonth() {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
     final lastMonth = DateTime(now.year, now.month - 1, now.day);
     return DateRangeNotifier(startDate: lastMonth, endDate: now);
   }

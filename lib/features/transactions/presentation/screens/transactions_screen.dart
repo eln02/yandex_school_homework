@@ -16,6 +16,7 @@ import 'package:yandex_school_homework/features/transactions/domain/state/transa
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/total_amount_header.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_list.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/screens/transaction_modal_screen.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 /// Экран с доходами/расходами
@@ -50,7 +51,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   /// Метод получения транзакций
   Future<void> _fetchTransactions() async {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
     final formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
     context.read<TransactionsCubit>().fetchTransactions(
@@ -104,7 +105,7 @@ class _TransactionsSuccessScreen extends StatelessWidget {
           ? [1, 2, 4, 5][Random().nextInt(4)]
           : [10, 7, 8, 9][Random().nextInt(4)],
       amount: (Random().nextDouble() * 1000).toStringAsFixed(2),
-      transactionDate: DateTime.now(),
+      transactionDate: DateTime.now().toUtc(),
       comment: 'Транзакция ${UniqueKey()}',
     );
     context.read<TransactionCubit>().createTransaction(transaction);
@@ -151,6 +152,18 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   ? state.sortedIncomes(SortingType.dateNewestFirst)
                   : state.sortedExpenses(SortingType.dateNewestFirst),
               onRefresh: onRefresh,
+              onTapTransaction: (transaction) async {
+                final updatedTransaction = await showTransactionEditModal(
+                  context: context,
+                  transaction: transaction,
+                );
+                if (updatedTransaction != null && context.mounted) {
+                  context.read<TransactionCubit>().updateTransaction(
+                    transaction: updatedTransaction,
+                    transactionId: transaction.id,
+                  );
+                }
+              },
             ),
             _FloatingButton(onTap: () => _addTransaction(context)),
           ],

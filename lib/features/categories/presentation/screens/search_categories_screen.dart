@@ -11,21 +11,7 @@ import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart'
 
 /// Экран поиска категорий
 class SearchCategoriesScreen extends StatelessWidget {
-  const SearchCategoriesScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          CategoriesCubit(context.di.repositories.categoriesRepository)
-            ..fetchCategories(),
-      child: _SearchCategoriesView(),
-    );
-  }
-}
-
-class _SearchCategoriesView extends StatelessWidget {
-  _SearchCategoriesView();
+  SearchCategoriesScreen({super.key});
 
   /// ValueNotifier для поискового запроса
   final ValueNotifier<String> queryNotifier = ValueNotifier('');

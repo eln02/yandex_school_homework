@@ -26,7 +26,7 @@ mixin _$TransactionRequestDto {
   int get accountId => throw _privateConstructorUsedError;
   int get categoryId => throw _privateConstructorUsedError;
   String get amount => throw _privateConstructorUsedError;
-  String get transactionDate => throw _privateConstructorUsedError;
+  DateTime get transactionDate => throw _privateConstructorUsedError;
   String? get comment => throw _privateConstructorUsedError;
 
   /// Serializes this TransactionRequestDto to a JSON map.
@@ -50,7 +50,7 @@ abstract class $TransactionRequestDtoCopyWith<$Res> {
     int accountId,
     int categoryId,
     String amount,
-    String transactionDate,
+    DateTime transactionDate,
     String? comment,
   });
 }
@@ -96,7 +96,7 @@ class _$TransactionRequestDtoCopyWithImpl<
             transactionDate: null == transactionDate
                 ? _value.transactionDate
                 : transactionDate // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as DateTime,
             comment: freezed == comment
                 ? _value.comment
                 : comment // ignore: cast_nullable_to_non_nullable
@@ -120,7 +120,7 @@ abstract class _$$TransactionRequestDtoImplCopyWith<$Res>
     int accountId,
     int categoryId,
     String amount,
-    String transactionDate,
+    DateTime transactionDate,
     String? comment,
   });
 }
@@ -163,7 +163,7 @@ class __$$TransactionRequestDtoImplCopyWithImpl<$Res>
         transactionDate: null == transactionDate
             ? _value.transactionDate
             : transactionDate // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as DateTime,
         comment: freezed == comment
             ? _value.comment
             : comment // ignore: cast_nullable_to_non_nullable
@@ -194,7 +194,7 @@ class _$TransactionRequestDtoImpl implements _TransactionRequestDto {
   @override
   final String amount;
   @override
-  final String transactionDate;
+  final DateTime transactionDate;
   @override
   final String? comment;
 
@@ -252,7 +252,7 @@ abstract class _TransactionRequestDto implements TransactionRequestDto {
     required final int accountId,
     required final int categoryId,
     required final String amount,
-    required final String transactionDate,
+    required final DateTime transactionDate,
     final String? comment,
   }) = _$TransactionRequestDtoImpl;
 
@@ -266,7 +266,7 @@ abstract class _TransactionRequestDto implements TransactionRequestDto {
   @override
   String get amount;
   @override
-  String get transactionDate;
+  DateTime get transactionDate;
   @override
   String? get comment;
 

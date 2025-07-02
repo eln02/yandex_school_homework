@@ -33,7 +33,7 @@ class DateFilterBar extends StatelessWidget {
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().toUtc(),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(

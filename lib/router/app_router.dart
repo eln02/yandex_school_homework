@@ -166,8 +166,7 @@ class AppRouter {
                     GoRoute(
                       path: 'search_categories',
                       name: searchCategories,
-                      builder: (context, state) =>
-                          const SearchCategoriesScreen(),
+                      builder: (context, state) => SearchCategoriesScreen(),
                     ),
                   ],
                 ),
