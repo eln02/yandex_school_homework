@@ -81,7 +81,7 @@ class AppRunner {
     required TimerRunner timerRunner,
   }) async {
     final diContainer = DiContainer(dService: debugService);
-    await diContainer.init(
+    final initFuture = diContainer.init(
       onProgress: (name) => timerRunner.logOnProgress(name),
       onComplete: (name) {
         timerRunner
@@ -91,6 +91,15 @@ class AppRunner {
       onError: (message, error, [stackTrace]) =>
           debugService.logError(message, error: error, stackTrace: stackTrace),
     );
+
+    /// Запускает инициализацию зависимостей параллельно с задержкой 2200 мс
+    /// - Ждёт минимум 2200 мс - минимальное время показа гифки в сплеше
+    /// - Если инициализация дольше - ждёт её завершения
+    await Future.wait([
+      initFuture,
+      Future.delayed(const Duration(milliseconds: 2200)),
+    ], eagerError: true);
+
     return diContainer;
   }
 }

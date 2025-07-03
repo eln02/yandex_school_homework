@@ -48,6 +48,7 @@ flutter:
 
   assets:
     - assets/icons/
+    - assets/gifs/
 
 flutter_gen:
   output: lib/gen/
