@@ -14,13 +14,20 @@ class TotalAmountBar extends StatelessWidget {
     this.isLast = true,
   });
 
-  final String totalAmount;
-  final String currency;
+  /// конструктор для отображения раздела, пока сумма еще не загурзилась
+  const TotalAmountBar.loading({
+    super.key,
+    required this.title,
+    this.color,
+    this.isLast = true,
+  }) : totalAmount = null,
+       currency = null;
+
+  final String? totalAmount;
+  final String? currency;
   final String title;
   final Color? color;
   final bool isLast;
-
-  double get height => 56.0;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +36,14 @@ class TotalAmountBar extends StatelessWidget {
       isLast: isLast,
       children: [
         Text(title, style: context.texts.bodyLarge_),
-        Text('$totalAmount $currency', style: context.texts.bodyLarge_),
+        if (totalAmount != null && currency != null)
+          Text('$totalAmount $currency', style: context.texts.bodyLarge_)
+        else
+          const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
       ],
     );
   }

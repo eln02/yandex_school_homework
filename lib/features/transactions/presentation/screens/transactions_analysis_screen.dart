@@ -91,6 +91,9 @@ class _TransactionsAnalysisView extends StatefulWidget {
 }
 
 class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
+  List<CategoryAnalysisEntity> _currentCategories = [];
+  List<CategoryAnalysisEntity> _previousCategories = [];
+
   @override
   void initState() {
     super.initState();
@@ -102,7 +105,7 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
     final dateNotifier = context.read<DateRangeNotifier>();
     context.read<TransactionsCubit>().fetchTransactions(
       // TODO: размокать accountId
-      accountId: 1,
+      accountId: 140,
       startDate: dateNotifier.apiFormattedStartDate,
       endDate: dateNotifier.apiFormattedEndDate,
     );
@@ -110,68 +113,13 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TransactionsCubit, TransactionsState>(
-      builder: (context, state) {
-        return switch (state) {
-          TransactionsLoadingState() => const Center(
-            child: CircularProgressIndicator(),
-          ),
-          TransactionsErrorState() => AppErrorScreen(
-            errorMessage: state.errorMessage,
-            onError: _fetchTransactions,
-          ),
-          TransactionsLoadedState() => _TransactionsAnalysisSuccessScreen(
-            isIncome: widget.isIncome,
-            state: state,
-            onRefresh: _fetchTransactions,
-          ),
-        };
-      },
-    );
-  }
-}
-
-class _TransactionsAnalysisSuccessScreen extends StatefulWidget {
-  const _TransactionsAnalysisSuccessScreen({
-    required this.isIncome,
-    required this.state,
-    required this.onRefresh,
-  });
-
-  final bool isIncome;
-  final TransactionsLoadedState state;
-  final Future<void> Function() onRefresh;
-
-  @override
-  State<_TransactionsAnalysisSuccessScreen> createState() =>
-      _TransactionsAnalysisSuccessScreenState();
-}
-
-class _TransactionsAnalysisSuccessScreenState
-    extends State<_TransactionsAnalysisSuccessScreen> {
-  List<CategoryAnalysisEntity> _previousCategories = [];
-
-  @override
-  void didUpdateWidget(covariant _TransactionsAnalysisSuccessScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Всегда сохраняем предыдущее состояние категорий
-    _previousCategories = oldWidget.isIncome
-        ? oldWidget.state.incomeCategoryList
-        : oldWidget.state.expenseCategoryList;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentCategories = widget.isIncome
-        ? widget.state.incomeCategoryList
-        : widget.state.expenseCategoryList;
-
+    final diagramContainerSize = 190 * 906 / MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: CustomAppBar(
         color: context.colors.mainBackground,
         title: 'Анализ ${widget.isIncome ? 'доходов' : 'расходов'}',
         showBackButton: true,
-        extraHeight: 56 * 3 + 250,
+        extraHeight: 56 * 3 + diagramContainerSize,
         children: [
           Consumer<DateRangeNotifier>(
             builder: (context, notifier, _) => DateFilterBar(
@@ -179,93 +127,193 @@ class _TransactionsAnalysisSuccessScreenState
               endDate: notifier.endDate,
               onDatesChanged: (start, end) {
                 notifier.updateDateRange(startDate: start, endDate: end);
-                widget.onRefresh();
+                _fetchTransactions();
               },
               color: context.colors.mainBackground,
               wrapData: true,
             ),
           ),
-          TotalAmountBar(
-            totalAmount: widget.isIncome
-                ? widget.state.incomesSum
-                : widget.state.expensesSum,
-            currency: widget.state.currency,
-            title: 'Сумма',
-            color: context.colors.mainBackground,
-            isLast: false,
+          BlocBuilder<TransactionsCubit, TransactionsState>(
+            builder: (context, state) {
+              return switch (state) {
+                TransactionsLoadingState() => TotalAmountBar.loading(
+                  title: 'Сумма',
+                  isLast: false,
+                  color: context.colors.mainBackground,
+                ),
+                TransactionsLoadedState() => TotalAmountBar(
+                  totalAmount: widget.isIncome
+                      ? state.incomesSum
+                      : state.expensesSum,
+                  currency: state.currency,
+                  title: 'Сумма',
+                  color: context.colors.mainBackground,
+                  isLast: false,
+                ),
+                TransactionsErrorState() => TotalAmountBar(
+                  totalAmount: 'Ошибка',
+                  currency: null,
+                  title: 'Сумма',
+                  color: context.colors.mainBackground,
+                  isLast: false,
+                ),
+              };
+            },
           ),
-          SizedBox(
-            height: 250,
-            child: AnimatedPieChartSwitcher(
-              oldData: _previousCategories,
-              newData: currentCategories,
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            height: diagramContainerSize,
+            child: BlocConsumer<TransactionsCubit, TransactionsState>(
+              listener: (context, state) {
+                if (state is TransactionsLoadedState) {
+                  final newCategories = widget.isIncome
+                      ? state.incomeCategoryList
+                      : state.expenseCategoryList;
+
+                  if (_currentCategories != newCategories) {
+                    setState(() {
+                      _previousCategories = _currentCategories;
+                      _currentCategories = newCategories;
+                    });
+                  }
+                }
+              },
+              builder: (context, state) {
+                return switch (state) {
+                  TransactionsLoadingState() when _currentCategories.isEmpty =>
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(
+                        height: diagramContainerSize,
+                        padding: const EdgeInsets.all(4),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox.expand(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 8,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                            const Text('Загрузка графика'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  TransactionsErrorState() when _currentCategories.isEmpty =>
+                    Center(
+                      child: Text(
+                        state.errorMessage,
+                        style: context.texts.bodyMedium_,
+                      ),
+                    ),
+                  _ => AnimatedPieChartSwitcher(
+                    oldData: _previousCategories,
+                    newData: _currentCategories,
+                    animate:
+                        state is TransactionsLoadedState &&
+                        _previousCategories.isNotEmpty,
+                  ),
+                };
+              },
             ),
           ),
         ],
       ),
-      body: ListView.separated(
-        itemCount: currentCategories.length,
-        separatorBuilder: (_, __) =>
-            Divider(height: 1, color: context.colors.transactionsDivider),
-        itemBuilder: (context, index) {
-          final category = currentCategories[index];
-          return GestureDetector(
-            onTap: () {
-              context.pushNamed(
-                widget.isIncome
-                    ? AppRouter.categoryTransactionsFromIncomes
-                    : AppRouter.categoryTransactionsFromExpenses,
-                extra: {'category': category},
-              );
-            },
-            child: Container(
-              height: 70,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              color: context.colors.mainBackground,
-              child: Row(
-                children: [
-                  Text(category.emoji, style: context.texts.emoji),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(category.name, style: context.texts.bodyLarge_),
-                        if (category.lastComment != null)
-                          Text(
-                            category.lastComment!,
-                            style: context.texts.bodyMedium_.copyWith(
-                              color: context.colors.onSurface_,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text('${category.percent.toStringAsFixed(0)}%'),
-                      Text(
-                        '${category.amount.toStringAsFixed(0)} ${widget.state.currency}',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 14,
-                    color: context.colors.labelsTertiary,
-                  ),
-                ],
-              ),
+      body: BlocBuilder<TransactionsCubit, TransactionsState>(
+        builder: (context, state) {
+          return switch (state) {
+            TransactionsLoadingState() => const Center(
+              child: CircularProgressIndicator(),
             ),
-          );
+            TransactionsErrorState() => AppErrorScreen(
+              errorMessage: state.errorMessage,
+              onError: _fetchTransactions,
+            ),
+            TransactionsLoadedState() => _CategoryList(
+              isIncome: widget.isIncome,
+              categories: _currentCategories,
+              currency: state.currency,
+            ),
+          };
         },
       ),
     );
   }
 }
 
+class _CategoryList extends StatelessWidget {
+  const _CategoryList({
+    required this.isIncome,
+    required this.categories,
+    required this.currency,
+  });
+
+  final bool isIncome;
+  final List<CategoryAnalysisEntity> categories;
+  final String currency;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: categories.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: 1, color: context.colors.transactionsDivider),
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        return GestureDetector(
+          onTap: () {
+            context.pushNamed(
+              isIncome
+                  ? AppRouter.categoryTransactionsFromIncomes
+                  : AppRouter.categoryTransactionsFromExpenses,
+              extra: {'category': category},
+            );
+          },
+          child: Container(
+            height: 70,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            color: context.colors.mainBackground,
+            child: Row(
+              children: [
+                Text(category.emoji, style: context.texts.emoji),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(category.name, style: context.texts.bodyLarge_),
+                      if (category.lastComment != null)
+                        Text(
+                          category.lastComment!,
+                          style: context.texts.bodyMedium_.copyWith(
+                            color: context.colors.onSurface_,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${category.percent.toStringAsFixed(0)}%'),
+                    Text('${category.amount.toStringAsFixed(0)} $currency'),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: context.colors.labelsTertiary,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

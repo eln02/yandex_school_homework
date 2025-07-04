@@ -1,41 +1,66 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
 
 class PieChartSample extends StatelessWidget {
   final List<CategoryAnalysisEntity> categories;
 
+  const PieChartSample({
+    super.key,
+    required this.categories,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final topCategories = categories.sublist(0)
+      ..sort((a, b) => b.percent.compareTo(a.percent));
+    final displayedCategories = topCategories.take(3).toList();
+
     final chart = PieChart(
-      PieChartData(
-        sectionsSpace: 0,
-        centerSpaceRadius:
-        (130 - 8) / 2 * MediaQuery.of(context).size.width / 412,
-        sections: _buildSections(),
-      ),
+      PieChartData(sectionsSpace: 0, sections: _buildSections()),
     );
 
     return Stack(
       alignment: Alignment.center,
       children: [
         chart,
-        // 👇 Центр круга — сюда можно что угодно
-        const Column(
+        Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Всего',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            SizedBox(height: 4),
-            Text(
-              '12 000 ₽',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            ...displayedCategories.map((category) {
+              final originalIndex = categories.indexWhere(
+                (c) => c.id == category.id,
+              );
+              final color = originalIndex != -1
+                  ? sectionColors[originalIndex % sectionColors.length]
+                  : Colors.grey;
+
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${category.percent.toStringAsFixed(1)}% ${category.name}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: context.colors.onSurface,
+                    ),
+                  ),
+                ],
+              );
+            }),
           ],
         ),
       ],
@@ -43,25 +68,25 @@ class PieChartSample extends StatelessWidget {
   }
 
   final List<Color> sectionColors = const [
-    Colors.blue,
-    Colors.red,
-    Colors.green,
-    Colors.orange,
-    Colors.purple,
-    Colors.teal,
-    Colors.pink,
-    Colors.brown,
-    Colors.indigo,
-    Colors.cyan,
+    Color(0xFF6582B3),
+    Color(0xFF95F6B0),
+    Color(0xFF95E2F5),
+    Color(0xFFE4A3F8),
+    Color(0xFFF8DB8D),
+    Color(0xFFCDFA93),
+    Color(0xFF949DF1),
+    Color(0xFF6E99BC),
+    Color(0xFFB0AAF5),
+    Color(0xFFDDBBF6),
+    Color(0xFFF5C39A),
+    Color(0xFFFCF690),
+    Color(0xFFE087A0),
   ];
-
-  const PieChartSample({super.key, required this.categories});
 
   List<PieChartSectionData> _buildSections() {
     return categories.asMap().entries.map((entry) {
       final index = entry.key;
       final category = entry.value;
-
       final color = sectionColors[index % sectionColors.length];
 
       return PieChartSectionData(
@@ -74,20 +99,21 @@ class PieChartSample extends StatelessWidget {
   }
 }
 
-
-
 class AnimatedPieChartSwitcher extends StatefulWidget {
   final List<CategoryAnalysisEntity> oldData;
   final List<CategoryAnalysisEntity> newData;
+  final bool animate;
 
   const AnimatedPieChartSwitcher({
     super.key,
     required this.oldData,
     required this.newData,
+    required this.animate,
   });
 
   @override
-  State<AnimatedPieChartSwitcher> createState() => _AnimatedPieChartSwitcherState();
+  State<AnimatedPieChartSwitcher> createState() =>
+      _AnimatedPieChartSwitcherState();
 }
 
 class _AnimatedPieChartSwitcherState extends State<AnimatedPieChartSwitcher>
@@ -102,36 +128,49 @@ class _AnimatedPieChartSwitcherState extends State<AnimatedPieChartSwitcher>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
       vsync: this,
     );
 
-    _rotation = Tween<double>(begin: 0, end: 2 * pi).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.linear,
-    ));
+    _rotation = Tween<double>(
+      begin: 0,
+      end: 2 * pi,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-    ));
+    _fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
+    );
 
-    _fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
-    ));
+    _fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
+    if (widget.animate) {
+      _controller.forward();
+    }
 
     _controller.addListener(() {
       if (_controller.value >= 0.5 && _showOld) {
-        setState(() {
-          _showOld = false; // На 180° — переключаем контент
-        });
+        setState(() => _showOld = false);
       }
     });
+  }
 
-    _controller.forward(); // Запускаем анимацию сразу
+  @override
+  void didUpdateWidget(AnimatedPieChartSwitcher oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.animate && !oldWidget.animate) {
+      _showOld = true;
+      _controller.reset();
+      _controller.forward();
+    }
   }
 
   @override
@@ -143,7 +182,9 @@ class _AnimatedPieChartSwitcherState extends State<AnimatedPieChartSwitcher>
   Widget _buildChart(List<CategoryAnalysisEntity> categories, double opacity) {
     return Opacity(
       opacity: opacity,
-      child: PieChartSample(categories: categories),
+      child: PieChartSample(
+        categories: categories,
+      ),
     );
   }
 
@@ -157,10 +198,13 @@ class _AnimatedPieChartSwitcherState extends State<AnimatedPieChartSwitcher>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              if (_showOld)
-                _buildChart(widget.oldData, _fadeOut.value)
-              else
-                _buildChart(widget.newData, _fadeIn.value),
+              if (_showOld && widget.oldData.isNotEmpty)
+                _buildChart(widget.oldData, _fadeOut.value),
+              if (!_showOld || widget.oldData.isEmpty || !widget.animate)
+                _buildChart(
+                  widget.newData,
+                  widget.animate ? _fadeIn.value : 1.0,
+                ),
             ],
           ),
         );
