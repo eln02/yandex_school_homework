@@ -33,6 +33,7 @@ dependencies:
 
   pie_chart_package:
     path: ./local_libs/pie_chart_package
+  fl_chart: ^1.0.0
 
 dev_dependencies:
   flutter_test:
