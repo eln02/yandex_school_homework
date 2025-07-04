@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pie_chart_package/pie_chart_package.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
@@ -8,11 +9,11 @@ import 'package:yandex_school_homework/app/theme/texts_extension.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
+import 'package:yandex_school_homework/features/transactions/domain/entity/chart_mapper.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/analysis_extension.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/date_filter_bar.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/componenets/diagram.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/total_amount_header.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/state/date_range_notifier.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
@@ -181,24 +182,8 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
               builder: (context, state) {
                 return switch (state) {
                   TransactionsLoadingState() when _currentCategories.isEmpty =>
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: Container(
-                        height: diagramContainerSize,
-                        padding: const EdgeInsets.all(4),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox.expand(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 8,
-                                color: Colors.grey[300],
-                              ),
-                            ),
-                            const Text('Загрузка графика'),
-                          ],
-                        ),
-                      ),
+                    AnimatedPieChart.loading(
+                      diagramContainerSize: diagramContainerSize,
                     ),
                   TransactionsErrorState() when _currentCategories.isEmpty =>
                     Center(
@@ -207,9 +192,9 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
                         style: context.texts.bodyMedium_,
                       ),
                     ),
-                  _ => AnimatedPieChartSwitcher(
-                    oldData: _previousCategories,
-                    newData: _currentCategories,
+                  _ => AnimatedPieChart(
+                    oldData: _previousCategories.toPieChartData(),
+                    newData: _currentCategories.toPieChartData(),
                     animate:
                         state is TransactionsLoadedState &&
                         _previousCategories.isNotEmpty,
