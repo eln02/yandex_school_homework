@@ -165,11 +165,6 @@ class _CashFlowChartState extends State<CashFlowChart> {
     return Column(
       children: [
         const SizedBox(height: 8),
-        Text(
-          widget.isMonthly ? 'Анализ по месяцам' : 'Анализ по дням',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
         Expanded(
           child: BarChart(
             BarChartData(
