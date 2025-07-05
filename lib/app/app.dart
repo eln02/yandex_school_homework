@@ -6,6 +6,7 @@ import 'package:yandex_school_homework/app/depends_providers.dart';
 import 'package:yandex_school_homework/app/theme/app_theme.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
+import 'package:yandex_school_homework/features/common/ui/splash_screen.dart';
 import 'package:yandex_school_homework/features/error/error_screen.dart';
 
 class App extends StatefulWidget {
@@ -37,6 +38,7 @@ class _AppState extends State<App> {
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
+              return const SplashScreen();
             case ConnectionState.done:
               if (snapshot.hasError) {
                 return ErrorScreen(

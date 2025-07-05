@@ -29,6 +29,11 @@ dependencies:
   fuzzy: ^0.5.1
   sqflite: ^2.4.2
   path: ^1.9.1 # надо для sqflite
+  flutter_launcher_icons: ^0.14.4
+
+  pie_chart_package:
+    path: ./local_libs/pie_chart_package
+  fl_chart: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -47,8 +52,14 @@ flutter:
 
   assets:
     - assets/icons/
+    - assets/gifs/
 
 flutter_gen:
   output: lib/gen/
   integrations:
     flutter_svg: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"

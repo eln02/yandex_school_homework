@@ -16,6 +16,7 @@ import 'package:yandex_school_homework/features/accounts/presentation/components
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
 import 'package:yandex_school_homework/features/common/ui/parametres_bar_wrapper.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_diagram.dart';
 
 /// Экран счета
 class AccountScreen extends StatelessWidget {
@@ -74,7 +75,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
 
   /// Метод определения поворота экрана и тряски
   void _handleAccelerometer(AccelerometerEvent event) {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
 
     // Проверка debounce
     if (_lastShakeTime != null &&
@@ -191,6 +192,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
                 ),
               ],
             ),
+            const TransactionsDiagram(),
           ],
         ),
       ),

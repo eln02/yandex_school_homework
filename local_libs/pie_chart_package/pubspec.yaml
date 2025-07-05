@@ -1,0 +1,12 @@
+name: pie_chart_package
+description: Пакет с графиком
+version: 1.0.0
+
+environment:
+  sdk: ^3.8.0
+  flutter: ">=3.32.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fl_chart: ^1.0.0

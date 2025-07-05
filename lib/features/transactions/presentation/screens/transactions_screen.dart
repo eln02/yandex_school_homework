@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +6,6 @@ import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
-import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/sorting_enum.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transaction_state.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
@@ -16,6 +13,7 @@ import 'package:yandex_school_homework/features/transactions/domain/state/transa
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/total_amount_header.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_list.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/screens/transaction_modal_screen.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 /// Экран с доходами/расходами
@@ -50,7 +48,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   /// Метод получения транзакций
   Future<void> _fetchTransactions() async {
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
     final formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
     context.read<TransactionsCubit>().fetchTransactions(
@@ -95,37 +93,33 @@ class _TransactionsSuccessScreen extends StatelessWidget {
   final TransactionsLoadedState state;
   final Future<void> Function() onRefresh;
 
-  /// Временный метод для создания сгенерированной
-  // TODO: заменить на переход на экран создания транзакции
-  void _addTransaction(BuildContext context) async {
-    final transaction = TransactionRequestEntity(
-      accountId: 140,
-      categoryId: isIncome
-          ? [1, 2, 4, 5][Random().nextInt(4)]
-          : [10, 7, 8, 9][Random().nextInt(4)],
-      amount: (Random().nextDouble() * 1000).toStringAsFixed(2),
-      transactionDate: DateTime.now(),
-      comment: 'Транзакция ${UniqueKey()}',
-    );
-    context.read<TransactionCubit>().createTransaction(transaction);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TransactionCubit, TransactionState>(
+    return BlocListener<TransactionOperationCubit, TransactionOperationState>(
       listener: (context, state) {
-        if (state is TransactionSuccessState) {
-          if (isIncome == state.transaction.category.isIncome) {
-            context.read<TransactionsCubit>().addNewTransaction(
-              state.transaction,
-            );
-          }
-        }
+        switch (state) {
+          /// Добавление новой транзакции в список
+          case TransactionOperationSuccessState():
+            if (isIncome == state.transaction.category.isIncome) {
+              context.read<TransactionsCubit>().addNewTransaction(
+                state.transaction,
+              );
+            }
 
-        if (state is TransactionFailure) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+          /// Обновление транзакции в списке
+          case TransactionOperationUpdateState():
+            if (isIncome == state.transaction.category.isIncome) {
+              context.read<TransactionsCubit>().updateTransaction(
+                state.transaction,
+              );
+            }
+
+          case TransactionOperationFailure():
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+
+          default:
         }
       },
       child: Scaffold(
@@ -151,8 +145,32 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   ? state.sortedIncomes(SortingType.dateNewestFirst)
                   : state.sortedExpenses(SortingType.dateNewestFirst),
               onRefresh: onRefresh,
+              onTapTransaction: (transaction) async {
+                final updatedTransaction = await showTransactionEditModal(
+                  context: context,
+                  transaction: transaction,
+                );
+                if (updatedTransaction != null && context.mounted) {
+                  context.read<TransactionOperationCubit>().updateTransaction(
+                    transaction: updatedTransaction,
+                    transactionId: transaction.id,
+                  );
+                }
+              },
             ),
-            _FloatingButton(onTap: () => _addTransaction(context)),
+            _FloatingButton(
+              onTap: () async {
+                final newTransaction = await showTransactionEditModal(
+                  context: context,
+                  isIncome: isIncome,
+                );
+                if (newTransaction != null && context.mounted) {
+                  context.read<TransactionOperationCubit>().createTransaction(
+                    newTransaction,
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),

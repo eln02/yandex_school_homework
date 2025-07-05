@@ -47,4 +47,20 @@ class TransactionsCubit extends Cubit<TransactionsState> {
       );
     }
   }
+
+  /// Обновление транзакции
+  /// (чтобы не перезагружать весь список после обновления одной транзакции)
+  void updateTransaction(TransactionResponseEntity updatedTransaction) {
+    if (state is TransactionsLoadedState) {
+      final currentState = state as TransactionsLoadedState;
+
+      final updatedTransactions = currentState.transactions.map((transaction) {
+        return transaction.id == updatedTransaction.id
+            ? updatedTransaction
+            : transaction;
+      }).toList();
+
+      emit(TransactionsLoadedState(transactions: updatedTransactions));
+    }
+  }
 }

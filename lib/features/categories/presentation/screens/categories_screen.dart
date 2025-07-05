@@ -18,30 +18,6 @@ class CategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          CategoriesCubit(context.di.repositories.categoriesRepository),
-      child: const _CategoriesScreenView(),
-    );
-  }
-}
-
-class _CategoriesScreenView extends StatefulWidget {
-  const _CategoriesScreenView();
-
-  @override
-  State<_CategoriesScreenView> createState() => _CategoriesScreenViewState();
-}
-
-class _CategoriesScreenViewState extends State<_CategoriesScreenView> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<CategoriesCubit>().fetchCategories();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return BlocBuilder<CategoriesCubit, CategoriesState>(
       builder: (context, state) {
         return switch (state) {

@@ -2,40 +2,51 @@ import 'package:equatable/equatable.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 
 /// Состояние транзакции
-sealed class TransactionState extends Equatable {
-  const TransactionState();
+sealed class TransactionOperationState extends Equatable {
+  const TransactionOperationState();
 
   @override
   List<Object?> get props => [];
 }
 
 /// Начальное состояние транзакции
-class TransactionInitialState extends TransactionState {
-  const TransactionInitialState();
+class TransactionOperationInitialState extends TransactionOperationState {
+  const TransactionOperationInitialState();
 }
 
 /// Состояние загрузки отправки транзакции
-class TransactionLoadingState extends TransactionState {
-  const TransactionLoadingState();
+class TransactionOperationLoadingState extends TransactionOperationState {
+  const TransactionOperationLoadingState();
 }
 
 /// Состояние после успешной отправки транзакции
-class TransactionSuccessState extends TransactionState {
+class TransactionOperationSuccessState extends TransactionOperationState {
   final TransactionResponseEntity transaction;
 
   /// транзакция
-  const TransactionSuccessState({required this.transaction});
+  const TransactionOperationSuccessState({required this.transaction});
+
+  @override
+  List<Object?> get props => [transaction];
+}
+
+/// Состояние после успешного редактирования транзакции
+class TransactionOperationUpdateState extends TransactionOperationState {
+  final TransactionResponseEntity transaction;
+
+  /// транзакция
+  const TransactionOperationUpdateState({required this.transaction});
 
   @override
   List<Object?> get props => [transaction];
 }
 
 /// Состояние ошибки отправки транзакции
-class TransactionFailure extends TransactionState {
+class TransactionOperationFailure extends TransactionOperationState {
   final dynamic error;
   final StackTrace stackTrace;
 
-  const TransactionFailure({
+  const TransactionOperationFailure({
     required this.error,
     required this.stackTrace,
   });

@@ -22,6 +22,14 @@ final class CategoriesLoadedState extends CategoriesState {
   /// Категории
   final List<CategoryEntity> categories;
 
+  /// Категории доходов
+  List<CategoryEntity> get incomeCategories =>
+      categories.where((c) => c.isIncome).toList();
+
+  /// Категории расходов
+  List<CategoryEntity> get expenseCategories =>
+      categories.where((c) => !c.isIncome).toList();
+
   @override
   List<Object?> get props => [categories];
 }

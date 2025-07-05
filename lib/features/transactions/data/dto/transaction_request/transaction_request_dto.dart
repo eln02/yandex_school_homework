@@ -10,7 +10,7 @@ class TransactionRequestDto with _$TransactionRequestDto {
     required int accountId,
     required int categoryId,
     required String amount,
-    required String transactionDate,
+    required DateTime transactionDate,
     String? comment,
   }) = _TransactionRequestDto;
 

@@ -18,17 +18,27 @@ final class AccountLoadingState extends AccountState {
 
 /// Состояние успешной загрузки счета
 final class AccountLoadedState extends AccountState {
-  const AccountLoadedState({required this.account});
+  const AccountLoadedState({required this.accounts});
 
   /// Счет
-  final AccountEntity account;
+  final List<AccountEntity> accounts;
+
+  // TODO: переделать логику, если появится функционал выбора счета
+  /// Первый счет в качестве дефолтного
+  AccountEntity get account {
+    final firstAccount = accounts.firstOrNull;
+    if (firstAccount == null) {
+      throw StateError('Нет счета');
+    }
+    return firstAccount;
+  }
 
   /*/// Геттер id аккаунта
   @override
   int get accountId => account.id;*/
 
   @override
-  List<Object?> get props => [account];
+  List<Object?> get props => [accounts];
 }
 
 /// Состояние ошибки загрузки счета
