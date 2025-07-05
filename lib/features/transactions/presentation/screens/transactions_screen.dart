@@ -95,20 +95,31 @@ class _TransactionsSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TransactionCubit, TransactionState>(
+    return BlocListener<TransactionOperationCubit, TransactionOperationState>(
       listener: (context, state) {
-        if (state is TransactionSuccessState) {
-          if (isIncome == state.transaction.category.isIncome) {
-            context.read<TransactionsCubit>().addNewTransaction(
-              state.transaction,
-            );
-          }
-        }
+        switch (state) {
+          /// Добавление новой транзакции в список
+          case TransactionOperationSuccessState():
+            if (isIncome == state.transaction.category.isIncome) {
+              context.read<TransactionsCubit>().addNewTransaction(
+                state.transaction,
+              );
+            }
 
-        if (state is TransactionFailure) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+          /// Обновление транзакции в списке
+          case TransactionOperationUpdateState():
+            if (isIncome == state.transaction.category.isIncome) {
+              context.read<TransactionsCubit>().updateTransaction(
+                state.transaction,
+              );
+            }
+
+          case TransactionOperationFailure():
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+
+          default:
         }
       },
       child: Scaffold(
@@ -140,7 +151,7 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   transaction: transaction,
                 );
                 if (updatedTransaction != null && context.mounted) {
-                  context.read<TransactionCubit>().updateTransaction(
+                  context.read<TransactionOperationCubit>().updateTransaction(
                     transaction: updatedTransaction,
                     transactionId: transaction.id,
                   );
@@ -154,7 +165,7 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   isIncome: isIncome,
                 );
                 if (newTransaction != null && context.mounted) {
-                  context.read<TransactionCubit>().createTransaction(
+                  context.read<TransactionOperationCubit>().createTransaction(
                     newTransaction,
                   );
                 }

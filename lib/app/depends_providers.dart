@@ -45,7 +45,7 @@ final class DependsProviders extends StatelessWidget {
         BlocProvider(
           /// кубит для создания транзакции
           create: (_) =>
-              TransactionCubit(diContainer.repositories.transactionsRepository),
+              TransactionOperationCubit(diContainer.repositories.transactionsRepository),
         ),
       ],
       child: child,

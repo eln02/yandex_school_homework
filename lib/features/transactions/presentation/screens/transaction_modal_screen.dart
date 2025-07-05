@@ -288,9 +288,14 @@ class _AccountField extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 value: accountId,
                 items: [
-                  const DropdownMenuItem<int?>(
+                  DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Выберите счет'),
+                    child: Text(
+                      'Выберите счет',
+                      style: context.texts.bodyLarge_.copyWith(
+                        color: context.colors.onSurfaceText,
+                      ),
+                    ),
                   ),
                   ...accounts.map((account) {
                     return DropdownMenuItem<int?>(
@@ -391,9 +396,14 @@ class _CategoryField extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 value: categoryId,
                 items: [
-                  const DropdownMenuItem<int?>(
+                  DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Выберите категорию'),
+                    child: Text(
+                      'Выберите категорию',
+                      style: context.texts.bodyLarge_.copyWith(
+                        color: context.colors.onSurfaceText,
+                      ),
+                    ),
                   ),
                   ...categories.map((category) {
                     return DropdownMenuItem<int?>(
@@ -506,9 +516,10 @@ class _CommentField extends StatelessWidget {
         style: context.texts.bodyLarge_.copyWith(
           color: context.colors.onSurfaceText,
         ),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           border: InputBorder.none,
           hintText: 'Комментарий',
+          hintStyle: TextStyle(color: Colors.grey[400]),
           isDense: true,
           contentPadding: EdgeInsets.zero,
         ),
