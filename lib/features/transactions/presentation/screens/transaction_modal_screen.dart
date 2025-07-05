@@ -66,14 +66,28 @@ class TransactionEditModal extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Не все поля заполнены'),
+          title: Text(
+            'Не все поля заполнены',
+            style: context.texts.titleLarge_.copyWith(
+              color: context.colors.onSurfaceText,
+            ),
+          ),
+          backgroundColor: context.colors.mainBackground,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: errors.map((error) => Text('• $error')).toList(),
           ),
           actions: <Widget>[
-            TextButton(child: const Text('OK'), onPressed: () => context.pop()),
+            TextButton(
+              child: Text(
+                'OK',
+                style: context.texts.titleLarge_.copyWith(
+                  color: context.colors.financeGreen,
+                ),
+              ),
+              onPressed: () => context.pop(),
+            ),
           ],
         );
       },
