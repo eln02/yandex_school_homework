@@ -167,6 +167,7 @@ class _CashFlowChartState extends State<CashFlowChart> {
         const SizedBox(height: 8),
         Expanded(
           child: BarChart(
+            key: ValueKey(widget.isMonthly),
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
               maxY: _calculateMaxY(widget.data),
