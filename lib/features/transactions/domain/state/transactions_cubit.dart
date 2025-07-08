@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/repository/i_transactions_repository.dart';
@@ -26,6 +28,8 @@ class TransactionsCubit extends Cubit<TransactionsState> {
 
       emit(TransactionsLoadedState(transactions: transactions));
     } on Object catch (error, stackTrace) {
+      log(error.toString());
+      log(stackTrace.toString());
       emit(
         TransactionsErrorState(
           stackTrace,

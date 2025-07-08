@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yandex_school_homework/features/Accounts/domain/repository/i_Accounts_repository.dart';
+import 'package:yandex_school_homework/features/accounts/domain/repository/i_accounts_repository.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_update_request_entity.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_state.dart';
 

@@ -102,7 +102,9 @@ class AppRunner {
     /// - Если инициализация дольше - ждёт её завершения
     await Future.wait([
       initFuture,
-      Future.delayed(const Duration(milliseconds: 2200)),
+      // TODO: расскомментить время для показа сплеша
+      // лень смотреть на него каждый раз
+      //Future.delayed(const Duration(milliseconds: 2200)),
     ], eagerError: true);
 
     return diContainer;

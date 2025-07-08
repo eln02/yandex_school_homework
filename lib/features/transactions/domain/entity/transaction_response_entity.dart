@@ -23,6 +23,9 @@ class TransactionResponseEntity extends Equatable {
     required this.updatedAt,
   });
 
+  int get accountId => account.id;
+  int get categoryId => category.id;
+
   /// Форматированная сумма для ui
   String get formattedAmount => amount.toStringAsFixed(0);
 

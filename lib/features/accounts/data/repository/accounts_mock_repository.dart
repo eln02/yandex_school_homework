@@ -1,4 +1,4 @@
-import 'package:yandex_school_homework/features/Accounts/domain/repository/i_Accounts_repository.dart';
+import 'package:yandex_school_homework/features/accounts/domain/repository/i_accounts_repository.dart';
 import 'package:yandex_school_homework/features/accounts/data/dto/account/account_dto.dart';
 import 'package:yandex_school_homework/features/accounts/data/dto/account/account_dto_mapper.dart';
 import 'package:yandex_school_homework/features/accounts/data/mock_data/accounts_mock_data.dart';

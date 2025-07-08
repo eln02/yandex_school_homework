@@ -39,25 +39,28 @@ final class TransactionsLocalRepository implements ITransactionsRepository {
     return data;
   }
 
-  // TODO: добавить остальные методы
+  /// Метод удаления транзакции
   @override
-  Future<void> deleteTransactionById(int id) {
-    // TODO: implement deleteTransactionById
-    throw UnimplementedError();
+  Future<void> deleteTransactionById(int id) async {
+    await databaseService.deleteTransaction(id);
+  }
+
+  /// Метод обновления транзакции
+  @override
+  Future<TransactionResponseEntity> updateTransaction({
+    required TransactionRequestEntity transaction,
+    required int id,
+  }) async {
+    final data = await databaseService.updateTransaction(
+      id: id,
+      request: transaction,
+    );
+    return data;
   }
 
   @override
   Future<TransactionResponseEntity> fetchTransactionById(int id) {
     // TODO: implement fetchTransactionById
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<TransactionResponseEntity> updateTransaction({
-    required TransactionRequestEntity transaction,
-    required int id,
-  }) {
-    // TODO: implement updateTransaction
     throw UnimplementedError();
   }
 }

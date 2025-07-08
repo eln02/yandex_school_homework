@@ -38,6 +38,15 @@ class _DebugScreenViewState extends State<_DebugScreenView> {
     _fetchInitialData();
   }
 
+  Future<void> _clearDatabase(BuildContext context) async {
+    await context.di.databaseService.clearDatabase();
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('База данных очищена')));
+    }
+  }
+
   Future<void> _fetchInitialData() async {
     final now = DateTime.now();
     // Загружаем данные за последний год (покроет и 30 дней и 12 месяцев)
@@ -64,6 +73,14 @@ class _DebugScreenViewState extends State<_DebugScreenView> {
       appBar: AppBar(
         title: const Text('Отладка графика'),
         actions: [
+          IconButton(
+            onPressed: () => _clearDatabase(context),
+            icon: const Icon(Icons.delete_outline),
+            style: IconButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.red,
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _fetchInitialData,
