@@ -2,15 +2,14 @@ import 'package:yandex_school_homework/app/env_config/env_config.dart';
 import 'package:yandex_school_homework/di/di_base_repo.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:yandex_school_homework/di/di_typedefs.dart';
-import 'package:yandex_school_homework/features/Accounts/domain/repository/i_Accounts_repository.dart';
+import 'package:yandex_school_homework/features/accounts/data/repository/accounts_backup_repository.dart';
+import 'package:yandex_school_homework/features/accounts/domain/repository/i_accounts_repository.dart';
 import 'package:yandex_school_homework/features/accounts/data/repository/accounts_mock_repository.dart';
-import 'package:yandex_school_homework/features/accounts/data/repository/accounts_repository.dart';
+import 'package:yandex_school_homework/features/categories/data/repository/categories_backup_repository.dart';
 import 'package:yandex_school_homework/features/categories/data/repository/categories_mock_repository.dart';
-import 'package:yandex_school_homework/features/categories/data/repository/categories_repository.dart';
 import 'package:yandex_school_homework/features/categories/domain/repository/i_categories_repository.dart';
-import 'package:yandex_school_homework/features/transactions/data/repository/transactions_local_repository.dart';
+import 'package:yandex_school_homework/features/transactions/data/repository/transactions_backup_repository.dart';
 import 'package:yandex_school_homework/features/transactions/data/repository/transactions_mock_repository.dart';
-import 'package:yandex_school_homework/features/transactions/data/repository/transactions_repository.dart';
 import 'package:yandex_school_homework/features/transactions/domain/repository/i_transactions_repository.dart';
 
 final class DiRepositories {
@@ -26,8 +25,10 @@ final class DiRepositories {
     try {
       categoriesRepository = _lazyInitRepo<ICategoriesRepository>(
         mockFactory: CategoriesMockRepository.new,
-        mainFactory: () =>
-            CategoriesRepository(httpClient: diContainer.httpClient),
+        mainFactory: () => CategoriesBackupRepository(
+          httpClient: diContainer.httpClient,
+          databaseService: diContainer.databaseService,
+        ),
       );
       onProgress(categoriesRepository.name);
     } on Object catch (error, stackTrace) {
@@ -41,8 +42,10 @@ final class DiRepositories {
     try {
       accountsRepository = _lazyInitRepo<IAccountsRepository>(
         mockFactory: AccountsMockRepository.new,
-        mainFactory: () =>
-            AccountsRepository(httpClient: diContainer.httpClient),
+        mainFactory: () => AccountsBackupRepository(
+          httpClient: diContainer.httpClient,
+          databaseService: diContainer.databaseService,
+        ),
       );
       onProgress(accountsRepository.name);
     } on Object catch (error, stackTrace) {
@@ -56,15 +59,10 @@ final class DiRepositories {
     try {
       transactionsRepository = _lazyInitRepo<ITransactionsRepository>(
         mockFactory: TransactionsMockRepository.new,
-        // TODO: переделать в рамках 10й домашки
-        /// TransactionsRepository для работы с апи
-        /// TransactionsLocalRepository для работы с базой данных
-        /// абсолютно взаимозаменяемы
-        mainFactory: () =>
-            TransactionsRepository(httpClient: diContainer.httpClient),
-            /*TransactionsLocalRepository(
-              databaseService: diContainer.databaseService,
-            ),*/
+        mainFactory: () => TransactionsBackupRepository(
+          httpClient: diContainer.httpClient,
+          databaseService: diContainer.databaseService,
+        ),
       );
       onProgress(transactionsRepository.name);
     } on Object catch (error, stackTrace) {

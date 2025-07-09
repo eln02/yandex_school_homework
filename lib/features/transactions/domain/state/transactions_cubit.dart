@@ -33,7 +33,7 @@ class TransactionsCubit extends Cubit<TransactionsState> {
       emit(
         TransactionsErrorState(
           stackTrace,
-          errorMessage: "Не удалось загрузить транзакции",
+          errorMessage: error.toString(),
         ),
       );
     }

@@ -1,47 +1,77 @@
+import 'package:yandex_school_homework/app/database/backup_operation.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_entity.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_update_request_entity.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 
-/// Сервис для работы с базой данных
 abstract class IDatabaseService {
-  /// Метод получения всех транзакций
+  //----------------------------------------------------------------------------
+  // Основные методы управления базой данных
+  //----------------------------------------------------------------------------
+
+  Future<void> clearDatabase();
+
+  Future<void> close();
+
+  //----------------------------------------------------------------------------
+  // Методы для работы с бэкапом операций
+  //----------------------------------------------------------------------------
+
+  Future<void> addBackupOperation({
+    required String operationType,
+    required String entityType,
+    required String entityId,
+    required Map<String, dynamic> payload,
+  });
+
+  Future<List<BackupOperation>> getUnsyncedOperations(String entityType);
+
+  Future<void> markAsSynced(List<String> operationIds);
+
+  //----------------------------------------------------------------------------
+  // Методы для работы с аккаунтами
+  //----------------------------------------------------------------------------
+
+  Future<List<AccountEntity>> getAllAccounts();
+
+  Future<void> saveAccounts(List<AccountEntity> accounts);
+
+  Future<AccountEntity> updateAccount({
+    required int id,
+    required AccountUpdateRequestEntity request,
+  });
+
+  //----------------------------------------------------------------------------
+  // Методы для работы с категориями
+  //----------------------------------------------------------------------------
+
+  Future<List<CategoryEntity>> getAllCategories();
+
+  Future<void> saveCategories(List<CategoryEntity> categories);
+
+  //----------------------------------------------------------------------------
+  // Методы для работы с транзакциями
+  //----------------------------------------------------------------------------
+
   Future<List<TransactionResponseEntity>> getAllTransactions({
     required int accountId,
     required String startDate,
     required String endDate,
   });
 
-  /// Метод создания транзакции
+  Future<void> saveTransactions(List<TransactionResponseEntity> transactions);
+
   Future<TransactionResponseEntity> createTransaction(
     TransactionRequestEntity request,
   );
 
-  /// Метод удаления транзакции
-  Future<void> deleteTransaction(int id);
-
-  /// Метод обновления транзакции
   Future<TransactionResponseEntity> updateTransaction({
     required int id,
     required TransactionRequestEntity request,
   });
 
-  /// Метод получения аккаунтов пользователя
-  Future<List<AccountEntity>> getAllAccounts();
+  Future<void> deleteTransaction(int id);
 
-  /// Метод обновления аккаунта
-  Future<AccountEntity> updateAccount({
-    required int id,
-    required AccountUpdateRequestEntity request,
-  });
-
-  /// Метод получения категорий
-  Future<List<CategoryEntity>> getAllCategories();
-
-  /// Метод очистки базы данных
-  Future<void> clearDatabase();
-
-  /// Метод закрытия соединения с базой данных
-  Future<void> close();
+  Future<void> updateTransactionId({required int oldId, required int newId});
 }

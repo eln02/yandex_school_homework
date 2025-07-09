@@ -16,12 +16,17 @@ class AccountCubit extends Cubit<AccountState> {
     try {
       final accounts = await repository.fetchAccounts();
 
+      if (accounts.isEmpty) {
+        emit(const AccountErrorState(null, errorMessage: "Нет счета"));
+        return;
+      }
+
       emit(AccountLoadedState(accounts: accounts));
     } on Object catch (error, stackTrace) {
       emit(
         AccountErrorState(
           stackTrace,
-          errorMessage: "Не удалось загрузить счет",
+          errorMessage: error.toString(),
         ),
       );
     }

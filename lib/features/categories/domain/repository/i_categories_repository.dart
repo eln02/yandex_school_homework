@@ -3,6 +3,4 @@ import 'package:yandex_school_homework/features/categories/domain/entity/categor
 
 abstract interface class ICategoriesRepository with DiBaseRepo {
   Future<List<CategoryEntity>> fetchCategories();
-
-  Future<List<CategoryEntity>> fetchCategoriesByType(bool isIncome);
 }

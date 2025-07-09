@@ -15,13 +15,16 @@ class AppErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(errorMessage),
-            ElevatedButton(onPressed: onError, child: const Text('Повторить')),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(errorMessage),
+              ElevatedButton(onPressed: onError, child: const Text('Повторить')),
+            ],
+          ),
         ),
       ),
     );
