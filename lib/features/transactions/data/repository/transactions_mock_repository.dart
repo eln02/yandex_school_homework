@@ -74,4 +74,10 @@ final class TransactionsMockRepository implements ITransactionsRepository {
         .map((json) => TransactionResponseDto.fromJson(json).toEntity())
         .toList();
   }
+
+  @override
+  Future<void> syncPendingChanges() {
+    // TODO: implement syncPendingChanges
+    throw UnimplementedError();
+  }
 }

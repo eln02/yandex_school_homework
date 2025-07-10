@@ -38,6 +38,7 @@ final class DiContainer {
     databaseService = DatabaseService(
       databaseName: _databaseName,
       databaseVersion: _databaseVersion,
+      debugService: debugService,
     );
 
     onProgress('Инициализация репозиториев...');

@@ -1,213 +1,133 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
-import 'package:yandex_school_homework/features/transactions/domain/entity/cash_flow_analysis_entity.dart';
-import 'package:yandex_school_homework/features/transactions/domain/state/daily_analysis_extension.dart';
-import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
-import 'package:yandex_school_homework/features/transactions/domain/state/transactions_state.dart';
-import 'package:intl/intl.dart';
-import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_diagram.dart';
+import 'package:yandex_school_homework/app/database/backup_operation.dart';
 
-class DebugScreen extends StatelessWidget {
+class DebugScreen extends StatefulWidget {
   const DebugScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          TransactionsCubit(context.di.repositories.transactionsRepository),
-      child: const _DebugScreenView(),
-    );
+  State<DebugScreen> createState() => _DebugScreenState();
+}
+
+class _DebugScreenState extends State<DebugScreen> {
+  List<BackupOperation> _backupOperations = [];
+  bool _isLoading = false;
+
+  Future<void> _loadBackupOperations() async {
+    setState(() => _isLoading = true);
+    try {
+      final transactions = await context.di.databaseService
+          .getUnsyncedOperations('transaction');
+      final accounts = await context.di.databaseService.getUnsyncedOperations(
+        'account',
+      );
+      final categories = await context.di.databaseService.getUnsyncedOperations(
+        'category',
+      );
+
+      setState(() {
+        _backupOperations = [...transactions, ...accounts, ...categories];
+        _backupOperations.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка загрузки операций: ${e.toString()}')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
-}
 
-class _DebugScreenView extends StatefulWidget {
-  const _DebugScreenView();
+  Future<void> _clearDatabase() async {
+    await context.di.databaseService.clearDatabase();
+    if (!mounted) return;
 
-  @override
-  State<_DebugScreenView> createState() => _DebugScreenViewState();
-}
-
-class _DebugScreenViewState extends State<_DebugScreenView> {
-  bool _showMonthly = false;
-  bool _initialLoadComplete = false;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('База данных очищена')));
+    await _loadBackupOperations();
+  }
 
   @override
   void initState() {
     super.initState();
-    _fetchInitialData();
-  }
-
-  Future<void> _clearDatabase(BuildContext context) async {
-    await context.di.databaseService.clearDatabase();
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('База данных очищена')));
-    }
-  }
-
-  Future<void> _fetchInitialData() async {
-    final now = DateTime.now();
-    // Загружаем данные за последний год (покроет и 30 дней и 12 месяцев)
-    final startDate = DateTime(now.year - 1, now.month, now.day);
-
-    await context.read<TransactionsCubit>().fetchTransactions(
-      accountId: 140,
-      startDate: DateFormat('yyyy-MM-dd').format(startDate),
-      endDate: DateFormat('yyyy-MM-dd').format(now),
-    );
-
-    setState(() {
-      _initialLoadComplete = true;
-    });
-  }
-
-  String _formatDisplayDate(DateTime date) {
-    return DateFormat('dd.MM.yyyy').format(date);
+    _loadBackupOperations();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Отладка графика'),
+        title: const Text('Debug Screen'),
         actions: [
           IconButton(
-            onPressed: () => _clearDatabase(context),
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadBackupOperations,
+            tooltip: 'Обновить',
+          ),
+          IconButton(
+            onPressed: _clearDatabase,
             icon: const Icon(Icons.delete_outline),
             style: IconButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: Colors.red,
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _fetchInitialData,
-          ),
         ],
       ),
-      body: BlocBuilder<TransactionsCubit, TransactionsState>(
-        builder: (context, state) {
-          if (!_initialLoadComplete && state is TransactionsLoadingState) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return switch (state) {
-            TransactionsErrorState(errorMessage: final message) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Ошибка: $message',
-                  style: const TextStyle(color: Colors.red, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _fetchInitialData,
-                  child: const Text('Повторить попытку'),
-                ),
-              ],
-            ),
-            TransactionsLoadedState() => SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  // Переключатель между днями и месяцами
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ToggleButtons(
-                      isSelected: [!_showMonthly, _showMonthly],
-                      onPressed: (index) {
-                        setState(() {
-                          _showMonthly = index == 1;
-                        });
-                      },
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('По дням'),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _backupOperations.isEmpty
+          ? const Center(child: Text('Нет операций в бэкапе'))
+          : ListView.builder(
+              itemCount: _backupOperations.length,
+              itemBuilder: (context, index) {
+                final op = _backupOperations[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${op.operationType} • ${op.entityType}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              _formatDate(op.createdAt),
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('По месяцам'),
+                        const SizedBox(height: 8),
+                        Text('ID: ${op.entityId}'),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Данные: ${op.payload.toString()}',
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-                  Text(
-                    _showMonthly
-                        ? 'График денежного потока за последние 12 месяцев'
-                        : 'График денежного потока за последние 30 дней',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SizedBox(
-                      height: 250,
-                      child: CashFlowChart(
-                        data: _showMonthly
-                            ? state.monthlyCashFlowLast12Months
-                            : state.dailyCashFlowLast30Days,
-                        isMonthly: _showMonthly,
-                        currency: state.currency,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildDataTable(
-                      _showMonthly
-                          ? state.monthlyCashFlowLast12Months
-                          : state.dailyCashFlowLast30Days,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-            _ => const SizedBox.shrink(),
-          };
-        },
-      ),
     );
   }
 
-  Widget _buildDataTable(List<CashFlowAnalysisEntity> data) {
-    return DataTable(
-      columns: [
-        DataColumn(label: Text(_showMonthly ? 'Месяц' : 'Дата')),
-        const DataColumn(label: Text('Баланс'), numeric: true),
-      ],
-      rows: data.map((item) {
-        return DataRow(
-          cells: [
-            DataCell(
-              Text(
-                _showMonthly
-                    ? DateFormat('MMMM yyyy', 'ru_RU').format(item.date)
-                    : _formatDisplayDate(item.date),
-              ),
-            ),
-            DataCell(
-              Text(
-                NumberFormat.currency(
-                  symbol: '₽',
-                  decimalDigits: 2,
-                  locale: 'ru_RU',
-                ).format(item.flow),
-                style: TextStyle(
-                  color: item.flow < 0 ? Colors.red : Colors.green,
-                ),
-              ),
-            ),
-          ],
-        );
-      }).toList(),
-    );
+  String _formatDate(DateTime date) {
+    return '${date.hour}:${date.minute.toString().padLeft(2, '0')} ${date.day}.${date.month}.${date.year}';
   }
 }

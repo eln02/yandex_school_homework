@@ -28,4 +28,10 @@ final class AccountsMockRepository implements IAccountsRepository {
     final account = AccountsMockData.accounts[0];
     return AccountDto.fromJson(account).toEntity();
   }
+
+  @override
+  Future<void> syncPendingChanges() {
+    // TODO: implement syncPendingChanges
+    throw UnimplementedError();
+  }
 }

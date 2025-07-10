@@ -40,6 +40,11 @@ final class AccountsBackupRepository implements IAccountsRepository {
     }
   }
 
+  @override
+  Future<void> syncPendingChanges() async {
+    await _syncPendingAccountChanges();
+  }
+
   Future<void> _syncPendingAccountChanges() async {
     final operations = await databaseService.getUnsyncedOperations('account');
     if (operations.isEmpty) return;
@@ -68,7 +73,6 @@ final class AccountsBackupRepository implements IAccountsRepository {
       await databaseService.markAsSynced(successfulIds);
     }
   }
-
 
   @override
   Future<AccountEntity> updateAccount({
@@ -100,5 +104,4 @@ final class AccountsBackupRepository implements IAccountsRepository {
     final data = response.data as List<dynamic>;
     return data.map((e) => AccountDto.fromJson(e).toEntity()).toList();
   }
-
 }

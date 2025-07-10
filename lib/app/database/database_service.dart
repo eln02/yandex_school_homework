@@ -7,6 +7,7 @@ import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_entity.dart';
 import 'package:yandex_school_homework/features/accounts/domain/entity/account_update_request_entity.dart';
 import 'package:yandex_school_homework/features/categories/domain/entity/category_entity.dart';
+import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 import 'database_mappers.dart';
@@ -14,6 +15,7 @@ import 'database_mappers.dart';
 /// Сервис для работы с локальной базой данных SQLite.
 /// Реализует offline-first подход с поддержкой бэкапа операций.
 class DatabaseService implements IDatabaseService {
+  final IDebugService debugService;
   final String databaseName;
   final int databaseVersion;
   Database? _database;
@@ -31,6 +33,7 @@ class DatabaseService implements IDatabaseService {
   DatabaseService({
     this.databaseName = 'finance_app.db',
     this.databaseVersion = 1,
+    required this.debugService,
   });
 
   //----------------------------------------------------------------------------
@@ -143,15 +146,28 @@ class DatabaseService implements IDatabaseService {
     required Map<String, dynamic> payload,
   }) async {
     final db = await _db;
-    await db.insert('backup_operations', {
-      'id': DateTime.now().microsecondsSinceEpoch.toString(),
-      'operation_type': operationType,
-      'entity_type': entityType,
-      'entity_id': entityId,
-      'payload': jsonEncode(payload),
-      'created_at': DateTime.now().millisecondsSinceEpoch,
-      'is_synced': 0,
-    });
+    try {
+      await db.insert('backup_operations', {
+        'id': DateTime.now().microsecondsSinceEpoch.toString(),
+        'operation_type': operationType,
+        'entity_type': entityType,
+        'entity_id': entityId,
+        'payload': jsonEncode(payload),
+        'created_at': DateTime.now().millisecondsSinceEpoch,
+        'is_synced': 0,
+      });
+
+      debugService.log(
+        'Операция добавлена в бэкап, type: $operationType, entity: $entityType, payload: $payload',
+      );
+    } catch (e, stackTrace) {
+      debugService.logError(
+        'Ошибка при добавлении операции в бэкап, type: $operationType, entity: $entityType, payload: $payload',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   /// Возвращает список несинхронизированных операций для указанного типа сущности.
@@ -170,17 +186,17 @@ class DatabaseService implements IDatabaseService {
     return operations
         .map(
           (op) => BackupOperation(
-        id: op['id'] as String,
-        operationType: op['operation_type'] as String,
-        entityType: op['entity_type'] as String,
-        entityId: op['entity_id'] as String,
-        payload: jsonDecode(op['payload'] as String),
-        createdAt: DateTime.fromMillisecondsSinceEpoch(
-          op['created_at'] as int,
-        ),
-        isSynced: op['is_synced'] == 1,
-      ),
-    )
+            id: op['id'] as String,
+            operationType: op['operation_type'] as String,
+            entityType: op['entity_type'] as String,
+            entityId: op['entity_id'] as String,
+            payload: jsonDecode(op['payload'] as String),
+            createdAt: DateTime.fromMillisecondsSinceEpoch(
+              op['created_at'] as int,
+            ),
+            isSynced: op['is_synced'] == 1,
+          ),
+        )
         .toList();
   }
 
@@ -191,12 +207,25 @@ class DatabaseService implements IDatabaseService {
   @override
   Future<void> markAsSynced(List<String> operationIds) async {
     final db = await _db;
-    await db.update(
-      'backup_operations',
-      {'is_synced': 1},
-      where: 'id IN (${operationIds.map((_) => '?').join(',')})',
-      whereArgs: operationIds,
-    );
+    try {
+      await db.update(
+        'backup_operations',
+        {'is_synced': 1},
+        where: 'id IN (${operationIds.map((_) => '?').join(',')})',
+        whereArgs: operationIds,
+      );
+
+      debugService.log(
+        'Операции синхронизированы, кол-во: ${operationIds.length}',
+      );
+    } catch (e, stackTrace) {
+      debugService.logError(
+        'Ошибка при синхронизации операций',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -225,16 +254,28 @@ class DatabaseService implements IDatabaseService {
   @override
   Future<void> saveAccounts(List<AccountEntity> accounts) async {
     final db = await _db;
+    try {
+      await db.transaction((txn) async {
+        for (final account in accounts) {
+          await txn.insert(
+            tableAccounts,
+            account.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+      });
 
-    await db.transaction((txn) async {
-      for (final account in accounts) {
-        await txn.insert(
-          tableAccounts,
-          account.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-    });
+      debugService.log(
+        'Аккаунты сохранены в базу данных, кол-во: ${accounts.length}',
+      );
+    } catch (e, stackTrace) {
+      debugService.logError(
+        'Ошибка при сохранении аккаунтов',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   /// Обновляет данные аккаунта в локальной базе.
@@ -307,22 +348,35 @@ class DatabaseService implements IDatabaseService {
   Future<void> saveCategories(List<CategoryEntity> categories) async {
     final db = await _db;
 
-    await db.transaction((txn) async {
-      await txn.delete(tableCategories);
-
-      for (final category in categories) {
-        await txn.insert(
-          tableCategories,
-          {
+    try {
+      await db.transaction((txn) async {
+        for (final category in categories) {
+          final categoryData = {
             'id': category.id,
             'name': category.name,
             'emoji': category.emoji,
             'isIncome': category.isIncome ? 1 : 0,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
+          };
+
+          await txn.insert(
+            tableCategories,
+            categoryData,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+
+        debugService.log(
+          'Категории сохранены в базу данных, кол-во: ${categories.length}',
         );
-      }
-    });
+      });
+    } catch (e, stackTrace) {
+      debugService.logError(
+        'Ошибка сохранения категорий',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -343,13 +397,9 @@ class DatabaseService implements IDatabaseService {
   }) async {
     final db = await _db;
 
-    final start = DateTime.parse(startDate).copyWith(
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-      microsecond: 0,
-    );
+    final start = DateTime.parse(
+      startDate,
+    ).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
     final end = DateTime.parse(endDate).copyWith(
       hour: 23,
       minute: 59,
@@ -386,29 +436,40 @@ class DatabaseService implements IDatabaseService {
   /// Параметры:
   /// - [transactions] - список транзакций для сохранения
   @override
-  Future<void> saveTransactions(List<TransactionResponseEntity> transactions) async {
+  Future<void> saveTransactions(
+    List<TransactionResponseEntity> transactions,
+  ) async {
     final db = await _db;
+    try {
+      await db.transaction((txn) async {
+        await txn.delete(tableTransactions);
 
-    await db.transaction((txn) async {
-      await txn.delete(tableTransactions);
-
-      for (final transaction in transactions) {
-        await txn.insert(
-          tableTransactions,
-          {
+        for (final transaction in transactions) {
+          await txn.insert(tableTransactions, {
             'id': transaction.id,
             'accountId': transaction.account.id,
             'categoryId': transaction.category.id,
             'amount': transaction.amount,
-            'transactionDate': transaction.transactionDate.millisecondsSinceEpoch,
+            'transactionDate':
+                transaction.transactionDate.millisecondsSinceEpoch,
             'comment': transaction.comment,
             'createdAt': transaction.createdAt.millisecondsSinceEpoch,
             'updatedAt': transaction.updatedAt.millisecondsSinceEpoch,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-    });
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      });
+
+      debugService.log(
+        'Транзакции сохранены в базу данных, кол-во: ${transactions.length}',
+      );
+    } catch (e, stackTrace) {
+      debugService.logError(
+        'Ошибка при сохранении транзакций',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   /// Создает новую транзакцию в локальной базе.
@@ -417,8 +478,8 @@ class DatabaseService implements IDatabaseService {
   /// - [request] - данные для создания транзакции
   @override
   Future<TransactionResponseEntity> createTransaction(
-      TransactionRequestEntity request,
-      ) async {
+    TransactionRequestEntity request,
+  ) async {
     final db = await _db;
     final now = DateTime.now();
 
@@ -634,10 +695,10 @@ class DatabaseService implements IDatabaseService {
   /// - [accountId] - ID аккаунта
   /// - [newBalance] - новое значение баланса
   Future<void> _updateAccountBalance(
-      Database db,
-      int accountId,
-      String newBalance,
-      ) async {
+    Database db,
+    int accountId,
+    String newBalance,
+  ) async {
     await db.update(
       tableAccounts,
       {

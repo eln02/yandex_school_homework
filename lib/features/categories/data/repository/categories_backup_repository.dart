@@ -22,10 +22,7 @@ final class CategoriesBackupRepository implements ICategoriesRepository {
   @override
   Future<List<CategoryEntity>> fetchCategories() async {
     try {
-      // 1. Сначала пробуем синхронизировать неотправленные изменения
-      await _syncPendingCategoryChanges();
-
-      // 2. Затем загружаем актуальные данные с сервера
+      // 2. Загружаем актуальные данные с сервера
       final remoteCategories = await _fetchFromApi();
 
       // 3. Сохраняем в локальную базу
@@ -42,43 +39,5 @@ final class CategoriesBackupRepository implements ICategoriesRepository {
     final response = await httpClient.get(categoriesEndpoint);
     final data = response.data as List<dynamic>;
     return data.map((e) => CategoryDto.fromJson(e).toEntity()).toList();
-  }
-
-  Future<void> _syncPendingCategoryChanges() async {
-    final operations = await databaseService.getUnsyncedOperations('category');
-    if (operations.isEmpty) return;
-
-    final successfulIds = <String>[];
-
-    for (final op in operations) {
-      try {
-        switch (op.operationType) {
-          case 'CREATE':
-            await httpClient.post(categoriesEndpoint, data: op.payload);
-            successfulIds.add(op.id);
-            break;
-
-          case 'UPDATE':
-            await httpClient.put(
-              '$categoriesEndpoint/${op.entityId}',
-              data: op.payload,
-            );
-            successfulIds.add(op.id);
-            break;
-
-          case 'DELETE':
-            await httpClient.delete('$categoriesEndpoint/${op.entityId}');
-            successfulIds.add(op.id);
-            break;
-        }
-      } catch (e) {
-        // Прерываем синхронизацию при первой же ошибке
-        break;
-      }
-    }
-
-    if (successfulIds.isNotEmpty) {
-      await databaseService.markAsSynced(successfulIds);
-    }
   }
 }

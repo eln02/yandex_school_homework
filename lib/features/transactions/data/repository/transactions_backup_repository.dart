@@ -129,6 +129,11 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
     return data.map((e) => TransactionResponseDto.fromJson(e).toEntity()).toList();
   }
 
+  @override
+  Future<void> syncPendingChanges() async {
+    await _syncPendingTransactionOperations();
+  }
+
   Future<void> _syncPendingTransactionOperations() async {
     final operations = await databaseService.getUnsyncedOperations('transaction');
     if (operations.isEmpty) return;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
+import 'package:yandex_school_homework/features/connectivity_checker/connectivity_status_bar.dart';
 import 'package:yandex_school_homework/gen/assets.gen.dart';
 
 class RootScreen extends StatelessWidget {
@@ -21,7 +22,12 @@ class RootScreen extends StatelessWidget {
     final labels = ['Расходы', 'Доходы', 'Счета', 'Статьи', 'Настройки'];
 
     return Scaffold(
-      body: navigationShell,
+      body: Column(
+        children: [
+          Expanded(child: navigationShell),
+          const ConnectivityStatusBar(),
+        ],
+      ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           splashFactory: NoSplash.splashFactory,

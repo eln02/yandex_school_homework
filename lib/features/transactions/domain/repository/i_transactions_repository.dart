@@ -19,4 +19,6 @@ abstract interface class ITransactionsRepository with DiBaseRepo {
   });
 
   Future<void> deleteTransactionById(int id);
+
+  Future<void> syncPendingChanges() async {}
 }
