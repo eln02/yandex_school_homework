@@ -1,12 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/env_config/env_config.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
+import 'package:yandex_school_homework/app/http/retry_interceptor.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 
 final class AppHttpClient implements IHttpClient {
-  AppHttpClient({
-    required IDebugService debugService,
-  }) {
+  AppHttpClient({required IDebugService debugService}) {
     _httpClient = Dio();
 
     _httpClient.options
@@ -18,8 +17,13 @@ final class AppHttpClient implements IHttpClient {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${EnvConfig.token}',
       };
+
+    _httpClient.interceptors.addAll([
+      debugService.dioLogger,
+      RetryInterceptor(_httpClient, debugService),
+    ]);
+
     debugService.log('HTTP client created');
-    _httpClient.interceptors.add(debugService.dioLogger);
   }
 
   late final Dio _httpClient;
