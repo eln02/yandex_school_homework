@@ -1,15 +1,10 @@
-import 'package:yandex_school_homework/app/env_config/env_config.dart';
-import 'package:yandex_school_homework/di/di_base_repo.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:yandex_school_homework/di/di_typedefs.dart';
 import 'package:yandex_school_homework/features/accounts/data/repository/accounts_backup_repository.dart';
 import 'package:yandex_school_homework/features/accounts/domain/repository/i_accounts_repository.dart';
-import 'package:yandex_school_homework/features/accounts/data/repository/accounts_mock_repository.dart';
 import 'package:yandex_school_homework/features/categories/data/repository/categories_backup_repository.dart';
-import 'package:yandex_school_homework/features/categories/data/repository/categories_mock_repository.dart';
 import 'package:yandex_school_homework/features/categories/domain/repository/i_categories_repository.dart';
 import 'package:yandex_school_homework/features/transactions/data/repository/transactions_backup_repository.dart';
-import 'package:yandex_school_homework/features/transactions/data/repository/transactions_mock_repository.dart';
 import 'package:yandex_school_homework/features/transactions/domain/repository/i_transactions_repository.dart';
 
 final class DiRepositories {
@@ -23,12 +18,9 @@ final class DiRepositories {
     required DiContainer diContainer,
   }) {
     try {
-      categoriesRepository = _lazyInitRepo<ICategoriesRepository>(
-        mockFactory: CategoriesMockRepository.new,
-        mainFactory: () => CategoriesBackupRepository(
-          httpClient: diContainer.httpClient,
-          databaseService: diContainer.databaseService,
-        ),
+      categoriesRepository = CategoriesBackupRepository(
+        httpClient: diContainer.httpClient,
+        databaseService: diContainer.databaseService,
       );
       onProgress(categoriesRepository.name);
     } on Object catch (error, stackTrace) {
@@ -40,12 +32,9 @@ final class DiRepositories {
     }
 
     try {
-      accountsRepository = _lazyInitRepo<IAccountsRepository>(
-        mockFactory: AccountsMockRepository.new,
-        mainFactory: () => AccountsBackupRepository(
-          httpClient: diContainer.httpClient,
-          databaseService: diContainer.databaseService,
-        ),
+      accountsRepository = AccountsBackupRepository(
+        httpClient: diContainer.httpClient,
+        databaseService: diContainer.databaseService,
       );
       onProgress(accountsRepository.name);
     } on Object catch (error, stackTrace) {
@@ -57,12 +46,9 @@ final class DiRepositories {
     }
 
     try {
-      transactionsRepository = _lazyInitRepo<ITransactionsRepository>(
-        mockFactory: TransactionsMockRepository.new,
-        mainFactory: () => TransactionsBackupRepository(
-          httpClient: diContainer.httpClient,
-          databaseService: diContainer.databaseService,
-        ),
+      transactionsRepository = TransactionsBackupRepository(
+        httpClient: diContainer.httpClient,
+        databaseService: diContainer.databaseService,
       );
       onProgress(transactionsRepository.name);
     } on Object catch (error, stackTrace) {
@@ -72,14 +58,5 @@ final class DiRepositories {
         stackTrace,
       );
     }
-  }
-
-  T _lazyInitRepo<T extends DiBaseRepo>({
-    required T Function() mainFactory,
-    required T Function() mockFactory,
-  }) {
-    return EnvConfig.useMocks.toLowerCase() == 'true'
-        ? mockFactory()
-        : mainFactory();
   }
 }
