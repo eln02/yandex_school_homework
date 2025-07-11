@@ -19,6 +19,34 @@ class AccountEntity with EquatableMixin {
     required this.updatedAt,
   });
 
+  AccountEntity copyWith({
+    int? id,
+    int? userId,
+    String? name,
+    String? balance,
+    String? currency,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return AccountEntity(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      balance: balance ?? this.balance,
+      currency: currency ?? this.currency,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   @override
-  List<Object> get props => [id, userId, name, balance, currency, createdAt, updatedAt];
+  List<Object> get props => [
+    id,
+    userId,
+    name,
+    balance,
+    currency,
+    createdAt,
+    updatedAt,
+  ];
 }
