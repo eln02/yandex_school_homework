@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:yandex_school_homework/app/database/backup_operation.dart';
@@ -397,16 +398,25 @@ class DatabaseService implements IDatabaseService {
   }) async {
     final db = await _db;
 
-    final start = DateTime.parse(
-      startDate,
-    ).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
-    final end = DateTime.parse(endDate).copyWith(
-      hour: 23,
-      minute: 59,
-      second: 59,
-      millisecond: 999,
-      microsecond: 999,
-    );
+    final start = DateFormat('yyyy-MM-dd')
+        .parseUtc(startDate)
+        .copyWith(
+          hour: 0,
+          minute: 0,
+          second: 0,
+          millisecond: 0,
+          microsecond: 0,
+        );
+
+    final end = DateFormat('yyyy-MM-dd')
+        .parseUtc(endDate)
+        .copyWith(
+          hour: 23,
+          minute: 59,
+          second: 59,
+          millisecond: 999,
+          microsecond: 999,
+        );
 
     final transactions = await db.query(
       tableTransactions,

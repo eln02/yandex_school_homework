@@ -100,19 +100,11 @@ class _TransactionsSuccessScreen extends StatelessWidget {
         switch (state) {
           /// Добавление новой транзакции в список
           case TransactionOperationSuccessState():
-            if (isIncome == state.transaction.category.isIncome) {
-              context.read<TransactionsCubit>().addNewTransaction(
-                state.transaction,
-              );
-            }
+            onRefresh();
 
           /// Обновление транзакции в списке
           case TransactionOperationUpdateState():
-            if (isIncome == state.transaction.category.isIncome) {
-              context.read<TransactionsCubit>().updateTransaction(
-                state.transaction,
-              );
-            }
+            onRefresh();
 
           case TransactionOperationFailure():
             ScaffoldMessenger.of(

@@ -145,6 +145,7 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
     if (operations.isEmpty) return;
 
     final successfulIds = <String>[];
+    final idMapping = <String, int>{}; // Для маппинга временных ID на серверные
 
     for (final op in operations) {
       try {
@@ -154,35 +155,41 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
               transactionsEndpoint,
               data: op.payload,
             );
-            final id = (response.data as Map<String, dynamic>)['id'];
+            final newId = (response.data as Map<String, dynamic>)['id'] as int;
             successfulIds.add(op.id);
 
-            // Обновляем локальный ID если нужно
+            // Сохраняем маппинг ID
+            idMapping[op.entityId] = newId;
+
+            // Обновляем локальный ID
             await databaseService.updateTransactionId(
               oldId: int.parse(op.entityId),
-              newId: id,
+              newId: newId,
             );
             break;
 
           case 'UPDATE':
+            // Если это обновление временной транзакции, используем новый ID
+            final entityId = idMapping[op.entityId]?.toString() ?? op.entityId;
             await httpClient.put(
-              '$transactionsEndpoint/${op.entityId}',
+              '$transactionsEndpoint/$entityId',
               data: op.payload,
             );
             successfulIds.add(op.id);
             break;
 
           case 'DELETE':
-            await httpClient.delete('$transactionsEndpoint/${op.entityId}');
+            // Если это удаление временной транзакции, используем новый ID
+            final entityId = idMapping[op.entityId]?.toString() ?? op.entityId;
+            await httpClient.delete('$transactionsEndpoint/$entityId');
             successfulIds.add(op.id);
             break;
         }
       } catch (e) {
-        break;
+        continue;
       }
     }
 
-    // Помечаем успешно отправленные операции
     if (successfulIds.isNotEmpty) {
       await databaseService.markAsSynced(successfulIds);
     }
