@@ -51,6 +51,7 @@ final class DependsProviders extends StatelessWidget {
           ),
         ),
         BlocProvider(
+          /// кубит для выполнения бэкапов при появлении интернета
           create: (_) => BackupCubit(
             connectivity: Connectivity(),
             accountsRepository: diContainer.repositories.accountsRepository,

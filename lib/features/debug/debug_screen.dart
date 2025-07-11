@@ -34,9 +34,7 @@ class _DebugScreenState extends State<DebugScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки операций: ${e.toString()}')),
-      );
+      _showErrorSnackbar('Ошибка загрузки операций: ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -45,11 +43,25 @@ class _DebugScreenState extends State<DebugScreen> {
   Future<void> _clearDatabase() async {
     await context.di.databaseService.clearDatabase();
     if (!mounted) return;
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('База данных очищена')));
+    _showSuccessSnackbar('База данных очищена');
     await _loadBackupOperations();
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   @override
@@ -76,8 +88,12 @@ class _DebugScreenState extends State<DebugScreen> {
         ),
         body: Column(
           children: [
-            // Добавленный блок для тестирования ретраев
-            BlocBuilder<DebugCubit, DebugState>(
+            BlocConsumer<DebugCubit, DebugState>(
+              listener: (context, state) {
+                if (state is DebugError) {
+                  _showErrorSnackbar('Ошибка: ${state.message}');
+                }
+              },
               builder: (context, state) {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -100,7 +116,7 @@ class _DebugScreenState extends State<DebugScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () =>
                             context.read<DebugCubit>().trigger500Error(),
@@ -110,82 +126,70 @@ class _DebugScreenState extends State<DebugScreen> {
                         ),
                         child: state is DebugLoading
                             ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
+                          color: Colors.white,
+                        )
                             : const Text(
-                                'Тест 500 ошибки с ретраями',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                          'Тест 500 ошибки с ретраями',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      if (state is DebugError)
-                        Text(
-                          'Статус: ${state.message}',
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      if (state is DebugSuccess)
-                        const Text(
-                          'Статус: Успех (не ожидается для 500 ошибки)',
-                          style: TextStyle(color: Colors.green),
-                        ),
                     ],
                   ),
                 );
               },
             ),
-            // Оригинальный контент
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _backupOperations.isEmpty
                   ? const Center(child: Text('Нет операций в бэкапе'))
                   : ListView.builder(
-                      itemCount: _backupOperations.length,
-                      itemBuilder: (context, index) {
-                        final op = _backupOperations[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${op.operationType} • ${op.entityType}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      _formatDate(op.createdAt),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text('ID: ${op.entityId}'),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Данные: ${op.payload.toString()}',
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                itemCount: _backupOperations.length,
+                itemBuilder: (context, index) {
+                  final op = _backupOperations[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${op.operationType} • ${op.entityType}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                _formatDate(op.createdAt),
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text('ID: ${op.entityId}'),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Данные: ${op.payload.toString()}',
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),

@@ -178,9 +178,7 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
             break;
         }
       } catch (e) {
-        // Логируем ошибку, но продолжаем пробовать остальные операции
-        print('Failed to sync transaction operation ${op.id}: $e');
-        break; // Прерываем при первой ошибке
+        break;
       }
     }
 

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 
+/// Интерцептор для повторных запросов с exponential backoff
 class RetryInterceptor extends Interceptor {
   final Dio _dio;
   final IDebugService debugService;

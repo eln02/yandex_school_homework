@@ -7,11 +7,11 @@ abstract interface class IHttpClient {
   static const name = 'IHttpClient';
 
   Future<Response<T>> get<T>(
-      String path, {
-        Object? data,
-        Map<String, dynamic>? queryParameters,
-        DeserializeConfig? deserializeConfig,
-      });
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    DeserializeConfig? deserializeConfig,
+  });
 
   Future<Response<T>> post<T>(
     String path, {
@@ -35,13 +35,6 @@ abstract interface class IHttpClient {
   });
 
   Future<Response<T>> delete<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  });
-
-  Future<Response<T>> head<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
