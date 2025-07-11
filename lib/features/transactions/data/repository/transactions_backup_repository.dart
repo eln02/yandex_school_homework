@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/features/transactions/data/dto/transaction_response/transaction_response_dto.dart';
@@ -126,9 +125,7 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
     final response = await httpClient.get<List<dynamic>>(
       '$transactionsEndpoint/account/$accountId/period',
       queryParameters: {'startDate': startDate, 'endDate': endDate},
-      options: Options(
-        extra: {'_deserialize': (TransactionResponseDto.fromJson, true)},
-      ),
+      deserializeConfig: (TransactionResponseDto.fromJson, true),
     );
 
     return (response.data ?? [])

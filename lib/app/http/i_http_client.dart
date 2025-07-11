@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:yandex_school_homework/app/http/deserialize_config.dart';
 
 abstract interface class IHttpClient {
   const IHttpClient();
@@ -6,11 +7,11 @@ abstract interface class IHttpClient {
   static const name = 'IHttpClient';
 
   Future<Response<T>> get<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  });
+      String path, {
+        Object? data,
+        Map<String, dynamic>? queryParameters,
+        DeserializeConfig? deserializeConfig,
+      });
 
   Future<Response<T>> post<T>(
     String path, {

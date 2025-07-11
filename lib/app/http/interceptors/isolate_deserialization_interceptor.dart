@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:worker_manager/worker_manager.dart';
 
-class StrictTypingDeserializationInterceptor extends Interceptor {
+class DeserializationInterceptor extends Interceptor {
   @override
   Future<void> onResponse(
       Response response,

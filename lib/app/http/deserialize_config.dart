@@ -1,0 +1,1 @@
+typedef DeserializeConfig = (Function fromJson, bool isList);

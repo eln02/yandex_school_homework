@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/features/accounts/domain/repository/i_accounts_repository.dart';
@@ -103,7 +102,7 @@ final class AccountsBackupRepository implements IAccountsRepository {
   Future<List<AccountEntity>> _fetchFromApi() async {
     final response = await httpClient.get<List<dynamic>>(
       accountsEndpoint,
-      options: Options(extra: {'_deserialize': (AccountDto.fromJson, true)}),
+      deserializeConfig: (AccountDto.fromJson, true),
     );
 
     final dtos = response.data ?? [];

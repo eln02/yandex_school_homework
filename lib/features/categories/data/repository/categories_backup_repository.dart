@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/features/categories/domain/repository/i_categories_repository.dart';
@@ -39,7 +38,7 @@ final class CategoriesBackupRepository implements ICategoriesRepository {
   Future<List<CategoryEntity>> _fetchFromApi() async {
     final response = await httpClient.get<List<dynamic>>(
       categoriesEndpoint,
-      options: Options(extra: {'_deserialize': (CategoryDto.fromJson, true)}),
+      deserializeConfig: (CategoryDto.fromJson, true),
     );
     final data = response.data ?? [];
     return data.map((e) => (e as CategoryDto).toEntity()).toList();

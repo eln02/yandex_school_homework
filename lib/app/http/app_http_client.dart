@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/env_config/env_config.dart';
+import 'package:yandex_school_homework/app/http/deserialize_config.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/app/http/interceptors/isolate_deserialization_interceptor.dart';
 import 'package:yandex_school_homework/app/http/interceptors/retry_interceptor.dart';
@@ -22,7 +23,7 @@ final class AppHttpClient implements IHttpClient {
     _httpClient.interceptors.addAll([
       debugService.dioLogger,
       RetryInterceptor(_httpClient, debugService),
-      StrictTypingDeserializationInterceptor(),
+      DeserializationInterceptor(),
     ]);
 
     debugService.log('HTTP client created');
@@ -32,12 +33,16 @@ final class AppHttpClient implements IHttpClient {
 
   @override
   Future<Response<T>> get<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
-    return _httpClient.get(
+      String path, {
+        Object? data,
+        Map<String, dynamic>? queryParameters,
+        DeserializeConfig? deserializeConfig,
+      }) async {
+    final options = deserializeConfig != null
+        ? Options(extra: {'_deserialize': deserializeConfig})
+        : null;
+
+    return _httpClient.get<T>(
       path,
       data: data,
       queryParameters: queryParameters,
