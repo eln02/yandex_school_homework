@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/features/transactions/data/dto/transaction_response/transaction_response_dto.dart';
@@ -54,10 +55,12 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
 
   @override
   Future<TransactionResponseEntity> createTransaction(
-      TransactionRequestEntity transaction,
-      ) async {
+    TransactionRequestEntity transaction,
+  ) async {
     // 1. Сначала сохраняем в локальную базу
-    final createdTransaction = await databaseService.createTransaction(transaction);
+    final createdTransaction = await databaseService.createTransaction(
+      transaction,
+    );
 
     // 2. Добавляем операцию в бэкап
     await databaseService.addBackupOperation(
@@ -120,13 +123,17 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
     required String startDate,
     required String endDate,
   }) async {
-    final response = await httpClient.get(
+    final response = await httpClient.get<List<dynamic>>(
       '$transactionsEndpoint/account/$accountId/period',
       queryParameters: {'startDate': startDate, 'endDate': endDate},
+      options: Options(
+        extra: {'_deserialize': (TransactionResponseDto.fromJson, true)},
+      ),
     );
 
-    final data = response.data as List<dynamic>;
-    return data.map((e) => TransactionResponseDto.fromJson(e).toEntity()).toList();
+    return (response.data ?? [])
+        .map((e) => (e as TransactionResponseDto).toEntity())
+        .toList();
   }
 
   @override
@@ -135,7 +142,9 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
   }
 
   Future<void> _syncPendingTransactionOperations() async {
-    final operations = await databaseService.getUnsyncedOperations('transaction');
+    final operations = await databaseService.getUnsyncedOperations(
+      'transaction',
+    );
     if (operations.isEmpty) return;
 
     final successfulIds = <String>[];
@@ -167,9 +176,7 @@ final class TransactionsBackupRepository implements ITransactionsRepository {
             break;
 
           case 'DELETE':
-            await httpClient.delete(
-              '$transactionsEndpoint/${op.entityId}',
-            );
+            await httpClient.delete('$transactionsEndpoint/${op.entityId}');
             successfulIds.add(op.id);
             break;
         }

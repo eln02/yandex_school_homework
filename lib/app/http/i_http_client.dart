@@ -5,42 +5,42 @@ abstract interface class IHttpClient {
 
   static const name = 'IHttpClient';
 
-  Future<Response> get(
+  Future<Response<T>> get<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   });
 
-  Future<Response> post(
+  Future<Response<T>> post<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   });
 
-  Future<Response> patch(
+  Future<Response<T>> patch<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   });
 
-  Future<Response> put(
+  Future<Response<T>> put<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   });
 
-  Future<Response> delete(
+  Future<Response<T>> delete<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   });
 
-  Future<Response> head(
+  Future<Response<T>> head<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,

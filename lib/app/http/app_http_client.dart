@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/env_config/env_config.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
-import 'package:yandex_school_homework/app/http/retry_interceptor.dart';
+import 'package:yandex_school_homework/app/http/interceptors/isolate_deserialization_interceptor.dart';
+import 'package:yandex_school_homework/app/http/interceptors/retry_interceptor.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 
 final class AppHttpClient implements IHttpClient {
@@ -21,6 +22,7 @@ final class AppHttpClient implements IHttpClient {
     _httpClient.interceptors.addAll([
       debugService.dioLogger,
       RetryInterceptor(_httpClient, debugService),
+      StrictTypingDeserializationInterceptor(),
     ]);
 
     debugService.log('HTTP client created');
@@ -29,7 +31,7 @@ final class AppHttpClient implements IHttpClient {
   late final Dio _httpClient;
 
   @override
-  Future<Response> get(
+  Future<Response<T>> get<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -44,7 +46,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> post(
+  Future<Response<T>> post<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -59,7 +61,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> patch(
+  Future<Response<T>> patch<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -74,7 +76,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> put(
+  Future<Response<T>> put<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -89,7 +91,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> delete(
+  Future<Response<T>> delete<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -104,7 +106,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> head(
+  Future<Response<T>> head<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
