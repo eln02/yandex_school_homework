@@ -157,12 +157,46 @@ class TransactionEditModal extends StatelessWidget {
                     comment: notifier.comment,
                     onChanged: notifier.updateComment,
                   ),
+                  if (mode == TransactionEditMode.edit)
+                    _DeleteButton(
+                      onDelete: () {
+                        notifier.markForDeletion();
+                        context.pop(notifier.buildRequest());
+                      },
+                    ),
                 ],
               );
             },
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Кнопка удаления транзакции
+class _DeleteButton extends StatelessWidget {
+  final VoidCallback onDelete;
+
+  const _DeleteButton({required this.onDelete});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: ElevatedButton(
+        onPressed: onDelete,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: context.colors.error,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+        ),
+        child: Text(
+          'Удалить транзакцию',
+          style: context.texts.bodyLarge_.copyWith(color: context.colors.white),
+        ),
+      ),
     );
   }
 }

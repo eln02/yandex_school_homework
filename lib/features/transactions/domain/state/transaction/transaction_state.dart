@@ -41,6 +41,11 @@ class TransactionOperationUpdateState extends TransactionOperationState {
   List<Object?> get props => [transaction];
 }
 
+/// Состояние после успешного удаления транзакции
+class TransactionOperationDeleteState extends TransactionOperationState {
+  const TransactionOperationDeleteState();
+}
+
 /// Состояние ошибки отправки транзакции
 class TransactionOperationFailure extends TransactionOperationState {
   final dynamic error;

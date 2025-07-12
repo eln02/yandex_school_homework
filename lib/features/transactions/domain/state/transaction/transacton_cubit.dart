@@ -38,4 +38,16 @@ class TransactionOperationCubit extends Cubit<TransactionOperationState> {
       emit(TransactionOperationFailure(error: error, stackTrace: stackTrace));
     }
   }
+
+  /// Метод удаления транзакции
+  Future<void> deleteTransaction(int transactionId) async {
+    emit(const TransactionOperationLoadingState());
+
+    try {
+      await repository.deleteTransactionById(transactionId);
+      emit(const TransactionOperationDeleteState());
+    } catch (error, stackTrace) {
+      emit(TransactionOperationFailure(error: error, stackTrace: stackTrace));
+    }
+  }
 }

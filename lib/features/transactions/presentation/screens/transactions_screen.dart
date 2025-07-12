@@ -98,12 +98,16 @@ class _TransactionsSuccessScreen extends StatelessWidget {
     return BlocListener<TransactionOperationCubit, TransactionOperationState>(
       listener: (context, state) {
         switch (state) {
-          /// Добавление новой транзакции в список
+          /// Добавление новой транзакции
           case TransactionOperationSuccessState():
             onRefresh();
 
-          /// Обновление транзакции в списке
+          /// Обновление транзакции
           case TransactionOperationUpdateState():
+            onRefresh();
+
+          /// Удаление транзакции
+          case TransactionOperationDeleteState():
             onRefresh();
 
           case TransactionOperationFailure():
@@ -142,6 +146,15 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   context: context,
                   transaction: transaction,
                 );
+
+                /// Удаление транзакции
+                if (updatedTransaction == null && context.mounted) {
+                  context.read<TransactionOperationCubit>().deleteTransaction(
+                    transaction.id,
+                  );
+                }
+
+                /// Обновление транзакции
                 if (updatedTransaction != null && context.mounted) {
                   context.read<TransactionOperationCubit>().updateTransaction(
                     transaction: updatedTransaction,
