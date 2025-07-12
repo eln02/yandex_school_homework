@@ -98,21 +98,17 @@ class _TransactionsSuccessScreen extends StatelessWidget {
     return BlocListener<TransactionOperationCubit, TransactionOperationState>(
       listener: (context, state) {
         switch (state) {
-          /// Добавление новой транзакции в список
+          /// Добавление новой транзакции
           case TransactionOperationSuccessState():
-            if (isIncome == state.transaction.category.isIncome) {
-              context.read<TransactionsCubit>().addNewTransaction(
-                state.transaction,
-              );
-            }
+            onRefresh();
 
-          /// Обновление транзакции в списке
+          /// Обновление транзакции
           case TransactionOperationUpdateState():
-            if (isIncome == state.transaction.category.isIncome) {
-              context.read<TransactionsCubit>().updateTransaction(
-                state.transaction,
-              );
-            }
+            onRefresh();
+
+          /// Удаление транзакции
+          case TransactionOperationDeleteState():
+            onRefresh();
 
           case TransactionOperationFailure():
             ScaffoldMessenger.of(
@@ -150,6 +146,15 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   context: context,
                   transaction: transaction,
                 );
+
+                /// Удаление транзакции
+                if (updatedTransaction == null && context.mounted) {
+                  context.read<TransactionOperationCubit>().deleteTransaction(
+                    transaction.id,
+                  );
+                }
+
+                /// Обновление транзакции
                 if (updatedTransaction != null && context.mounted) {
                   context.read<TransactionOperationCubit>().updateTransaction(
                     transaction: updatedTransaction,

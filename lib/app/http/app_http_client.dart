@@ -1,12 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:yandex_school_homework/app/env_config/env_config.dart';
+import 'package:yandex_school_homework/app/http/deserialize_config.dart';
 import 'package:yandex_school_homework/app/http/i_http_client.dart';
+import 'package:yandex_school_homework/app/http/interceptors/deserialization_interceptor.dart';
+import 'package:yandex_school_homework/app/http/interceptors/retry_interceptor.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 
+/// Реализация HTTP-клиента на основе Dio.
+/// Обеспечивает:
+/// - Базовую конфигурацию подключения
+/// - Поддержку десериализации в изолятах
+/// - Механизм повторных запросов
+/// - Логирование сетевых операций
+/// - Стандартные HTTP-методы (GET, POST и др.)
 final class AppHttpClient implements IHttpClient {
-  AppHttpClient({
-    required IDebugService debugService,
-  }) {
+  AppHttpClient({required IDebugService debugService}) {
     _httpClient = Dio();
 
     _httpClient.options
@@ -18,20 +26,30 @@ final class AppHttpClient implements IHttpClient {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${EnvConfig.token}',
       };
+
+    _httpClient.interceptors.addAll([
+      debugService.dioLogger,
+      RetryInterceptor(_httpClient, debugService),
+      DeserializationInterceptor(),
+    ]);
+
     debugService.log('HTTP client created');
-    _httpClient.interceptors.add(debugService.dioLogger);
   }
 
   late final Dio _httpClient;
 
   @override
-  Future<Response> get(
+  Future<Response<T>> get<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
-    Options? options,
+    DeserializeConfig? deserializeConfig,
   }) async {
-    return _httpClient.get(
+    final options = deserializeConfig != null
+        ? Options(extra: {'_deserialize': deserializeConfig})
+        : null;
+
+    return _httpClient.get<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -40,7 +58,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> post(
+  Future<Response<T>> post<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -55,7 +73,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> patch(
+  Future<Response<T>> patch<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -70,7 +88,7 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> put(
+  Future<Response<T>> put<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -85,28 +103,13 @@ final class AppHttpClient implements IHttpClient {
   }
 
   @override
-  Future<Response> delete(
+  Future<Response<T>> delete<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     return _httpClient.delete(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-    );
-  }
-
-  @override
-  Future<Response> head(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
-    return _httpClient.head(
       path,
       data: data,
       queryParameters: queryParameters,

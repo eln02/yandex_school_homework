@@ -20,7 +20,7 @@ class CategoriesCubit extends Cubit<CategoriesState> {
       emit(
         CategoriesErrorState(
           stackTrace,
-          errorMessage: "Не удалось загрузить категории",
+          errorMessage: error.toString(),
         ),
       );
     }

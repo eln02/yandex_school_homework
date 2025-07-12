@@ -9,4 +9,6 @@ abstract interface class IAccountsRepository with DiBaseRepo {
     required int id,
     required AccountUpdateRequestEntity account,
   });
+
+  Future<void> syncPendingChanges() async {}
 }

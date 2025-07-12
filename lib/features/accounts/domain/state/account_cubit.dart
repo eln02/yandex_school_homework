@@ -16,12 +16,17 @@ class AccountCubit extends Cubit<AccountState> {
     try {
       final accounts = await repository.fetchAccounts();
 
+      if (accounts.isEmpty) {
+        emit(const AccountErrorState(null, errorMessage: "Нет счета"));
+        return;
+      }
+
       emit(AccountLoadedState(accounts: accounts));
     } on Object catch (error, stackTrace) {
       emit(
         AccountErrorState(
           stackTrace,
-          errorMessage: "Не удалось загрузить счет",
+          errorMessage: error.toString(),
         ),
       );
     }
@@ -33,39 +38,53 @@ class AccountCubit extends Cubit<AccountState> {
     String? currency,
     String? name,
   }) async {
-    if (state is AccountLoadedState) {
-      final currentState = state as AccountLoadedState;
-      final currentAccount = currentState.account;
+    if (state is! AccountLoadedState) return;
 
-      final accountRequest = AccountUpdateRequestEntity(
-        name: name ?? currentAccount.name,
-        balance: balance ?? currentAccount.balance,
-        currency: currency ?? currentAccount.currency,
+    final currentState = state as AccountLoadedState;
+    final currentAccount = currentState.account;
+
+    // Создаем оптимистично обновленный аккаунт
+    final optimisticAccount = currentAccount.copyWith(
+      name: name,
+      balance: balance,
+      currency: currency,
+    );
+
+    // Создаем оптимистично обновленный список
+    final optimisticAccounts = currentState.accounts.map((account) {
+      return account.id == currentAccount.id ? optimisticAccount : account;
+    }).toList();
+
+    // Сразу показываем изменения пользователю
+    emit(AccountLoadedState(accounts: optimisticAccounts));
+
+    final accountRequest = AccountUpdateRequestEntity(
+      name: name ?? currentAccount.name,
+      balance: balance ?? currentAccount.balance,
+      currency: currency ?? currentAccount.currency,
+    );
+
+    try {
+      final updatedAccount = await repository.updateAccount(
+        id: currentAccount.id,
+        account: accountRequest,
       );
 
-      // TODO: подумать над оптимистичным обновлением чтобы не обновлять весь экран
-      emit(const AccountLoadingState());
+      // Если сервер вернул другие данные - используем их
+      final finalAccounts = currentState.accounts.map((account) {
+        return account.id == updatedAccount.id ? updatedAccount : account;
+      }).toList();
 
-      try {
-        final updatedAccount = await repository.updateAccount(
-          id: currentAccount.id,
-          account: accountRequest,
-        );
+      emit(AccountLoadedState(accounts: finalAccounts));
+    } on Object catch (error, stackTrace) {
+      // В случае ошибки - возвращаем предыдущее состояние
+      emit(AccountErrorState(
+        stackTrace,
+        errorMessage: error.toString(),
+      ));
 
-        final updatedAccounts = currentState.accounts.map((account) {
-          return account.id == updatedAccount.id ? updatedAccount : account;
-        }).toList();
-
-        emit(AccountLoadedState(accounts: updatedAccounts));
-      } on Object catch (error, stackTrace) {
-        emit(
-          AccountErrorState(
-            stackTrace,
-            errorMessage: "Не удалось обновить счет",
-          ),
-        );
-        emit(currentState);
-      }
+      // Возвращаем оригинальные данные
+      emit(currentState);
     }
   }
 }

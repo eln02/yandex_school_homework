@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:worker_manager/worker_manager.dart';
 import 'package:yandex_school_homework/app/app.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:yandex_school_homework/features/debug/debug_service.dart';
@@ -30,6 +31,8 @@ class AppRunner {
 
       /// Инициализация локализации
       await initializeDateFormatting('ru_RU');
+
+      await workerManager.init();
 
       _debugService = DebugService();
 

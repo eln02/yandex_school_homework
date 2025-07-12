@@ -3,8 +3,6 @@ import 'package:yandex_school_homework/features/transactions/domain/entity/trans
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
 
 abstract interface class ITransactionsRepository with DiBaseRepo {
-  Future<TransactionResponseEntity> fetchTransactionById(int id);
-
   Future<List<TransactionResponseEntity>> fetchTransactionsByPeriod({
     required int accountId,
     required String startDate,
@@ -21,4 +19,6 @@ abstract interface class ITransactionsRepository with DiBaseRepo {
   });
 
   Future<void> deleteTransactionById(int id);
+
+  Future<void> syncPendingChanges() async {}
 }
