@@ -14,6 +14,7 @@ import 'package:yandex_school_homework/features/transactions/domain/state/transa
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/total_amount_header.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/componenets/transactions_list.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transaction_modal_screen.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/state/transaction_edit_result.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 /// Экран с доходами/расходами
@@ -142,37 +143,55 @@ class _TransactionsSuccessScreen extends StatelessWidget {
                   : state.sortedExpenses(SortingType.dateNewestFirst),
               onRefresh: onRefresh,
               onTapTransaction: (transaction) async {
-                final updatedTransaction = await showTransactionEditModal(
+                final result = await showTransactionEditModal(
                   context: context,
                   transaction: transaction,
                 );
 
-                /// Удаление транзакции
-                if (updatedTransaction == null && context.mounted) {
-                  context.read<TransactionOperationCubit>().deleteTransaction(
-                    transaction.id,
-                  );
-                }
+                if (!context.mounted) return;
 
-                /// Обновление транзакции
-                if (updatedTransaction != null && context.mounted) {
-                  context.read<TransactionOperationCubit>().updateTransaction(
-                    transaction: updatedTransaction,
-                    transactionId: transaction.id,
-                  );
+                if (result != null) {
+                  switch (result) {
+                    case TransactionEditSuccess(
+                      request: final updatedTransaction,
+                    ):
+                      // Обновление транзакции
+                      context
+                          .read<TransactionOperationCubit>()
+                          .updateTransaction(
+                            transaction: updatedTransaction,
+                            transactionId: transaction.id,
+                          );
+                    case TransactionEditDeleted():
+                      // Удаление транзакции
+                      context
+                          .read<TransactionOperationCubit>()
+                          .deleteTransaction(transaction.id);
+                    case TransactionEditCanceled():
+                      // Пользователь закрыл без изменений
+                      break;
+                  }
                 }
               },
             ),
             _FloatingButton(
               onTap: () async {
-                final newTransaction = await showTransactionEditModal(
+                final result = await showTransactionEditModal(
                   context: context,
                   isIncome: isIncome,
                 );
-                if (newTransaction != null && context.mounted) {
-                  context.read<TransactionOperationCubit>().createTransaction(
-                    newTransaction,
-                  );
+
+                if (!context.mounted) return;
+
+                if (result != null) {
+                  switch (result) {
+                    case TransactionEditSuccess(request: final newTransaction):
+                      // Создание новой транзакции
+                      context
+                          .read<TransactionOperationCubit>()
+                          .createTransaction(newTransaction);
+                    default:
+                  }
                 }
               },
             ),

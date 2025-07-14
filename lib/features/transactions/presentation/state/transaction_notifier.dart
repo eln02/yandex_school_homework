@@ -12,7 +12,6 @@ class TransactionNotifier extends ChangeNotifier {
   String _amount;
   DateTime _transactionDate;
   String? _comment;
-  bool _isDeleted = false;
   final bool? _isIncome;
 
   /// Конструктор для редактирования существующей транзакции
@@ -50,8 +49,6 @@ class TransactionNotifier extends ChangeNotifier {
   String? get comment => _comment;
 
   bool? get isIncome => _isIncome;
-
-  bool get isDeleted => _isDeleted;
 
   /// Геттер-дебаунс чтобы не отправлять запрос при отсутствии изменений
   bool get hasChanges {
@@ -93,11 +90,6 @@ class TransactionNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void markForDeletion() {
-    _isDeleted = true;
-    notifyListeners();
-  }
-
   /// Метод валидации формы
   List<String> validateForm() {
     final errors = <String>[];
@@ -109,7 +101,6 @@ class TransactionNotifier extends ChangeNotifier {
 
   /// Метод создания сущности транзакции для запроса
   TransactionRequestEntity? buildRequest() {
-    if (_isDeleted) return null;
     if (validateForm().isNotEmpty) return null;
     return TransactionRequestEntity(
       accountId: _accountId!,

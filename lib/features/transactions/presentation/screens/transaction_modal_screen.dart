@@ -12,20 +12,20 @@ import 'package:yandex_school_homework/features/accounts/domain/state/account_st
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_state.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
-import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_request_entity.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/transaction_response_entity.dart';
+import 'package:yandex_school_homework/features/transactions/presentation/state/transaction_edit_result.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/state/transaction_notifier.dart';
 
 /// Режим редактирования/создания транзакции
 enum TransactionEditMode { create, edit }
 
 /// Функция вызова модального окна редактирования/создания транзакции
-Future<TransactionRequestEntity?> showTransactionEditModal({
+Future<TransactionEditResult?> showTransactionEditModal({
   required BuildContext context,
   TransactionResponseEntity? transaction,
   bool? isIncome,
 }) async {
-  return await showModalBottomSheet<TransactionRequestEntity>(
+  return await showModalBottomSheet<TransactionEditResult>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
@@ -108,7 +108,9 @@ class TransactionEditModal extends StatelessWidget {
           onNext: () async {
             /// дебаунс при отсутсвии измений - просто закрытие
             if (mode == TransactionEditMode.edit && !notifier.hasChanges) {
-              if (context.mounted) context.pop();
+              if (context.mounted) {
+                context.pop(TransactionEditResult.canceled());
+              }
               return;
             }
 
@@ -122,7 +124,7 @@ class TransactionEditModal extends StatelessWidget {
             /// создание сущности и возврат ее на прошлый экран, если все успешно
             final request = notifier.buildRequest();
             if (request != null && context.mounted) {
-              context.pop(request);
+              context.pop(TransactionEditResult.success(request));
             }
           },
           showBackButton: true,
@@ -160,8 +162,7 @@ class TransactionEditModal extends StatelessWidget {
                   if (mode == TransactionEditMode.edit)
                     _DeleteButton(
                       onDelete: () {
-                        notifier.markForDeletion();
-                        context.pop(notifier.buildRequest());
+                        context.pop(TransactionEditResult.deleted());
                       },
                     ),
                 ],
