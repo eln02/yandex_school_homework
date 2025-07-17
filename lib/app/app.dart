@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
-import 'package:yandex_school_homework/app/app_providers.dart';
 import 'package:yandex_school_homework/app/depends_providers.dart';
 import 'package:yandex_school_homework/app/theme/app_theme.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
@@ -30,42 +29,37 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return AppProviders(
-      child: FutureBuilder<DiContainer>(
-        future: _initFuture,
-        builder: (_, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              return const SplashScreen();
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                return ErrorScreen(
-                  error: snapshot.error,
-                  stackTrace: snapshot.stackTrace,
-                  onRetry: _retryInit,
-                );
-              }
-
-              final diContainer = snapshot.data;
-              if (diContainer == null) {
-                return ErrorScreen(
-                  error:
-                      'Ошибка инициализации зависимостей, diContainer = null',
-                  stackTrace: null,
-                  onRetry: _retryInit,
-                );
-              }
-              return DependsProviders(
-                diContainer: diContainer,
-                child: ThemeConsumer(
-                  builder: () => _App(router: widget.router),
-                ),
+    return FutureBuilder<DiContainer>(
+      future: _initFuture,
+      builder: (_, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return const SplashScreen();
+          case ConnectionState.done:
+            if (snapshot.hasError) {
+              return ErrorScreen(
+                error: snapshot.error,
+                stackTrace: snapshot.stackTrace,
+                onRetry: _retryInit,
               );
-          }
-        },
-      ),
+            }
+
+            final diContainer = snapshot.data;
+            if (diContainer == null) {
+              return ErrorScreen(
+                error: 'Ошибка инициализации зависимостей, diContainer = null',
+                stackTrace: null,
+                onRetry: _retryInit,
+              );
+            }
+            return DependsProviders(
+              diContainer: diContainer,
+              child: ThemeConsumer(builder: () => _App(router: widget.router)),
+            );
+        }
+      },
     );
   }
 

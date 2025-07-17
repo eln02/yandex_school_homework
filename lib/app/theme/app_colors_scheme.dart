@@ -6,40 +6,44 @@ extension AppColorsScheme on ColorScheme {
 
   Color get testColor => _isLight ? Colors.green : Colors.red;
 
-  Color get white => Colors.white;
+  Color get white => AppColors.white;
 
   Color get mainBackground =>
-      _isLight ? AppColors.mainBackground : AppColors.mainBackground;
+      _isLight ? AppColors.mainBackgroundLight : AppColors.mainBackgroundDark;
 
-  Color get surfaceContainer_ =>
-      _isLight ? const Color(0xFFF3EDF7) : const Color(0xFFF3EDF7);
+  Color get surfaceContainer_ => _isLight
+      ? AppColors.surfaceContainerLight
+      : AppColors.surfaceContainerDark;
 
   Color get onSurface_ =>
-      _isLight ? const Color(0xFF49454F) : const Color(0xFF49454F);
+      _isLight ? AppColors.onSurfaceLight : AppColors.onSurfaceDark;
 
-  Color get financeGreen =>
-      _isLight ? const Color(0xFF2AE881) : const Color(0xFF2AE881);
+  Color get onColoredBackground_ => AppColors.onColoredBackgroundDark;
 
-  Color get lightFinanceGreen =>
-      _isLight ? const Color(0xFFD4FAE6) : const Color(0xFFD4FAE6);
+  Color get financeGreen => AppColors.financeGreen;
 
-  Color get transactionsDivider =>
-      _isLight ? const Color(0xFFCAC4D0) : const Color(0xFFCAC4D0);
+  Color get secondFinanceGreen => _isLight
+      ? AppColors.lightFinanceGreenLight
+      : AppColors.lightFinanceGreenDark;
+
+  Color get transactionsDivider => _isLight
+      ? AppColors.transactionsDividerLight
+      : AppColors.transactionsDividerDark;
 
   Color get onSurfaceText =>
-      _isLight ? const Color(0xFF1D1B20) : const Color(0xFF1D1B20);
+      _isLight ? AppColors.onSurfaceTextLight : AppColors.onSurfaceTextDark;
 
-  // withAlpha(77) = 30% прозрачность
-  Color get labelsTertiary => _isLight
-      ? const Color(0xFF3C3C43).withAlpha(77)
-      : const Color(0xFF3C3C43).withAlpha(77);
+  Color get labelsTertiary =>
+      _isLight ? AppColors.labelsTertiaryLight : AppColors.labelsTertiaryDark;
 
-  Color get surfaceContainer =>
-      _isLight ? const Color(0xFFECE6F0) : const Color(0xFFECE6F0);
+  Color get surfaceContainer => _isLight
+      ? AppColors.surfaceContainerLight
+      : AppColors.surfaceContainerDark;
 
   Color get modalLine =>
-      _isLight ? const Color(0xFF79747E) : const Color(0xFF79747E);
+      _isLight ? AppColors.modalLineLight : AppColors.modalLineDark;
 
-  Color get shimmerContainer =>
-      _isLight ? const Color(0XFFB8F5D5) : const Color(0XFFB8F5D5);
+  Color get shimmerContainer => _isLight
+      ? AppColors.shimmerContainerLight
+      : AppColors.shimmerContainerDark;
 }

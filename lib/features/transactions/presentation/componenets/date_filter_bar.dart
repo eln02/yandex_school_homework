@@ -40,6 +40,7 @@ class DateFilterBar extends StatelessWidget {
             colorScheme: ColorScheme.light(
               primary: context.colors.financeGreen,
               surface: context.colors.mainBackground,
+              onSurface: context.colors.onSurface_,
             ),
           ),
           child: child!,
@@ -96,7 +97,11 @@ class _DateTile extends StatelessWidget {
 
     final dateText = Text(
       formatted,
-      style: context.texts.bodyLarge_,
+      style: context.texts.bodyLarge_.copyWith(
+        color: wrapDate
+            ? context.colors.onColoredBackground_
+            : context.colors.onSurface_,
+      ),
     );
 
     return GestureDetector(

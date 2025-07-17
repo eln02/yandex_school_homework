@@ -5,6 +5,8 @@ import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/di/di_repositories.dart';
 import 'package:yandex_school_homework/di/di_typedefs.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/i_user_settings_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/user_settings_service.dart';
 
 final class DiContainer {
   DiContainer({
@@ -24,6 +26,8 @@ final class DiContainer {
 
   late final IDatabaseService databaseService;
 
+  late final IUserSettingsService userSettingsService;
+
   late final DiRepositories repositories;
 
   Future<void> init({
@@ -40,6 +44,10 @@ final class DiContainer {
       databaseVersion: _databaseVersion,
       debugService: debugService,
     );
+
+    onProgress('Инициализация сервиса настроек...');
+    userSettingsService = UserSettingsService();
+    await userSettingsService.init();
 
     onProgress('Инициализация репозиториев...');
     repositories = DiRepositories()

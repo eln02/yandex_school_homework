@@ -118,6 +118,7 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
     return Scaffold(
       appBar: CustomAppBar(
         color: context.colors.mainBackground,
+        titleColor: context.colors.onSurface_,
         title: 'Анализ ${widget.isIncome ? 'доходов' : 'расходов'}',
         showBackButton: true,
         extraHeight: 56 * 3 + diagramContainerSize,

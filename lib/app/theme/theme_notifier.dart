@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/i_user_settings_service.dart';
 
 typedef ThemeBuilder = Widget Function();
 
@@ -19,14 +20,23 @@ class ThemeConsumer extends StatelessWidget {
 }
 
 final class ThemeNotifier extends ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.system;
+  final IUserSettingsService _settingsService;
+  late ThemeMode _themeMode;
+
+  ThemeNotifier(this._settingsService) {
+    _initTheme();
+  }
+
+  Future<void> _initTheme() async {
+    _themeMode = _settingsService.themeMode;
+    notifyListeners();
+  }
 
   ThemeMode get themeMode => _themeMode;
 
-  void changeTheme() {
-    _themeMode = _themeMode == ThemeMode.light
-        ? ThemeMode.dark
-        : ThemeMode.light;
+  Future<void> changeTheme(bool useDarkTheme) async {
+    _themeMode = useDarkTheme ? ThemeMode.dark : ThemeMode.system;
+    await _settingsService.saveThemeMode(_themeMode);
     notifyListeners();
   }
 }

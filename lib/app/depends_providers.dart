@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
@@ -55,8 +56,12 @@ final class DependsProviders extends StatelessWidget {
           create: (_) => BackupCubit(
             connectivity: Connectivity(),
             accountsRepository: diContainer.repositories.accountsRepository,
-            transactionsRepository: diContainer.repositories.transactionsRepository,
+            transactionsRepository:
+                diContainer.repositories.transactionsRepository,
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeNotifier(diContainer.userSettingsService),
         ),
       ],
       child: child,

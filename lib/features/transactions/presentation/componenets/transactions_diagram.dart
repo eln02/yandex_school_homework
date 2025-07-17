@@ -295,7 +295,11 @@ class _CashFlowChartState extends State<CashFlowChart> {
           widget.isMonthly
               ? _formatMonth(widget.data[index].date)
               : _formatDay(widget.data[index].date),
-          style: const TextStyle(fontSize: 10, color: Colors.black),
+          style: TextStyle(
+            fontSize: 10,
+            color:
+                context.colors.onSurfaceText, // Используем цвет текста из темы
+          ),
         ),
       );
     }

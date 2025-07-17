@@ -61,7 +61,7 @@ class RootScreen extends StatelessWidget {
                 height: 32,
                 decoration: isSelected
                     ? BoxDecoration(
-                        color: context.colors.lightFinanceGreen,
+                        color: context.colors.secondFinanceGreen,
                         borderRadius: BorderRadius.circular(32),
                       )
                     : null,

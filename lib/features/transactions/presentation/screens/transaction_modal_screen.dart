@@ -220,6 +220,7 @@ class _DateField extends StatelessWidget {
           colorScheme: ColorScheme.light(
             primary: context.colors.financeGreen,
             surface: context.colors.mainBackground,
+            onSurface: context.colors.onSurface_,
           ),
         ),
         child: child!,
@@ -276,6 +277,7 @@ class _TimeField extends StatelessWidget {
           colorScheme: ColorScheme.light(
             primary: context.colors.financeGreen,
             surface: context.colors.mainBackground,
+            onSurface: context.colors.onSurface_,
           ),
         ),
         child: child!,
