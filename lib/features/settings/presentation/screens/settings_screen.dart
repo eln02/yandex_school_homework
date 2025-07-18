@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
+import 'package:yandex_school_homework/router/app_router.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -32,6 +34,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
+            ElevatedButton(
+              onPressed: () => context.pushNamed(AppRouter.pinSettings),
+              child: Text('Экран настроек пина'),
+            ),
             _buildThemeSwitch(context),
             const SizedBox(height: 16),
             _buildColorPicker(context),
@@ -52,10 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
-            leading: Icon(
-              Icons.palette,
-              color: context.primaryColor,
-            ),
+            leading: Icon(Icons.palette, color: context.primaryColor),
             title: const Text('Основной цвет'),
             trailing: Container(
               width: 24,
@@ -147,31 +150,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildAppVersion(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(
-              Icons.info_outline,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.info_outline, color: Colors.grey[600]),
             const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Версия приложения',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                 ),
-                Text(
-                  '1.0.0',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text('1.0.0', style: Theme.of(context).textTheme.titleMedium),
               ],
             ),
           ],

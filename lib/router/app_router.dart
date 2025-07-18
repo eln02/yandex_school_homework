@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/features/accounts/presentation/screens/account_screen.dart';
 import 'package:yandex_school_homework/features/categories/presentation/screens/categories_screen.dart';
 import 'package:yandex_school_homework/features/categories/presentation/screens/search_categories_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
+import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_screen.dart';
+import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_settings.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/settings_screen.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_analysis_screen.dart';
@@ -35,12 +40,61 @@ class AppRouter {
 
   static String get searchCategories => '/search_categories_name';
 
+  static String get pinSettings => '/pin_settings_name';
+
+  static const String pinConfirm = '/confirm_pin_name';
+  static const String pinConfirmPath = '/confirm_pin';
+  static const String pinSet = '/pin_set_name';
+  static const String pinUpdate = '/pin_update_name';
+  static const String pinDelete = '/pin_delete_name';
+
   static GoRouter createRouter(IDebugService debugService) {
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       debugLogDiagnostics: true,
       initialLocation: initialLocation,
+      redirect: (context, state) {
+        final pinCodeCubit = context.read<PinCodeCubit>();
+        final isPinSet = pinCodeCubit.state is PinSet;
+        final isConfirmed = pinCodeCubit.state is PinConfirmed;
+        final isOnConfirmScreen = state.uri.toString() == pinConfirmPath;
+
+        if (isPinSet && !isConfirmed && !isOnConfirmScreen) {
+          return pinConfirmPath;
+        }
+
+        if (isConfirmed && isOnConfirmScreen) {
+          return initialLocation;
+        }
+
+        return null;
+      },
       routes: [
+        GoRoute(
+          path: '/pin_set',
+          name: pinSet,
+          builder: (context, state) =>
+              const PinActionScreen(actionType: PinActionType.set),
+        ),
+        GoRoute(
+          path: '/pin_update',
+          name: pinUpdate,
+          builder: (context, state) =>
+              const PinActionScreen(actionType: PinActionType.update),
+        ),
+        GoRoute(
+          path: '/pin_delete',
+          name: pinDelete,
+          builder: (context, state) =>
+              const PinActionScreen(actionType: PinActionType.delete),
+        ),
+        GoRoute(
+          path: pinConfirmPath,
+          name: pinConfirm,
+          builder: (context, state) =>
+              const PinActionScreen(actionType: PinActionType.confirm),
+        ),
+
         // TODO: вынести ветки в отдельные классы
         StatefulShellRoute.indexedStack(
           parentNavigatorKey: rootNavigatorKey,
@@ -178,6 +232,13 @@ class AppRouter {
                   path: '/settings_path',
                   name: 'settings',
                   builder: (context, state) => const SettingsScreen(),
+                  routes: [
+                    GoRoute(
+                      path: '/pin_settings_path',
+                      name: pinSettings,
+                      builder: (context, state) => const PinSettingsScreen(),
+                    ),
+                  ],
                 ),
               ],
             ),

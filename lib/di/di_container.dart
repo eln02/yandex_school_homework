@@ -5,6 +5,7 @@ import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/di/di_repositories.dart';
 import 'package:yandex_school_homework/di/di_typedefs.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/pincode_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/i_user_settings_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/user_settings_service.dart';
 
@@ -27,6 +28,7 @@ final class DiContainer {
   late final IDatabaseService databaseService;
 
   late final IUserSettingsService userSettingsService;
+  late final IPinCodeService pinCodeService;
 
   late final DiRepositories repositories;
 
@@ -48,6 +50,10 @@ final class DiContainer {
     onProgress('Инициализация сервиса настроек...');
     userSettingsService = UserSettingsService();
     await userSettingsService.init();
+
+    onProgress('Инициализация сервиса пинкода...');
+    pinCodeService = SecurePinCodeService();
+    await pinCodeService.init();
 
     onProgress('Инициализация репозиториев...');
     repositories = DiRepositories()
