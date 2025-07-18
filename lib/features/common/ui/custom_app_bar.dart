@@ -33,9 +33,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onSurfaceColor = titleColor ?? context.colors.onColoredBackground_;
+    final onSurfaceColor = titleColor ?? context.textColor;
     return Container(
-      color: color ?? context.colors.financeGreen,
+      color: color ?? context.primaryColor,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         children: [
@@ -71,7 +71,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-          ...children,
+          ColoredBox(
+            color: context.colors.mainBackground,
+            child: Column(children: children),
+          ),
         ],
       ),
     );

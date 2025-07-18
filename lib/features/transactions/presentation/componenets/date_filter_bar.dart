@@ -38,7 +38,7 @@ class DateFilterBar extends StatelessWidget {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: context.colors.financeGreen,
+              primary: context.primaryColor,
               surface: context.colors.mainBackground,
               onSurface: context.colors.onSurface_,
             ),
@@ -117,7 +117,7 @@ class _DateTile extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.financeGreen,
+                    color: context.primaryColor,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: dateText,

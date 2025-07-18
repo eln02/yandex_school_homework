@@ -74,12 +74,12 @@ class _TransactionsDiagramViewState extends State<_TransactionsDiagramView> {
               selectedColor: Colors.white,
               fillColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return context.colors.financeGreen;
+                  return context.primaryColor;
                 }
                 return Colors.transparent;
               }),
-              borderColor: context.colors.financeGreen,
-              selectedBorderColor: context.colors.financeGreen,
+              borderColor: context.primaryColor,
+              selectedBorderColor: context.primaryColor,
               borderRadius: BorderRadius.circular(8),
               borderWidth: 1,
               splashColor: Colors.transparent,

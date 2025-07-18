@@ -218,7 +218,7 @@ class _FloatingButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onTap,
           style: ElevatedButton.styleFrom(
-            backgroundColor: context.colors.financeGreen,
+            backgroundColor: context.primaryColor,
             shape: const CircleBorder(),
             padding: EdgeInsets.zero,
             elevation: 0,

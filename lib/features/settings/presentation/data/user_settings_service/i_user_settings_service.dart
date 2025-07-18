@@ -10,4 +10,8 @@ abstract class IUserSettingsService {
 
   /// Сохранить выбранную тему
   Future<void> saveThemeMode(ThemeMode mode);
+
+  Color get primaryColor;
+
+  Future<void> savePrimaryColor(Color color);
 }

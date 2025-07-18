@@ -83,7 +83,7 @@ class TransactionEditModal extends StatelessWidget {
               child: Text(
                 'OK',
                 style: context.texts.titleLarge_.copyWith(
-                  color: context.colors.financeGreen,
+                  color: context.primaryColor,
                 ),
               ),
               onPressed: () => context.pop(),
@@ -218,7 +218,7 @@ class _DateField extends StatelessWidget {
       builder: (context, child) => Theme(
         data: ThemeData.light().copyWith(
           colorScheme: ColorScheme.light(
-            primary: context.colors.financeGreen,
+            primary: context.primaryColor,
             surface: context.colors.mainBackground,
             onSurface: context.colors.onSurface_,
           ),
@@ -275,7 +275,7 @@ class _TimeField extends StatelessWidget {
       builder: (context, child) => Theme(
         data: ThemeData.light().copyWith(
           colorScheme: ColorScheme.light(
-            primary: context.colors.financeGreen,
+            primary: context.primaryColor,
             surface: context.colors.mainBackground,
             onSurface: context.colors.onSurface_,
           ),

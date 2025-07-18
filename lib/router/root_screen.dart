@@ -61,7 +61,7 @@ class RootScreen extends StatelessWidget {
                 height: 32,
                 decoration: isSelected
                     ? BoxDecoration(
-                        color: context.colors.secondFinanceGreen,
+                        color: context.secondaryColor,
                         borderRadius: BorderRadius.circular(32),
                       )
                     : null,
@@ -69,7 +69,7 @@ class RootScreen extends StatelessWidget {
                 child: icons[index].svg(
                   colorFilter: ColorFilter.mode(
                     isSelected
-                        ? context.colors.financeGreen
+                        ? context.primaryColor
                         : context.colors.onSurface_,
                     BlendMode.srcIn,
                   ),

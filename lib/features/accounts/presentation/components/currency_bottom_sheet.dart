@@ -55,7 +55,7 @@ void showCurrencyBottomSheet(BuildContext context, AccountEntity account) {
                     style: context.texts.bodyLarge_,
                   ),
                   trailing: account.currency == currency.code
-                      ? Icon(Icons.check, color: context.colors.financeGreen)
+                      ? Icon(Icons.check, color: context.primaryColor)
                       : null,
                   onTap: () {
                     context.pop();

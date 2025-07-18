@@ -22,9 +22,7 @@ extension AppColorsScheme on ColorScheme {
 
   Color get financeGreen => AppColors.financeGreen;
 
-  Color get secondFinanceGreen => _isLight
-      ? AppColors.lightFinanceGreenLight
-      : AppColors.lightFinanceGreenDark;
+  Color get secondFinanceGreen => AppColors.financeGreenWithOpacity;
 
   Color get transactionsDivider => _isLight
       ? AppColors.transactionsDividerLight

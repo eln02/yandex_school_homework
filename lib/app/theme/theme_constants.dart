@@ -4,8 +4,8 @@ import 'dart:ui';
 abstract class AppColors {
   // Light theme colors
   static const Color onSurfaceTextLight = Color(0xFF1D1B20);
+
   //static const Color onColoredBackgroundLight = Color(0xFFFFFFFF);
-  static const Color lightFinanceGreenLight = Color(0xFFD4FAE6);
   static const Color mainBackgroundLight = Color(0xFFFEF7FF);
   static const Color surfaceContainerLight = Color(0xFFECE6F0);
   static const Color onSurfaceLight = Color(0xFF49454F);
@@ -17,7 +17,6 @@ abstract class AppColors {
   // Dark theme colors
   static const Color onSurfaceTextDark = Color(0xFFE6E0E9);
   static const Color onColoredBackgroundDark = Color(0xFF1D1B20);
-  static const Color lightFinanceGreenDark = Color(0xFF1E3A2F);
   static const Color mainBackgroundDark = Color(0xFF141218);
   static const Color surfaceContainerDark = Color(0xFF211F26);
   static const Color onSurfaceDark = Color(0xFFCAC4D0);
@@ -28,5 +27,6 @@ abstract class AppColors {
 
   // Common colors (same for both themes)
   static const Color financeGreen = Color(0xFF2AE881);
+  static Color financeGreenWithOpacity = const Color(0xFF2AE881).withAlpha(76);
   static const Color white = Color(0xFFFFFFFF);
 }
