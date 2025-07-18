@@ -5,6 +5,7 @@ import 'package:yandex_school_homework/features/accounts/presentation/screens/ac
 import 'package:yandex_school_homework/features/categories/presentation/screens/categories_screen.dart';
 import 'package:yandex_school_homework/features/categories/presentation/screens/search_categories_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_screen.dart';
@@ -54,17 +55,15 @@ class AppRouter {
       debugLogDiagnostics: true,
       initialLocation: initialLocation,
       redirect: (context, state) {
-        final pinCodeCubit = context.read<PinCodeCubit>();
-        final isPinSet = pinCodeCubit.state is PinSet;
-        final isConfirmed = pinCodeCubit.state is PinConfirmed;
-        final isOnConfirmScreen = state.uri.toString() == pinConfirmPath;
+        final isPinSet = context.read<PinStatusNotifier>().value;
+        final pinState = context.read<PinOperationCubit>().state;
+        final isConfirmed =
+            (pinState is PinConfirmed) ||
+            (pinState is PinUpdated) ||
+            (pinState is PinSetSuccess);
 
-        if (isPinSet && !isConfirmed && !isOnConfirmScreen) {
+        if (isPinSet && !isConfirmed) {
           return pinConfirmPath;
-        }
-
-        if (isConfirmed && isOnConfirmScreen) {
-          return initialLocation;
         }
 
         return null;

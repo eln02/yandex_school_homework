@@ -1,31 +1,27 @@
 import 'package:equatable/equatable.dart';
 
-sealed class PinCodeState extends Equatable {
-  const PinCodeState();
+sealed class PinOperationState extends Equatable {
+  const PinOperationState();
 
   @override
   List<Object?> get props => [];
 }
 
-class PinInitial extends PinCodeState {}
+class PinOperationInitial extends PinOperationState {}
 
-class PinLoading extends PinCodeState {}
+class PinLoading extends PinOperationState {}
 
-class PinNotSet extends PinCodeState {}
+class PinSetSuccess extends PinOperationState {}
 
-class PinSet extends PinCodeState {}
+class PinConfirmed extends PinOperationState {}
 
-class PinValidated extends PinCodeState {}
+class PinDeleted extends PinOperationState {}
 
-class PinValidationFailed extends PinCodeState {}
+class PinUpdated extends PinOperationState {}
 
-final class PinConfirmed extends PinCodeState {}
+class PinValidationFailed extends PinOperationState {}
 
-//class PinUpdated extends PinCodeState {}
-
-class PinDeleted extends PinCodeState {}
-
-class PinError extends PinCodeState {
+class PinError extends PinOperationState {
   final String message;
 
   const PinError(this.message);

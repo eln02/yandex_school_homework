@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/connectivity_checker/backup_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
@@ -64,7 +65,13 @@ final class DependsProviders extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ThemeNotifier(diContainer.userSettingsService),
         ),
-        BlocProvider(create: (_) => PinCodeCubit(diContainer.pinCodeService)),
+        ChangeNotifierProvider(
+          create: (_) =>
+              PinStatusNotifier(isPinSet: diContainer.pinCodeService.isPinSet),
+        ),
+        BlocProvider(
+          create: (_) => PinOperationCubit(diContainer.pinCodeService),
+        ),
       ],
       child: child,
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
@@ -22,11 +23,12 @@ class _PinActionScreenState extends State<PinActionScreen> {
   final _newPinController = TextEditingController();
 
   bool get isSet => widget.actionType == PinActionType.set;
-  bool get isUpdate => widget.actionType == PinActionType.update;
-  bool get isDelete => widget.actionType == PinActionType.delete;
-  bool get isConfirm => widget.actionType == PinActionType.confirm;
 
-  bool _isLoading = false;
+  bool get isUpdate => widget.actionType == PinActionType.update;
+
+  bool get isDelete => widget.actionType == PinActionType.delete;
+
+  bool get isConfirm => widget.actionType == PinActionType.confirm;
 
   @override
   void dispose() {
@@ -38,7 +40,7 @@ class _PinActionScreenState extends State<PinActionScreen> {
   void _onConfirmPressed(BuildContext context) {
     if (!_formKey.currentState!.validate()) return;
 
-    final cubit = context.read<PinCodeCubit>();
+    final cubit = context.read<PinOperationCubit>();
 
     switch (widget.actionType) {
       case PinActionType.set:
@@ -60,33 +62,51 @@ class _PinActionScreenState extends State<PinActionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_getTitle(widget.actionType))),
-      body: BlocConsumer<PinCodeCubit, PinCodeState>(
+      body: BlocConsumer<PinOperationCubit, PinOperationState>(
         listener: (context, state) {
           switch (state) {
-            case PinValidated():
-            case PinSet():
+            case PinSetSuccess():
+              context.read<PinStatusNotifier>().setPinStatus(true);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Пин установлен')));
+              context.pop();
+              break;
+            case PinUpdated():
+              context.read<PinStatusNotifier>().setPinStatus(true);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Пин обновлен')));
+              context.pop();
+              break;
             case PinConfirmed():
+              context.read<PinStatusNotifier>().setPinStatus(true);
               context.go(AppRouter.initialLocation);
               break;
             case PinDeleted():
-              Navigator.of(context).pop();
+              context.read<PinStatusNotifier>().setPinStatus(false);
+              context.pop();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Пин удален')));
               break;
             case PinError(:final message):
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(message)));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(message)));
               break;
             case PinValidationFailed():
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Неверный PIN")),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Неверный PIN')));
               break;
             default:
               break;
           }
-
-          _isLoading = state is PinLoading;
         },
         builder: (context, state) {
+          final isLoading = state is PinLoading;
+
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
@@ -110,22 +130,20 @@ class _PinActionScreenState extends State<PinActionScreen> {
                       obscureText: true,
                       maxLength: 4,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Новый PIN',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Новый PIN'),
                       validator: _pinValidator,
                     ),
                   const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: _isLoading
+                    onPressed: isLoading
                         ? null
                         : () => _onConfirmPressed(context),
-                    child: _isLoading
+                    child: isLoading
                         ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Text('Подтвердить'),
                   ),
                 ],
@@ -147,13 +165,8 @@ class _PinActionScreenState extends State<PinActionScreen> {
   }
 
   String? _pinValidator(String? value) {
-    if (value == null || value.length != 4) {
-      return 'Введите 4 цифры';
-    }
-    if (!RegExp(r'^\d{4}$').hasMatch(value)) {
-      return 'Только цифры';
-    }
+    if (value == null || value.length != 4) return 'Введите 4 цифры';
+    if (!RegExp(r'^\d{4}$').hasMatch(value)) return 'Только цифры';
     return null;
   }
 }
-

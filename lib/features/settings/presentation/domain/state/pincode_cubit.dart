@@ -2,54 +2,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/pincode_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
 
-class PinCodeCubit extends Cubit<PinCodeState> {
+class PinOperationCubit extends Cubit<PinOperationState> {
   final IPinCodeService _pinService;
 
-  PinCodeCubit(this._pinService) : super(PinInitial()) {
-    _checkInitialPinState();
-  }
-
-  void _checkInitialPinState() {
-    emit(_pinService.isPinSet ? PinSet() : PinNotSet());
-  }
+  PinOperationCubit(this._pinService) : super(PinOperationInitial());
 
   Future<void> savePin(String pin) async {
     emit(PinLoading());
     try {
       await _pinService.savePin(pin);
-      emit(PinSet());
+      emit(PinSetSuccess());
     } catch (e) {
-      emit(PinError(e.toString()));
-      _checkInitialPinState();
-    }
-  }
-
-  Future<void> updatePin(String oldPin, String newPin) async {
-    emit(PinLoading());
-    try {
-      await _pinService.updatePin(oldPin, newPin);
-      emit(PinSet());
-    } catch (e) {
-      emit(PinError(e.toString()));
-      _checkInitialPinState();
-    }
-  }
-
-
-  Future<void> validateAndDeletePin(String pin) async {
-    emit(PinLoading());
-    try {
-      final isValid = await _pinService.validatePin(pin);
-      if (isValid) {
-        await _pinService.deletePin();
-        emit(PinDeleted());
-        emit(PinNotSet());
-      } else {
-        emit(PinValidationFailed());
-      }
-    } catch (e) {
-      emit(PinError(e.toString()));
-      _checkInitialPinState();
+      emit(const PinError('Ошибка при установке PIN'));
     }
   }
 
@@ -58,12 +22,45 @@ class PinCodeCubit extends Cubit<PinCodeState> {
     try {
       final isValid = await _pinService.validatePin(pin);
       if (isValid) {
-        emit(PinConfirmed()); // для confirm
+        emit(PinConfirmed());
       } else {
         emit(PinValidationFailed());
       }
     } catch (e) {
-      emit(PinError(e.toString()));
+      emit(const PinError('Ошибка при проверке PIN'));
+    }
+  }
+
+  Future<void> validateAndDeletePin(String pin) async {
+    emit(PinLoading());
+    try {
+      final isValid = await _pinService.validatePin(pin);
+      if (!isValid) {
+        emit(PinValidationFailed());
+        return;
+      }
+      await _pinService.deletePin();
+
+      emit(PinDeleted());
+    } catch (e) {
+      emit(const PinError('Ошибка при удалении PIN'));
+    }
+  }
+
+  Future<void> updatePin(String oldPin, String newPin) async {
+    emit(PinLoading());
+    try {
+      final isValid = await _pinService.validatePin(oldPin);
+
+      if (!isValid) {
+        emit(PinValidationFailed());
+        return;
+      }
+      await _pinService.updatePin(oldPin, newPin);
+
+      emit(PinUpdated());
+    } catch (e) {
+      emit(const PinError('Ошибка при обновлении PIN'));
     }
   }
 }
