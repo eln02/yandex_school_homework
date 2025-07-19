@@ -226,4 +226,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pinValidationFailed => 'Неверный PIN';
+
+  @override
+  String get hapticFeedbackSetting => 'Тактильный отклик';
+
+  @override
+  String get hapticFeedbackEnabled => 'Включён';
+
+  @override
+  String get hapticFeedbackDisabled => 'Выключен';
 }

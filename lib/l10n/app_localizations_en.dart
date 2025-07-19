@@ -226,4 +226,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pinValidationFailed => 'Invalid PIN';
+
+  @override
+  String get hapticFeedbackSetting => 'Haptic feedback';
+
+  @override
+  String get hapticFeedbackEnabled => 'Enabled';
+
+  @override
+  String get hapticFeedbackDisabled => 'Disabled';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/haptic/haptic_hotifier.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/sorting_enum.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transaction_state.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
@@ -218,7 +220,12 @@ class _FloatingButton extends StatelessWidget {
         width: 56,
         height: 56,
         child: ElevatedButton(
-          onPressed: onTap,
+          onPressed: () async {
+            if (context.read<HapticFeedbackStatusNotifier>().value) {
+              await HapticFeedback.heavyImpact();
+            }
+            onTap();
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: context.primaryColor,
             shape: const CircleBorder(),

@@ -535,6 +535,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid PIN'**
   String get pinValidationFailed;
+
+  /// No description provided for @hapticFeedbackSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic feedback'**
+  String get hapticFeedbackSetting;
+
+  /// No description provided for @hapticFeedbackEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get hapticFeedbackEnabled;
+
+  /// No description provided for @hapticFeedbackDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get hapticFeedbackDisabled;
 }
 
 class _AppLocalizationsDelegate

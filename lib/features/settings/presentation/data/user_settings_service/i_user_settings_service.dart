@@ -18,4 +18,10 @@ abstract class IUserSettingsService {
   Locale get locale;
 
   Future<void> saveLocale(Locale locale);
+
+  /// Получить текущее состояние звукового отклика
+  bool get hapticFeedbackEnabled;
+
+  /// Сохранить состояние звукового отклика
+  Future<void> saveHapticFeedbackEnabled(bool enabled);
 }

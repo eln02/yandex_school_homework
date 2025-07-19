@@ -72,5 +72,8 @@
   "pinSetSuccess": "PIN set successfully",
   "pinUpdatedSuccess": "PIN updated successfully",
   "pinDeletedSuccess": "PIN deleted successfully",
-  "pinValidationFailed": "Invalid PIN"
+  "pinValidationFailed": "Invalid PIN",
+  "hapticFeedbackSetting": "Haptic feedback",
+  "hapticFeedbackEnabled": "Enabled",
+  "hapticFeedbackDisabled": "Disabled"
 }

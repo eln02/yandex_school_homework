@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/features/connectivity_checker/connectivity_status_bar.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/haptic/haptic_hotifier.dart';
 import 'package:yandex_school_homework/gen/assets.gen.dart';
 
 class RootScreen extends StatelessWidget {
@@ -43,7 +46,12 @@ class RootScreen extends StatelessWidget {
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: navigationShell.currentIndex,
-          onTap: navigationShell.goBranch,
+          onTap: (index) async {
+            if (context.read<HapticFeedbackStatusNotifier>().value) {
+              await HapticFeedback.heavyImpact();
+            }
+            navigationShell.goBranch(index);
+          },
           backgroundColor: context.colors.surfaceContainer_,
           selectedItemColor: context.colors.onSurface_,
           unselectedItemColor: context.colors.onSurface_,

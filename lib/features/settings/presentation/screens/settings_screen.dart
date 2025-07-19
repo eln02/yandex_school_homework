@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/haptic/haptic_hotifier.dart';
 import 'package:yandex_school_homework/l10n/locale_notifier.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
@@ -40,6 +42,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text(context.strings.pinSettingsButton),
             ),
             _buildThemeSwitch(context),
+            const SizedBox(height: 16),
+            _buildHapticToggle(context),
             const SizedBox(height: 16),
             _buildColorPicker(context),
             const SizedBox(height: 16),
@@ -156,6 +160,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text(context.strings.save),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  // Новый виджет для переключателя хаптика
+  Widget _buildHapticToggle(BuildContext context) {
+    return Consumer<HapticFeedbackStatusNotifier>(
+      builder: (context, hapticNotifier, child) {
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            leading: Icon(Icons.vibration, color: context.primaryColor),
+            title: Text(
+              context.strings.hapticFeedbackSetting,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            subtitle: Text(
+              hapticNotifier.value
+                  ? context.strings.hapticFeedbackEnabled
+                  : context.strings.hapticFeedbackDisabled,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            trailing: Switch.adaptive(
+              value: hapticNotifier.value,
+              onChanged: (value) async {
+                await hapticNotifier.setHapticFeedbackEnabled(value);
+                if (value) {
+                  await HapticFeedback.mediumImpact();
+                }
+              },
+              activeColor: context.primaryColor,
+            ),
+          ),
         );
       },
     );

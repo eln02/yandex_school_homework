@@ -74,5 +74,8 @@
   "pinSetSuccess": "Пин установлен",
   "pinUpdatedSuccess": "Пин обновлен",
   "pinDeletedSuccess": "Пин удален",
-  "pinValidationFailed": "Неверный PIN"
+  "pinValidationFailed": "Неверный PIN",
+  "hapticFeedbackSetting": "Тактильный отклик",
+  "hapticFeedbackEnabled": "Включён",
+  "hapticFeedbackDisabled": "Выключен"
 }
