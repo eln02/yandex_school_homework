@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/features/connectivity_checker/connectivity_status_bar.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/haptic/haptic_hotifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/haptic/haptic_hotifier.dart';
 import 'package:yandex_school_homework/gen/assets.gen.dart';
 
 class RootScreen extends StatelessWidget {

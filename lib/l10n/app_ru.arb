@@ -77,5 +77,6 @@
   "pinValidationFailed": "Неверный PIN",
   "hapticFeedbackSetting": "Тактильный отклик",
   "hapticFeedbackEnabled": "Включён",
-  "hapticFeedbackDisabled": "Выключен"
+  "hapticFeedbackDisabled": "Выключен",
+  "confirmNewPinLabel": "Подтвердите новый PIN"
 }

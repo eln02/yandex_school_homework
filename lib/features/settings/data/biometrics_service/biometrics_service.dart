@@ -1,5 +1,5 @@
 import 'package:local_auth/local_auth.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/i_biometric_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/data/biometrics_service/i_biometric_auth_service.dart';
 
 class BiometricAuthService implements IBiometricAuthService {
   final LocalAuthentication _auth;

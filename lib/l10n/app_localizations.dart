@@ -553,6 +553,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disabled'**
   String get hapticFeedbackDisabled;
+
+  /// No description provided for @confirmNewPinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new PIN'**
+  String get confirmNewPinLabel;
 }
 
 class _AppLocalizationsDelegate

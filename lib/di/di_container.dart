@@ -8,12 +8,12 @@ import 'package:yandex_school_homework/app/http/i_http_client.dart';
 import 'package:yandex_school_homework/di/di_repositories.dart';
 import 'package:yandex_school_homework/di/di_typedefs.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/biometrics_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/i_biometric_auth_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/i_auth_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/auth_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/i_user_settings_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/user_settings_service.dart';
+import 'package:yandex_school_homework/features/settings/data/biometrics_service/biometrics_service.dart';
+import 'package:yandex_school_homework/features/settings/data/biometrics_service/i_biometric_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/data/pincode_service/auth_service.dart';
+import 'package:yandex_school_homework/features/settings/data/pincode_service/i_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/data/user_settings_service/i_user_settings_service.dart';
+import 'package:yandex_school_homework/features/settings/data/user_settings_service/user_settings_service.dart';
 
 final class DiContainer {
   DiContainer({

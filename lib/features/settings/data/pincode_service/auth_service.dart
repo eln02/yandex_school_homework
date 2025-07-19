@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/i_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/data/pincode_service/i_auth_service.dart';
 
 class SecureAuthService implements IAuthService {
   static const _pinKey = 'user_pin_hash';

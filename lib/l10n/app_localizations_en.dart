@@ -235,4 +235,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hapticFeedbackDisabled => 'Disabled';
+
+  @override
+  String get confirmNewPinLabel => 'Confirm new PIN';
 }

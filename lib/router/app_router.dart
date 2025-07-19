@@ -5,11 +5,11 @@ import 'package:yandex_school_homework/features/accounts/presentation/screens/ac
 import 'package:yandex_school_homework/features/categories/presentation/screens/categories_screen.dart';
 import 'package:yandex_school_homework/features/categories/presentation/screens/search_categories_screen.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_state.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_operation_state.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_screen.dart';
-import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_settings.dart';
+import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_settings_screen.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/settings_screen.dart';
 import 'package:yandex_school_homework/features/transactions/domain/entity/category_analysis_entity.dart';
 import 'package:yandex_school_homework/features/transactions/presentation/screens/transactions_analysis_screen.dart';

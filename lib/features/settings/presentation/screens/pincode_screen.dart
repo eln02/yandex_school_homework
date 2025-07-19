@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_state.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_state.dart';
+import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
+import 'package:yandex_school_homework/app/theme/texts_extension.dart';
+import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_auth_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_auth_state.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_status_notifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_operation_state.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_status_notifier.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 /// Типы операций с PIN-кодом
 enum PinActionType { set, update, delete, confirm }
 
-/// Экран для выполнения операций с PIN-кодом (установка, изменение, удаление, подтверждение)
+/// Экран для выполнения операций с PIN-кодом
 class PinActionScreen extends StatefulWidget {
   final PinActionType actionType;
 
@@ -28,11 +31,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
   final _pinController = TextEditingController();
   final _newPinController = TextEditingController();
 
-  bool get isSet => widget.actionType == PinActionType.set;
-  bool get isUpdate => widget.actionType == PinActionType.update;
-  bool get isDelete => widget.actionType == PinActionType.delete;
-  bool get isConfirm => widget.actionType == PinActionType.confirm;
-
   @override
   void initState() {
     super.initState();
@@ -46,7 +44,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
     super.dispose();
   }
 
-  /// Инициализация биометрии (если включена)
   void _initBiometric() {
     final biometricNotifier = context.read<BiometricStatusNotifier>();
     if (biometricNotifier.value) {
@@ -54,7 +51,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
     }
   }
 
-  /// Обработка нажатия кнопки подтверждения
   void _onConfirmPressed() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -79,7 +75,11 @@ class _PinActionScreenState extends State<PinActionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_getTitle(context, widget.actionType))),
+      backgroundColor: context.colors.mainBackground,
+      appBar: CustomAppBar(
+        title: _getTitle(context, widget.actionType),
+        showBackButton: true,
+      ),
       body: BlocConsumer<PinOperationCubit, PinOperationState>(
         listener: (context, state) => _handlePinOperationState(context, state),
         builder: (context, state) {
@@ -96,7 +96,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
     );
   }
 
-  /// Обработка состояний операции с PIN-кодом
   void _handlePinOperationState(BuildContext context, PinOperationState state) {
     final pinNotifier = context.read<PinStatusNotifier>();
     final biometricNotifier = context.read<BiometricStatusNotifier>();
@@ -127,7 +126,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
     }
   }
 
-  /// Получение заголовка экрана в зависимости от типа операции
   String _getTitle(BuildContext context, PinActionType type) {
     return switch (type) {
       PinActionType.set => context.strings.setPinTitle,
@@ -137,22 +135,20 @@ class _PinActionScreenState extends State<PinActionScreen> {
     };
   }
 
-  /// Показать уведомление об успехе
   void _showSuccessSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  /// Показать уведомление об ошибке
   void _showErrorSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
-/// Виджет с содержимым экрана операций с PIN-кодом
+/// Содержимое экрана операций с PIN-кодом
 class _PinActionContent extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final PinActionType actionType;
@@ -170,78 +166,83 @@ class _PinActionContent extends StatelessWidget {
     required this.onConfirmPressed,
   });
 
-  bool get isSet => actionType == PinActionType.set;
-  bool get isUpdate => actionType == PinActionType.update;
-  bool get isDelete => actionType == PinActionType.delete;
-  bool get isConfirm => actionType == PinActionType.confirm;
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
+          const SizedBox(height: 24),
           Expanded(
             child: Form(
               key: formKey,
               child: Column(
                 children: [
-                  if (isUpdate || isDelete || isConfirm)
-                    PinTextField(
+                  if (actionType == PinActionType.update ||
+                      actionType == PinActionType.delete ||
+                      actionType == PinActionType.confirm)
+                    _PinInputField(
                       label: context.strings.currentPinLabel,
                       controller: pinController,
                     ),
-                  if (isSet || isUpdate)
-                    PinTextField(
-                      label: context.strings.newPinLabel,
-                      controller: isSet ? pinController : newPinController,
+                  if (actionType == PinActionType.set ||
+                      actionType == PinActionType.update)
+                    _PinInputField(
+                      label: actionType == PinActionType.set
+                          ? context.strings.newPinLabel
+                          : context.strings.confirmNewPinLabel,
+                      controller: actionType == PinActionType.set
+                          ? pinController
+                          : newPinController,
                     ),
                 ],
               ),
             ),
           ),
-          if (isConfirm) const _BiometricAuthButton(),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: isLoading ? null : onConfirmPressed,
-            child: isLoading
-                ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-                : Text(context.strings.confirmButton),
-          ),
+          if (actionType == PinActionType.confirm) const _BiometricAuthOption(),
+          const SizedBox(height: 24),
+          _ConfirmButton(isLoading: isLoading, onPressed: onConfirmPressed),
         ],
       ),
     );
   }
 }
 
-/// Поле ввода PIN-кода с валидацией
-class PinTextField extends StatelessWidget {
+/// Поле ввода PIN-кода
+class _PinInputField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
 
-  const PinTextField({
-    super.key,
-    required this.label,
-    required this.controller,
-  });
+  const _PinInputField({required this.label, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      obscureText: true,
-      maxLength: 4,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(labelText: label),
-      validator: _pinValidator,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextFormField(
+        controller: controller,
+        obscureText: true,
+        maxLength: 4,
+        keyboardType: TextInputType.number,
+        style: context.texts.bodyLarge_.copyWith(
+          color: context.colors.onSurfaceText,
+        ),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: context.texts.bodyLarge_.copyWith(
+            color: context.colors.onSurfaceText,
+          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: context.colors.primary),
+          ),
+        ),
+        validator: _pinValidator,
+      ),
     );
   }
 
-  /// Валидация PIN-кода
   String? _pinValidator(String? value) {
     if (value == null || value.length != 4) return 'Введите 4 цифры';
     if (!RegExp(r'^\d{4}$').hasMatch(value)) return 'Только цифры';
@@ -249,9 +250,47 @@ class PinTextField extends StatelessWidget {
   }
 }
 
-/// Кнопка биометрической аутентификации
-class _BiometricAuthButton extends StatelessWidget {
-  const _BiometricAuthButton();
+/// Кнопка подтверждения
+class _ConfirmButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _ConfirmButton({required this.isLoading, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: context.colors.primary,
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                context.strings.confirmButton,
+                style: context.texts.bodyLarge_.copyWith(color: Colors.white),
+              ),
+      ),
+    );
+  }
+}
+
+/// Опция биометрической аутентификации
+class _BiometricAuthOption extends StatelessWidget {
+  const _BiometricAuthOption();
 
   @override
   Widget build(BuildContext context) {
@@ -266,23 +305,39 @@ class _BiometricAuthButton extends StatelessWidget {
               return const SizedBox.shrink();
             }
 
-            final isAuthenticating = state is BiometricAuthenticating;
-
             return Column(
               children: [
-                const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: isAuthenticating
-                      ? null
-                      : () => _authenticateWithBiometrics(context),
-                  icon: const Icon(Icons.fingerprint),
-                  label: isAuthenticating
-                      ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                      : Text(context.strings.biometricAuthButton),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: state is BiometricAuthenticating
+                        ? null
+                        : () => _authenticateWithBiometrics(context),
+                    icon: Icon(
+                      Icons.fingerprint,
+                      color: context.colors.primary,
+                    ),
+                    label: state is BiometricAuthenticating
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            context.strings.biometricAuthButton,
+                            style: context.texts.bodyLarge_.copyWith(
+                              color: context.colors.primary,
+                            ),
+                          ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(color: context.colors.primary),
+                    ),
+                  ),
                 ),
               ],
             );
@@ -292,23 +347,14 @@ class _BiometricAuthButton extends StatelessWidget {
     );
   }
 
-  /// Аутентификация с помощью биометрии
   Future<void> _authenticateWithBiometrics(BuildContext context) async {
-    final biometricNotifier = context.read<BiometricStatusNotifier>();
-    if (!biometricNotifier.value) return;
-
     final cubit = context.read<BiometricAuthCubit>();
     await cubit.authenticate();
 
     if (cubit.state is BiometricSuccess && context.mounted) {
-      _handleBiometricSuccess(context);
+      context.read<PinStatusNotifier>().setPinStatus(true);
+      context.read<PinOperationCubit>().confirmWithoutPin();
+      context.go(AppRouter.initialLocation);
     }
-  }
-
-  /// Обработка успешной биометрической аутентификации
-  void _handleBiometricSuccess(BuildContext context) {
-    context.read<PinStatusNotifier>().setPinStatus(true);
-    context.read<PinOperationCubit>().confirmWithoutPin();
-    context.go(AppRouter.initialLocation);
   }
 }

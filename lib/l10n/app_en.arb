@@ -75,5 +75,6 @@
   "pinValidationFailed": "Invalid PIN",
   "hapticFeedbackSetting": "Haptic feedback",
   "hapticFeedbackEnabled": "Enabled",
-  "hapticFeedbackDisabled": "Disabled"
+  "hapticFeedbackDisabled": "Disabled",
+  "confirmNewPinLabel": "Confirm new PIN"
 }

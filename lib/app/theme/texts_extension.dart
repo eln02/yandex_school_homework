@@ -12,6 +12,14 @@ extension TextStyleScheme on TextTheme {
     fontFamily: roboto,
   );
 
+  TextStyle get bodySmall_ => const TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    height: 18 / 12,
+    letterSpacing: 0.5,
+    fontFamily: roboto,
+  );
+
   TextStyle get bodyMedium_ => const TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,

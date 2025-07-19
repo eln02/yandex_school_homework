@@ -7,14 +7,14 @@ import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/connectivity_checker/backup_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/haptic/haptic_hotifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_auth_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_status_notifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/haptic/haptic_hotifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
-import 'package:yandex_school_homework/l10n/locale_notifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/localization_notifier/locale_notifier.dart';
 
 final class DependsProviders extends StatelessWidget {
   const DependsProviders({

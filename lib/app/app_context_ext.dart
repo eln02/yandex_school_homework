@@ -3,7 +3,7 @@ import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/l10n/app_localizations.dart';
-import 'package:yandex_school_homework/l10n/locale_notifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/localization_notifier/locale_notifier.dart';
 
 extension AppContextExt on BuildContext {
   DiContainer get di => read<DiContainer>();

@@ -235,4 +235,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hapticFeedbackDisabled => 'Выключен';
+
+  @override
+  String get confirmNewPinLabel => 'Подтвердите новый PIN';
 }
