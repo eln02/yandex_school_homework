@@ -13,6 +13,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double extraHeight;
   final bool showBackButton;
   final Color? color;
+  final Color? titleColor;
 
   const CustomAppBar({
     super.key,
@@ -24,6 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.extraHeight = 0,
     this.showBackButton = false,
     this.color,
+    this.titleColor,
   });
 
   @override
@@ -31,8 +33,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurfaceColor = titleColor ?? context.textColor;
     return Container(
-      color: color ?? context.colors.financeGreen,
+      color: color ?? context.primaryColor,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         children: [
@@ -47,18 +50,31 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     onPressed: () {
                       context.pop();
                     },
+                    color: onSurfaceColor,
                   )
                 else
                   const SizedBox(width: 48),
-                Text(title, style: context.texts.titleLarge_),
+                Text(
+                  title,
+                  style: context.texts.titleLarge_.copyWith(
+                    color: onSurfaceColor,
+                  ),
+                ),
                 if (nextIcon != null)
-                  IconButton(icon: nextIcon!, onPressed: onNext)
+                  IconButton(
+                    icon: nextIcon!,
+                    onPressed: onNext,
+                    color: onSurfaceColor,
+                  )
                 else
                   const SizedBox(width: 48),
               ],
             ),
           ),
-          ...children,
+          ColoredBox(
+            color: context.colors.mainBackground,
+            child: Column(children: children),
+          ),
         ],
       ),
     );

@@ -1,16 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yandex_school_homework/app/theme/theme_constants.dart';
+import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 
-abstract class AppTheme {
-  static ThemeData get light => ThemeData.light().copyWith(
+extension AppTheme on BuildContext {
+  ThemeNotifier get notifier => read<ThemeNotifier>();
+
+  Color get _color => notifier.primaryColor;
+
+  Color get _color2 => notifier.secondaryColor;
+
+  ThemeData get light => ThemeData.light().copyWith(
+    colorScheme: const ColorScheme.light().copyWith(
+      primary: _color,
+      secondary: _color2,
+    ),
     textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: AppColors.onSurfaceText),
+      bodyMedium: TextStyle(color: AppColors.onSurfaceTextLight),
     ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: AppColors.financeGreen,
-    ),
-    scaffoldBackgroundColor: AppColors.mainBackground,
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: _color),
+    scaffoldBackgroundColor: AppColors.mainBackgroundLight,
   );
 
-  static ThemeData get dark => ThemeData.dark();
+  ThemeData get dark => ThemeData.dark().copyWith(
+    colorScheme: const ColorScheme.dark().copyWith(
+      primary: _color,
+      secondary: _color2,
+      surface: AppColors.mainBackgroundDark,
+    ),
+    textTheme: const TextTheme(
+      bodyMedium: TextStyle(color: AppColors.onSurfaceTextDark),
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: _color),
+    scaffoldBackgroundColor: AppColors.mainBackgroundDark,
+    dialogTheme: const DialogThemeData(
+      backgroundColor: AppColors.surfaceContainerDark,
+    ),
+  );
 }

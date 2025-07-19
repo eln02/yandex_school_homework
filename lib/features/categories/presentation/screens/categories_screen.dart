@@ -48,13 +48,16 @@ class _CategoriesSuccessScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         extraHeight: 56,
-        title: 'Мои статьи',
+        title: context.strings.my_articles,
         children: [
           ParametersBarWrapper(
             color: context.colors.surfaceContainer,
             onTap: () => context.pushNamed(AppRouter.searchCategories),
             children: [
-              Text('Найти статью', style: context.texts.bodyLarge_),
+              Text(
+                context.strings.search_article,
+                style: context.texts.bodyLarge_,
+              ),
               const Icon(Icons.search),
             ],
           ),

@@ -25,7 +25,7 @@ class ParametersBarWrapper extends StatelessWidget {
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: color ?? context.colors.lightFinanceGreen,
+          color: color ?? context.secondaryColor,
           border: isLast
               ? null
               : Border(

@@ -17,6 +17,7 @@ class TransactionsByCategoryScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: category.name,
+        titleColor: context.colors.onSurface_,
         showBackButton: true,
         color: context.colors.mainBackground,
       ),

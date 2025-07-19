@@ -22,7 +22,7 @@ class SortingBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ParametersBarWrapper(
       children: [
-        Text('Сортировка', style: context.texts.bodyLarge_),
+        Text(context.strings.sorting, style: context.texts.bodyLarge_),
         Transform.translate(
           offset: const Offset(8, 0),
           child: DropdownButton<SortingType>(
@@ -33,7 +33,7 @@ class SortingBar extends StatelessWidget {
               return DropdownMenuItem(
                 value: type,
                 child: Text(
-                  type.displayName,
+                  type.getDisplayName(context),
                   style: context.texts.bodyLarge_.copyWith(
                     color: context.colors.onSurfaceText,
                   ),

@@ -67,7 +67,7 @@ class TransactionEditModal extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Не все поля заполнены',
+            context.strings.validationErrorTitle,
             style: context.texts.titleLarge_.copyWith(
               color: context.colors.onSurfaceText,
             ),
@@ -81,9 +81,9 @@ class TransactionEditModal extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               child: Text(
-                'OK',
+                context.strings.ok,
                 style: context.texts.titleLarge_.copyWith(
-                  color: context.colors.financeGreen,
+                  color: context.primaryColor,
                 ),
               ),
               onPressed: () => context.pop(),
@@ -101,12 +101,11 @@ class TransactionEditModal extends StatelessWidget {
       children: [
         CustomAppBar(
           title: mode == TransactionEditMode.edit
-              ? 'Редактирование'
-              : 'Новая транзакция',
+              ? context.strings.editTransaction
+              : context.strings.newTransaction,
           nextIcon: const Icon(Icons.check),
           backIcon: const Icon(Icons.close),
           onNext: () async {
-            /// дебаунс при отсутсвии измений - просто закрытие
             if (mode == TransactionEditMode.edit && !notifier.hasChanges) {
               if (context.mounted) {
                 context.pop(TransactionEditResult.canceled());
@@ -114,14 +113,12 @@ class TransactionEditModal extends StatelessWidget {
               return;
             }
 
-            /// валидация формы
             final errors = notifier.validateForm();
             if (errors.isNotEmpty) {
               await _showValidationDialog(context, errors);
               return;
             }
 
-            /// создание сущности и возврат ее на прошлый экран, если все успешно
             final request = notifier.buildRequest();
             if (request != null && context.mounted) {
               context.pop(TransactionEditResult.success(request));
@@ -194,7 +191,7 @@ class _DeleteButton extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Удалить транзакцию',
+          context.strings.deleteTransaction,
           style: context.texts.bodyLarge_.copyWith(color: context.colors.white),
         ),
       ),
@@ -218,8 +215,9 @@ class _DateField extends StatelessWidget {
       builder: (context, child) => Theme(
         data: ThemeData.light().copyWith(
           colorScheme: ColorScheme.light(
-            primary: context.colors.financeGreen,
+            primary: context.primaryColor,
             surface: context.colors.mainBackground,
+            onSurface: context.colors.onSurface_,
           ),
         ),
         child: child!,
@@ -244,7 +242,7 @@ class _DateField extends StatelessWidget {
     final formattedDate = DateFormat('dd.MM.yyyy').format(date.toLocal());
 
     return _FieldWrapper(
-      label: 'Дата',
+      label: context.strings.date,
       child: GestureDetector(
         onTap: () => _selectDate(context, date),
         child: AbsorbPointer(
@@ -274,8 +272,9 @@ class _TimeField extends StatelessWidget {
       builder: (context, child) => Theme(
         data: ThemeData.light().copyWith(
           colorScheme: ColorScheme.light(
-            primary: context.colors.financeGreen,
+            primary: context.primaryColor,
             surface: context.colors.mainBackground,
+            onSurface: context.colors.onSurface_,
           ),
         ),
         child: child!,
@@ -300,7 +299,7 @@ class _TimeField extends StatelessWidget {
     final formattedTime = DateFormat('HH:mm').format(time.toLocal());
 
     return _FieldWrapper(
-      label: 'Время',
+      label: context.strings.time,
       child: GestureDetector(
         onTap: () => _selectTime(context, time),
         child: AbsorbPointer(
@@ -326,7 +325,7 @@ class _AccountField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _FieldWrapper(
-      label: 'Счет',
+      label: context.strings.account,
       child: BlocBuilder<AccountCubit, AccountState>(
         builder: (context, state) {
           switch (state) {
@@ -340,7 +339,7 @@ class _AccountField extends StatelessWidget {
                   DropdownMenuItem<int?>(
                     value: null,
                     child: Text(
-                      'Выберите счет',
+                      context.strings.selectAccount,
                       style: context.texts.bodyLarge_.copyWith(
                         color: context.colors.onSurfaceText,
                       ),
@@ -366,7 +365,7 @@ class _AccountField extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        'Выберите счет',
+                        context.strings.selectAccount,
                         style: context.texts.bodyLarge_.copyWith(
                           color: context.colors.onSurfaceText,
                         ),
@@ -389,7 +388,7 @@ class _AccountField extends StatelessWidget {
 
             case AccountErrorState():
               return Text(
-                'Ошибка загрузки',
+                context.strings.loadingError,
                 style: context.texts.bodyLarge_.copyWith(
                   color: context.colors.error,
                 ),
@@ -423,14 +422,14 @@ class _CategoryField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _FieldWrapper(
-      label: 'Статья',
+      label: context.strings.category,
       child: BlocBuilder<CategoriesCubit, CategoriesState>(
         builder: (context, state) {
           switch (state) {
             case CategoriesLoadedState():
               if (isIncome == null) {
                 return Text(
-                  'Сначала выберите тип транзакции',
+                  context.strings.selectTransactionTypeFirst,
                   style: context.texts.bodyLarge_.copyWith(
                     color: context.colors.onSurfaceText,
                   ),
@@ -448,7 +447,7 @@ class _CategoryField extends StatelessWidget {
                   DropdownMenuItem<int?>(
                     value: null,
                     child: Text(
-                      'Выберите категорию',
+                      context.strings.selectCategory,
                       style: context.texts.bodyLarge_.copyWith(
                         color: context.colors.onSurfaceText,
                       ),
@@ -474,7 +473,7 @@ class _CategoryField extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        'Выберите категорию',
+                        context.strings.selectCategory,
                         style: context.texts.bodyLarge_.copyWith(
                           color: context.colors.onSurfaceText,
                         ),
@@ -497,7 +496,7 @@ class _CategoryField extends StatelessWidget {
 
             case CategoriesErrorState():
               return Text(
-                'Ошибка загрузки категорий',
+                context.strings.categoriesLoadingError,
                 style: context.texts.bodyLarge_.copyWith(
                   color: context.colors.error,
                 ),
@@ -516,7 +515,7 @@ class _CategoryField extends StatelessWidget {
   }
 }
 
-/// Раздел редактирования даты
+/// Раздел редактирования суммы
 class _AmountField extends StatelessWidget {
   final String amount;
   final ValueChanged<String> onChanged;
@@ -526,7 +525,7 @@ class _AmountField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _FieldWrapper(
-      label: 'Сумма',
+      label: context.strings.amount,
       child: TextFormField(
         initialValue: amount,
         onChanged: onChanged,
@@ -567,7 +566,7 @@ class _CommentField extends StatelessWidget {
         ),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: 'Комментарий',
+          hintText: context.strings.comment,
           hintStyle: TextStyle(color: Colors.grey[400]),
           isDense: true,
           contentPadding: EdgeInsets.zero,

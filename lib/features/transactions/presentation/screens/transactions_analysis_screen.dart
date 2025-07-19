@@ -118,7 +118,10 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
     return Scaffold(
       appBar: CustomAppBar(
         color: context.colors.mainBackground,
-        title: 'Анализ ${widget.isIncome ? 'доходов' : 'расходов'}',
+        titleColor: context.colors.onSurface_,
+        title: widget.isIncome
+            ? context.strings.analysis_income
+            : context.strings.analysis_expense,
         showBackButton: true,
         extraHeight: 56 * 3 + diagramContainerSize,
         children: [
@@ -138,7 +141,6 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
             builder: (context, state) {
               return switch (state) {
                 TransactionsLoadingState() => TotalAmountBar.loading(
-                  title: 'Сумма',
                   isLast: false,
                   color: context.colors.mainBackground,
                 ),
@@ -147,14 +149,12 @@ class _TransactionsAnalysisViewState extends State<_TransactionsAnalysisView> {
                       ? state.incomesSum
                       : state.expensesSum,
                   currency: state.currency,
-                  title: 'Сумма',
                   color: context.colors.mainBackground,
                   isLast: false,
                 ),
                 TransactionsErrorState() => TotalAmountBar(
-                  totalAmount: 'Ошибка',
+                  totalAmount: context.strings.error,
                   currency: null,
-                  title: 'Сумма',
                   color: context.colors.mainBackground,
                   isLast: false,
                 ),

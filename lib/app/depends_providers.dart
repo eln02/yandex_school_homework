@@ -1,13 +1,20 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/connectivity_checker/backup_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_auth_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/biometric_auth/biometric_status_notifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/haptic/haptic_hotifier.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/pincode_auth/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/localization_notifier/locale_notifier.dart';
 
 final class DependsProviders extends StatelessWidget {
   const DependsProviders({
@@ -55,8 +62,32 @@ final class DependsProviders extends StatelessWidget {
           create: (_) => BackupCubit(
             connectivity: Connectivity(),
             accountsRepository: diContainer.repositories.accountsRepository,
-            transactionsRepository: diContainer.repositories.transactionsRepository,
+            transactionsRepository:
+                diContainer.repositories.transactionsRepository,
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeNotifier(diContainer.userSettingsService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LocaleNotifier(diContainer.userSettingsService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              PinStatusNotifier(isPinSet: diContainer.pinCodeService.isPinSet),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => BiometricStatusNotifier(diContainer.pinCodeService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              HapticFeedbackStatusNotifier(diContainer.userSettingsService),
+        ),
+        BlocProvider(
+          create: (_) => PinOperationCubit(diContainer.pinCodeService),
+        ),
+        BlocProvider(
+          create: (_) => BiometricAuthCubit(diContainer.biometricAuthService),
         ),
       ],
       child: child,

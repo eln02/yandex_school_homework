@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/theme/app_colors_scheme.dart';
 import 'package:yandex_school_homework/features/common/ui/app_error_screen.dart';
 import 'package:yandex_school_homework/features/common/ui/custom_app_bar.dart';
+import 'package:yandex_school_homework/features/settings/domain/state/haptic/haptic_hotifier.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/sorting_enum.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transaction_state.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
@@ -112,9 +114,11 @@ class _TransactionsSuccessScreen extends StatelessWidget {
             onRefresh();
 
           case TransactionOperationFailure():
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${context.strings.error}: ${state.error}'),
+              ),
+            );
 
           default:
         }
@@ -122,7 +126,8 @@ class _TransactionsSuccessScreen extends StatelessWidget {
       child: Scaffold(
         appBar: CustomAppBar(
           extraHeight: 56,
-          title: '${isIncome ? 'Доходы' : 'Расходы'} сегодня',
+          title:
+              '${isIncome ? context.strings.income : context.strings.expenses} ${context.strings.today}',
           onNext: () => context.pushNamed(
             isIncome ? AppRouter.incomeHistory : AppRouter.expensesHistory,
           ),
@@ -131,7 +136,6 @@ class _TransactionsSuccessScreen extends StatelessWidget {
             TotalAmountBar(
               totalAmount: isIncome ? state.incomesSum : state.expensesSum,
               currency: state.currency,
-              title: 'Всего',
             ),
           ],
         ),
@@ -216,9 +220,14 @@ class _FloatingButton extends StatelessWidget {
         width: 56,
         height: 56,
         child: ElevatedButton(
-          onPressed: onTap,
+          onPressed: () async {
+            if (context.read<HapticFeedbackStatusNotifier>().value) {
+              await HapticFeedback.heavyImpact();
+            }
+            onTap();
+          },
           style: ElevatedButton.styleFrom(
-            backgroundColor: context.colors.financeGreen,
+            backgroundColor: context.primaryColor,
             shape: const CircleBorder(),
             padding: EdgeInsets.zero,
             elevation: 0,

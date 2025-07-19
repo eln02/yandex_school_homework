@@ -119,7 +119,8 @@ class _TransactionsHistorySuccessScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         showBackButton: true,
-        title: 'История ${isIncome ? 'доходов' : 'расходов'}',
+        title:
+            '${context.strings.history} ${isIncome ? context.strings.income : context.strings.expenses}',
         onNext: () {
           final dateNotifier = context.read<DateRangeNotifier>();
           // переход на экран анализа с сохранением выбранного временного промежутка
@@ -156,7 +157,6 @@ class _TransactionsHistorySuccessScreen extends StatelessWidget {
           TotalAmountBar(
             totalAmount: isIncome ? state.incomesSum : state.expensesSum,
             currency: state.currency,
-            title: 'Сумма',
           ),
         ],
       ),

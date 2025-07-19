@@ -74,24 +74,24 @@ class _TransactionsDiagramViewState extends State<_TransactionsDiagramView> {
               selectedColor: Colors.white,
               fillColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return context.colors.financeGreen;
+                  return context.primaryColor;
                 }
                 return Colors.transparent;
               }),
-              borderColor: context.colors.financeGreen,
-              selectedBorderColor: context.colors.financeGreen,
+              borderColor: context.primaryColor,
+              selectedBorderColor: context.primaryColor,
               borderRadius: BorderRadius.circular(8),
               borderWidth: 1,
               splashColor: Colors.transparent,
               constraints: const BoxConstraints(minHeight: 40, minWidth: 100),
-              children: const [
+              children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('По дням'),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(context.strings.by_days),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('По месяцам'),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(context.strings.by_months),
                 ),
               ],
             ),
@@ -187,7 +187,8 @@ class _CashFlowChartState extends State<CashFlowChart> {
                       ),
                       children: [
                         TextSpan(
-                          text: '\n${_formatTooltipDate(dayData.date)}',
+                          text:
+                              '\n${_formatTooltipDate(context, dayData.date)}',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 12,
@@ -293,9 +294,13 @@ class _CashFlowChartState extends State<CashFlowChart> {
         padding: const EdgeInsets.only(top: 8.0),
         child: Text(
           widget.isMonthly
-              ? _formatMonth(widget.data[index].date)
+              ? _formatMonth(context, widget.data[index].date)
               : _formatDay(widget.data[index].date),
-          style: const TextStyle(fontSize: 10, color: Colors.black),
+          style: TextStyle(
+            fontSize: 10,
+            color:
+                context.colors.onSurfaceText, // Используем цвет текста из темы
+          ),
         ),
       );
     }
@@ -306,13 +311,17 @@ class _CashFlowChartState extends State<CashFlowChart> {
     return DateFormat('dd.MM').format(date);
   }
 
-  String _formatMonth(DateTime date) {
-    return DateFormat('MMM yy', 'ru_RU').format(date);
+  String _formatMonth(BuildContext context, DateTime date) {
+    final locale = Localizations.localeOf(context).toString();
+    return DateFormat('MMM yy', locale).format(date);
   }
 
-  String _formatTooltipDate(DateTime date) {
+  String _formatTooltipDate(BuildContext context, DateTime date) {
     return widget.isMonthly
-        ? DateFormat('MMMM yyyy', 'ru_RU').format(date)
+        ? DateFormat(
+            'MMMM yyyy',
+            Localizations.localeOf(context).toString(),
+          ).format(date)
         : DateFormat('dd.MM.yyyy').format(date);
   }
 }

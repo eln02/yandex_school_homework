@@ -38,8 +38,9 @@ class DateFilterBar extends StatelessWidget {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: context.colors.financeGreen,
+              primary: context.primaryColor,
               surface: context.colors.mainBackground,
+              onSurface: context.colors.onSurface_,
             ),
           ),
           child: child!,
@@ -57,14 +58,14 @@ class DateFilterBar extends StatelessWidget {
     return Column(
       children: [
         _DateTile(
-          label: 'Начало',
+          label: context.strings.start,
           date: startDate,
           onTap: () => _pickDate(context, startDate, true),
           color: color,
           wrapDate: wrapData,
         ),
         _DateTile(
-          label: 'Конец',
+          label: context.strings.end,
           date: endDate,
           onTap: () => _pickDate(context, endDate, false),
           color: color,
@@ -96,7 +97,11 @@ class _DateTile extends StatelessWidget {
 
     final dateText = Text(
       formatted,
-      style: context.texts.bodyLarge_,
+      style: context.texts.bodyLarge_.copyWith(
+        color: wrapDate
+            ? context.colors.onColoredBackground_
+            : context.colors.onSurface_,
+      ),
     );
 
     return GestureDetector(
@@ -112,7 +117,7 @@ class _DateTile extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.financeGreen,
+                    color: context.primaryColor,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: dateText,
