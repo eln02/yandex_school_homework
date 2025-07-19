@@ -19,7 +19,14 @@ class RootScreen extends StatelessWidget {
       Assets.icons.items,
       Assets.icons.settings,
     ];
-    final labels = ['Расходы', 'Доходы', 'Счета', 'Статьи', 'Настройки'];
+    final loc = context.strings;
+    final labels = [
+      loc.expenses, // 'Расходы'
+      loc.income, // 'Доходы'
+      loc.accounts, // 'Счета'
+      loc.items, // 'Статьи'
+      loc.settings, // 'Настройки'
+    ];
 
     return Scaffold(
       body: Column(

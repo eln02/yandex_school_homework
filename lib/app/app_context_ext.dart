@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:provider/provider.dart';
+import 'package:yandex_school_homework/l10n/app_localizations.dart';
 
 extension AppContextExt on BuildContext {
   DiContainer get di => read<DiContainer>();
@@ -11,6 +12,8 @@ extension AppContextExt on BuildContext {
   ThemeNotifier get theme => read<ThemeNotifier>();
 
   TextTheme get texts => Theme.of(this).textTheme;
+
+  AppLocalizations get strings => AppLocalizations.of(this)!;
 
   ThemeNotifier get _tint => watch<ThemeNotifier>();
 

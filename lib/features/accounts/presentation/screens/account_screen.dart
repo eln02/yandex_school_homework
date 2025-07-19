@@ -124,7 +124,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Мой счет',
+        title: context.strings.my_account,
         nextIcon: const Icon(Icons.edit_rounded),
         onNext: () {},
       ),
@@ -134,7 +134,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
           children: [
             ParametersBarWrapper(
               children: [
-                Text('Баланс', style: context.texts.bodyLarge_),
+                Text(context.strings.balance, style: context.texts.bodyLarge_),
                 Row(
                   spacing: 22,
                   children: [
@@ -161,7 +161,7 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
             ParametersBarWrapper(
               onTap: () => showCurrencyBottomSheet(context, account),
               children: [
-                Text('Валюта', style: context.texts.bodyLarge_),
+                Text(context.strings.currency, style: context.texts.bodyLarge_),
                 Row(
                   spacing: 22,
                   children: [
@@ -179,7 +179,10 @@ class _AccountSuccessScreenState extends State<_AccountSuccessScreen>
               onTap: () => showNameEditBottomSheet(context, account),
               isLast: true,
               children: [
-                Text('Название', style: context.texts.bodyLarge_),
+                Text(
+                  context.strings.account_name,
+                  style: context.texts.bodyLarge_,
+                ),
                 Row(
                   spacing: 22,
                   children: [

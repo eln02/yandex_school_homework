@@ -112,9 +112,11 @@ class _TransactionsSuccessScreen extends StatelessWidget {
             onRefresh();
 
           case TransactionOperationFailure():
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('Ошибка: ${state.error}')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${context.strings.error}: ${state.error}'),
+              ),
+            );
 
           default:
         }
@@ -122,7 +124,8 @@ class _TransactionsSuccessScreen extends StatelessWidget {
       child: Scaffold(
         appBar: CustomAppBar(
           extraHeight: 56,
-          title: '${isIncome ? 'Доходы' : 'Расходы'} сегодня',
+          title:
+              '${isIncome ? context.strings.income : context.strings.expenses} ${context.strings.today}',
           onNext: () => context.pushNamed(
             isIncome ? AppRouter.incomeHistory : AppRouter.expensesHistory,
           ),
@@ -131,7 +134,6 @@ class _TransactionsSuccessScreen extends StatelessWidget {
             TotalAmountBar(
               totalAmount: isIncome ? state.incomesSum : state.expensesSum,
               currency: state.currency,
-              title: 'Всего',
             ),
           ],
         ),

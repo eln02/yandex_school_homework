@@ -58,14 +58,14 @@ class DateFilterBar extends StatelessWidget {
     return Column(
       children: [
         _DateTile(
-          label: 'Начало',
+          label: context.strings.start,
           date: startDate,
           onTap: () => _pickDate(context, startDate, true),
           color: color,
           wrapDate: wrapData,
         ),
         _DateTile(
-          label: 'Конец',
+          label: context.strings.end,
           date: endDate,
           onTap: () => _pickDate(context, endDate, false),
           color: color,

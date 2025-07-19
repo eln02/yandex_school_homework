@@ -9,7 +9,6 @@ class TotalAmountBar extends StatelessWidget {
     super.key,
     required this.totalAmount,
     required this.currency,
-    required this.title,
     this.color,
     this.isLast = true,
   });
@@ -17,7 +16,6 @@ class TotalAmountBar extends StatelessWidget {
   /// конструктор для отображения раздела, пока сумма еще не загурзилась
   const TotalAmountBar.loading({
     super.key,
-    required this.title,
     this.color,
     this.isLast = true,
   }) : totalAmount = null,
@@ -25,7 +23,6 @@ class TotalAmountBar extends StatelessWidget {
 
   final String? totalAmount;
   final String? currency;
-  final String title;
   final Color? color;
   final bool isLast;
 
@@ -35,7 +32,7 @@ class TotalAmountBar extends StatelessWidget {
       color: color,
       isLast: isLast,
       children: [
-        Text(title, style: context.texts.bodyLarge_),
+        Text(context.strings.sum, style: context.texts.bodyLarge_),
         if (totalAmount != null && currency != null)
           Text('$totalAmount $currency', style: context.texts.bodyLarge_)
         else

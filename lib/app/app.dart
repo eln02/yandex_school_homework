@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/app/depends_providers.dart';
@@ -8,6 +9,7 @@ import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:yandex_school_homework/features/common/ui/app_blur_wrapper.dart';
 import 'package:yandex_school_homework/features/common/ui/splash_screen.dart';
 import 'package:yandex_school_homework/features/error/error_screen.dart';
+import 'package:yandex_school_homework/l10n/app_localizations.dart';
 
 class App extends StatefulWidget {
   const App({super.key, required this.router, required this.initDependencies});
@@ -85,6 +87,14 @@ class _App extends StatelessWidget {
       themeMode: context.theme.themeMode,
       builder: (context, child) =>
           AppBlurWrapper(child: child ?? const SizedBox()),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('ru')],
+      locale: const Locale('en'),
     );
   }
 }
