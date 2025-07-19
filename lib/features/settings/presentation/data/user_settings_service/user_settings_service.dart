@@ -6,23 +6,28 @@ import 'package:yandex_school_homework/features/settings/presentation/data/user_
 class UserSettingsService implements IUserSettingsService {
   static const _themeModeKey = 'theme_mode';
   static const _primaryColorKey = 'primary_color';
+  static const _localeLanguageKey = 'locale_language';
 
   final SharedPreferences _prefs;
   ThemeMode _cachedThemeMode;
   Color _cachedPrimaryColor;
+  Locale _cachedLocale;
 
   UserSettingsService({
     required SharedPreferences prefs,
     ThemeMode? initialThemeMode,
     Color? initialPrimaryColor,
+    Locale? initialLocale,
   }) : _prefs = prefs,
        _cachedThemeMode = initialThemeMode ?? ThemeMode.system,
-       _cachedPrimaryColor = initialPrimaryColor ?? AppColors.financeGreen;
+       _cachedPrimaryColor = initialPrimaryColor ?? AppColors.financeGreen,
+       _cachedLocale = initialLocale ?? const Locale('ru');
 
   @override
   Future<void> init() async {
     _cachedThemeMode = await _loadThemeMode();
     _cachedPrimaryColor = await _loadPrimaryColor();
+    _cachedLocale = await _loadLocale();
   }
 
   Future<ThemeMode> _loadThemeMode() async {
@@ -56,5 +61,19 @@ class UserSettingsService implements IUserSettingsService {
   Future<void> savePrimaryColor(Color color) async {
     _cachedPrimaryColor = color;
     await _prefs.setInt(_primaryColorKey, color.toARGB32());
+  }
+
+  Future<Locale> _loadLocale() async {
+    final languageCode = _prefs.getString(_localeLanguageKey);
+    return languageCode != null ? Locale(languageCode) : const Locale('ru');
+  }
+
+  @override
+  Locale get locale => _cachedLocale;
+
+  @override
+  Future<void> saveLocale(Locale locale) async {
+    _cachedLocale = locale;
+    await _prefs.setString(_localeLanguageKey, locale.languageCode);
   }
 }

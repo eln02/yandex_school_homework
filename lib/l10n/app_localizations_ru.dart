@@ -139,4 +139,91 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get search_article => 'Найти статью';
+
+  @override
+  String get settingsTitle => 'Настройки';
+
+  @override
+  String get pinSettingsButton => 'Экран настроек пина';
+
+  @override
+  String get languageSettingTitle => 'Язык приложения';
+
+  @override
+  String get russianLanguage => 'Русский';
+
+  @override
+  String get englishLanguage => 'Английский';
+
+  @override
+  String get primaryColorSetting => 'Основной цвет';
+
+  @override
+  String get colorPickerTitle => 'Выберите основной цвет';
+
+  @override
+  String get cancel => 'Отмена';
+
+  @override
+  String get save => 'Сохранить';
+
+  @override
+  String get darkThemeSetting => 'Темная тема';
+
+  @override
+  String get darkThemeEnabled => 'Включена';
+
+  @override
+  String get darkThemeSystem => 'Системная';
+
+  @override
+  String get pinSettingsTitle => 'Настройки PIN';
+
+  @override
+  String get setPinButton => 'Установить PIN';
+
+  @override
+  String get changePinButton => 'Сменить PIN';
+
+  @override
+  String get removePinButton => 'Удалить PIN';
+
+  @override
+  String get biometricAuthLabel => 'Вход по биометрии';
+
+  @override
+  String get setPinTitle => 'Установить PIN';
+
+  @override
+  String get updatePinTitle => 'Сменить PIN';
+
+  @override
+  String get deletePinTitle => 'Удалить PIN';
+
+  @override
+  String get confirmPinTitle => 'Введите PIN';
+
+  @override
+  String get currentPinLabel => 'Текущий PIN';
+
+  @override
+  String get newPinLabel => 'Новый PIN';
+
+  @override
+  String get confirmButton => 'Подтвердить';
+
+  @override
+  String get biometricAuthButton => 'Войти по отпечатку';
+
+  @override
+  String get pinSetSuccess => 'Пин установлен';
+
+  @override
+  String get pinUpdatedSuccess => 'Пин обновлен';
+
+  @override
+  String get pinDeletedSuccess => 'Пин удален';
+
+  @override
+  String get pinValidationFailed => 'Неверный PIN';
 }

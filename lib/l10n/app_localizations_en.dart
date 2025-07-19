@@ -139,4 +139,91 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search_article => 'Search article';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get pinSettingsButton => 'PIN settings screen';
+
+  @override
+  String get languageSettingTitle => 'App language';
+
+  @override
+  String get russianLanguage => 'Russian';
+
+  @override
+  String get englishLanguage => 'English';
+
+  @override
+  String get primaryColorSetting => 'Primary color';
+
+  @override
+  String get colorPickerTitle => 'Choose primary color';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get darkThemeSetting => 'Dark theme';
+
+  @override
+  String get darkThemeEnabled => 'Enabled';
+
+  @override
+  String get darkThemeSystem => 'System';
+
+  @override
+  String get pinSettingsTitle => 'PIN Settings';
+
+  @override
+  String get setPinButton => 'Set PIN';
+
+  @override
+  String get changePinButton => 'Change PIN';
+
+  @override
+  String get removePinButton => 'Remove PIN';
+
+  @override
+  String get biometricAuthLabel => 'Biometric login';
+
+  @override
+  String get setPinTitle => 'Set PIN';
+
+  @override
+  String get updatePinTitle => 'Change PIN';
+
+  @override
+  String get deletePinTitle => 'Delete PIN';
+
+  @override
+  String get confirmPinTitle => 'Enter PIN';
+
+  @override
+  String get currentPinLabel => 'Current PIN';
+
+  @override
+  String get newPinLabel => 'New PIN';
+
+  @override
+  String get confirmButton => 'Confirm';
+
+  @override
+  String get biometricAuthButton => 'Login with biometrics';
+
+  @override
+  String get pinSetSuccess => 'PIN set successfully';
+
+  @override
+  String get pinUpdatedSuccess => 'PIN updated successfully';
+
+  @override
+  String get pinDeletedSuccess => 'PIN deleted successfully';
+
+  @override
+  String get pinValidationFailed => 'Invalid PIN';
 }

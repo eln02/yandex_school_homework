@@ -93,8 +93,8 @@ class _App extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en'), Locale('ru')],
-      locale: const Locale('en'),
+      supportedLocales: context.locale.supportedLocales,
+      locale: context.locale.locale,
     );
   }
 }

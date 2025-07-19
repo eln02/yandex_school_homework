@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_screen.dart';
@@ -13,7 +14,7 @@ class PinSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Настройки PIN')),
+      appBar: AppBar(title: Text(context.strings.pinSettingsTitle)),
       body: const Padding(
         padding: EdgeInsets.all(16.0),
         child: _PinSettingsContent(),
@@ -64,7 +65,7 @@ class _SetPinButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () => _navigateToPinScreen(context, PinActionType.set),
-      child: const Text('Установить PIN'),
+      child: Text(context.strings.setPinButton),
     );
   }
 }
@@ -79,12 +80,12 @@ class _PinModificationButtons extends StatelessWidget {
       children: [
         ElevatedButton(
           onPressed: () => _navigateToPinScreen(context, PinActionType.update),
-          child: const Text('Сменить PIN'),
+          child: Text(context.strings.changePinButton),
         ),
         const SizedBox(height: 12),
         ElevatedButton(
           onPressed: () => _navigateToPinScreen(context, PinActionType.delete),
-          child: const Text('Удалить PIN'),
+          child: Text(context.strings.removePinButton),
         ),
       ],
     );
@@ -118,7 +119,7 @@ class _BiometricSwitch extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Вход по биометрии'),
+            Text(context.strings.biometricAuthLabel),
             Switch(
               value: isBiometricEnabled,
               onChanged: context

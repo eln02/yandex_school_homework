@@ -361,6 +361,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search article'**
   String get search_article;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @pinSettingsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN settings screen'**
+  String get pinSettingsButton;
+
+  /// No description provided for @languageSettingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App language'**
+  String get languageSettingTitle;
+
+  /// No description provided for @russianLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Russian'**
+  String get russianLanguage;
+
+  /// No description provided for @englishLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get englishLanguage;
+
+  /// No description provided for @primaryColorSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary color'**
+  String get primaryColorSetting;
+
+  /// No description provided for @colorPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose primary color'**
+  String get colorPickerTitle;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @darkThemeSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark theme'**
+  String get darkThemeSetting;
+
+  /// No description provided for @darkThemeEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get darkThemeEnabled;
+
+  /// No description provided for @darkThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get darkThemeSystem;
+
+  /// No description provided for @pinSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN Settings'**
+  String get pinSettingsTitle;
+
+  /// No description provided for @setPinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get setPinButton;
+
+  /// No description provided for @changePinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get changePinButton;
+
+  /// No description provided for @removePinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN'**
+  String get removePinButton;
+
+  /// No description provided for @biometricAuthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric login'**
+  String get biometricAuthLabel;
+
+  /// No description provided for @setPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get setPinTitle;
+
+  /// No description provided for @updatePinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get updatePinTitle;
+
+  /// No description provided for @deletePinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete PIN'**
+  String get deletePinTitle;
+
+  /// No description provided for @confirmPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get confirmPinTitle;
+
+  /// No description provided for @currentPinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current PIN'**
+  String get currentPinLabel;
+
+  /// No description provided for @newPinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New PIN'**
+  String get newPinLabel;
+
+  /// No description provided for @confirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmButton;
+
+  /// No description provided for @biometricAuthButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Login with biometrics'**
+  String get biometricAuthButton;
+
+  /// No description provided for @pinSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN set successfully'**
+  String get pinSetSuccess;
+
+  /// No description provided for @pinUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN updated successfully'**
+  String get pinUpdatedSuccess;
+
+  /// No description provided for @pinDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN deleted successfully'**
+  String get pinDeletedSuccess;
+
+  /// No description provided for @pinValidationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid PIN'**
+  String get pinValidationFailed;
 }
 
 class _AppLocalizationsDelegate

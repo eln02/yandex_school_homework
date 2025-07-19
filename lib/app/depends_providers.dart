@@ -13,6 +13,7 @@ import 'package:yandex_school_homework/features/settings/presentation/domain/sta
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transactions_cubit.dart';
+import 'package:yandex_school_homework/l10n/locale_notifier.dart';
 
 final class DependsProviders extends StatelessWidget {
   const DependsProviders({
@@ -66,6 +67,9 @@ final class DependsProviders extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ThemeNotifier(diContainer.userSettingsService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LocaleNotifier(diContainer.userSettingsService),
         ),
         ChangeNotifierProvider(
           create: (_) =>

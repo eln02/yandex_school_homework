@@ -3,6 +3,7 @@ import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/l10n/app_localizations.dart';
+import 'package:yandex_school_homework/l10n/locale_notifier.dart';
 
 extension AppContextExt on BuildContext {
   DiContainer get di => read<DiContainer>();
@@ -10,6 +11,8 @@ extension AppContextExt on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
 
   ThemeNotifier get theme => read<ThemeNotifier>();
+
+  LocaleNotifier get locale => watch<LocaleNotifier>();
 
   TextTheme get texts => Theme.of(this).textTheme;
 

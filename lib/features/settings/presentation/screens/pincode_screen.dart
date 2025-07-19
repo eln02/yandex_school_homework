@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yandex_school_homework/app/app_context_ext.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_cubit.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_state.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
@@ -28,11 +29,8 @@ class _PinActionScreenState extends State<PinActionScreen> {
   final _newPinController = TextEditingController();
 
   bool get isSet => widget.actionType == PinActionType.set;
-
   bool get isUpdate => widget.actionType == PinActionType.update;
-
   bool get isDelete => widget.actionType == PinActionType.delete;
-
   bool get isConfirm => widget.actionType == PinActionType.confirm;
 
   @override
@@ -81,7 +79,7 @@ class _PinActionScreenState extends State<PinActionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_getTitle(widget.actionType))),
+      appBar: AppBar(title: Text(_getTitle(context, widget.actionType))),
       body: BlocConsumer<PinOperationCubit, PinOperationState>(
         listener: (context, state) => _handlePinOperationState(context, state),
         builder: (context, state) {
@@ -106,11 +104,11 @@ class _PinActionScreenState extends State<PinActionScreen> {
     switch (state) {
       case PinSetSuccess():
         pinNotifier.setPinStatus(true);
-        _showSuccessSnackbar(context, 'Пин установлен');
+        _showSuccessSnackbar(context, context.strings.pinSetSuccess);
         context.pop();
       case PinUpdated():
         pinNotifier.setPinStatus(true);
-        _showSuccessSnackbar(context, 'Пин обновлен');
+        _showSuccessSnackbar(context, context.strings.pinUpdatedSuccess);
         context.pop();
       case PinConfirmed():
         pinNotifier.setPinStatus(true);
@@ -118,39 +116,39 @@ class _PinActionScreenState extends State<PinActionScreen> {
       case PinDeleted():
         pinNotifier.setPinStatus(false);
         biometricNotifier.setBiometricEnabled(false);
-        _showSuccessSnackbar(context, 'Пин удален');
+        _showSuccessSnackbar(context, context.strings.pinDeletedSuccess);
         context.pop();
       case PinError(:final message):
         _showErrorSnackbar(context, message);
       case PinValidationFailed():
-        _showErrorSnackbar(context, 'Неверный PIN');
+        _showErrorSnackbar(context, context.strings.pinValidationFailed);
       default:
         break;
     }
   }
 
   /// Получение заголовка экрана в зависимости от типа операции
-  String _getTitle(PinActionType type) {
+  String _getTitle(BuildContext context, PinActionType type) {
     return switch (type) {
-      PinActionType.set => 'Установить PIN',
-      PinActionType.update => 'Сменить PIN',
-      PinActionType.delete => 'Удалить PIN',
-      PinActionType.confirm => 'Введите PIN',
+      PinActionType.set => context.strings.setPinTitle,
+      PinActionType.update => context.strings.updatePinTitle,
+      PinActionType.delete => context.strings.deletePinTitle,
+      PinActionType.confirm => context.strings.confirmPinTitle,
     };
   }
 
   /// Показать уведомление об успехе
   void _showSuccessSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   /// Показать уведомление об ошибке
   void _showErrorSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
 
@@ -173,11 +171,8 @@ class _PinActionContent extends StatelessWidget {
   });
 
   bool get isSet => actionType == PinActionType.set;
-
   bool get isUpdate => actionType == PinActionType.update;
-
   bool get isDelete => actionType == PinActionType.delete;
-
   bool get isConfirm => actionType == PinActionType.confirm;
 
   @override
@@ -193,12 +188,12 @@ class _PinActionContent extends StatelessWidget {
                 children: [
                   if (isUpdate || isDelete || isConfirm)
                     PinTextField(
-                      label: 'Текущий PIN',
+                      label: context.strings.currentPinLabel,
                       controller: pinController,
                     ),
                   if (isSet || isUpdate)
                     PinTextField(
-                      label: 'Новый PIN',
+                      label: context.strings.newPinLabel,
                       controller: isSet ? pinController : newPinController,
                     ),
                 ],
@@ -211,11 +206,11 @@ class _PinActionContent extends StatelessWidget {
             onPressed: isLoading ? null : onConfirmPressed,
             child: isLoading
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Подтвердить'),
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+                : Text(context.strings.confirmButton),
           ),
         ],
       ),
@@ -283,11 +278,11 @@ class _BiometricAuthButton extends StatelessWidget {
                   icon: const Icon(Icons.fingerprint),
                   label: isAuthenticating
                       ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Войти по отпечатку'),
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : Text(context.strings.biometricAuthButton),
                 ),
               ],
             );

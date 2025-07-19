@@ -14,4 +14,8 @@ abstract class IUserSettingsService {
   Color get primaryColor;
 
   Future<void> savePrimaryColor(Color color);
+
+  Locale get locale;
+
+  Future<void> saveLocale(Locale locale);
 }
