@@ -41,8 +41,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildThemeSwitch(context),
             const SizedBox(height: 16),
             _buildColorPicker(context),
-            const SizedBox(height: 16),
-            _buildAppVersion(context),
           ],
         ),
       ),
@@ -144,34 +142,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildAppVersion(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.info_outline, color: Colors.grey[600]),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Версия приложения',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-                ),
-                Text('1.0.0', style: Theme.of(context).textTheme.titleMedium),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
