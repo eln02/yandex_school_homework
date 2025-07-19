@@ -54,8 +54,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
   }
 
   void _onConfirmPressed() {
-    if (!_formKey.currentState!.validate()) return;
-
     final cubit = context.read<PinOperationCubit>();
 
     switch (widget.actionType) {
@@ -69,7 +67,6 @@ class _PinActionScreenState extends State<PinActionScreen> {
           cubit.saveUpdatedPin(_newPinController.text);
         }
         break;
-
       case PinActionType.delete:
         cubit.validateAndDeletePin(_pinController.text);
         break;
@@ -135,8 +132,14 @@ class _PinActionScreenState extends State<PinActionScreen> {
         context.pop();
       case PinError(:final message):
         _showErrorSnackbar(context, message);
+        _pinController.clear();
+        _newPinController.clear();
+        setState(() {});
       case PinValidationFailed():
         _showErrorSnackbar(context, context.strings.pinValidationFailed);
+        _pinController.clear();
+        _newPinController.clear();
+        setState(() {});
       default:
         break;
     }
@@ -190,122 +193,124 @@ class _PinActionContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUpdate = actionType == PinActionType.update;
+    final useNewField = isUpdate && updateStep == _UpdatePinStep.enterNew;
+    final label = switch (actionType) {
+      PinActionType.set => context.strings.newPinLabel,
+      PinActionType.confirm => context.strings.currentPinLabel,
+      PinActionType.delete => context.strings.currentPinLabel,
+      PinActionType.update when updateStep == _UpdatePinStep.validateOld =>
+        context.strings.currentPinLabel,
+      PinActionType.update when updateStep == _UpdatePinStep.enterNew =>
+        context.strings.confirmNewPinLabel,
+      PinActionType.update => context.strings.currentPinLabel,
+    };
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         children: [
-          const SizedBox(height: 24),
-          Expanded(
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  if (actionType == PinActionType.set)
-                    _PinInputField(
-                      label: context.strings.newPinLabel,
-                      controller: pinController,
-                    ),
-                  if (actionType == PinActionType.confirm ||
-                      actionType == PinActionType.delete ||
-                      (isUpdate && updateStep == _UpdatePinStep.validateOld))
-                    _PinInputField(
-                      label: context.strings.currentPinLabel,
-                      controller: pinController,
-                    ),
-                  if (isUpdate && updateStep == _UpdatePinStep.enterNew)
-                    _PinInputField(
-                      label: context.strings.confirmNewPinLabel,
-                      controller: newPinController,
-                    ),
-                ],
-              ),
-            ),
+          const SizedBox(height: 64),
+          Text(label, style: context.texts.bodyLarge_),
+          const SizedBox(height: 16),
+          _PinCodeField(
+            controller: useNewField ? newPinController : pinController,
+            onCompleted: (_) => onConfirmPressed(),
           ),
-          if (actionType == PinActionType.confirm) const _BiometricAuthOption(),
-          const SizedBox(height: 24),
-          _ConfirmButton(isLoading: isLoading, onPressed: onConfirmPressed),
+          if (actionType == PinActionType.confirm)
+            const Padding(
+              padding: EdgeInsets.only(top: 32),
+              child: _BiometricAuthOption(),
+            ),
         ],
       ),
     );
   }
 }
 
-/// Поле ввода PIN-кода
-class _PinInputField extends StatelessWidget {
-  final String label;
+/// Поле ввода PIN-кода из 4 квадратов
+class _PinCodeField extends StatefulWidget {
   final TextEditingController controller;
+  final void Function(String) onCompleted;
 
-  const _PinInputField({required this.label, required this.controller});
+  const _PinCodeField({required this.controller, required this.onCompleted});
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        obscureText: true,
-        maxLength: 4,
-        keyboardType: TextInputType.number,
-        style: context.texts.bodyLarge_.copyWith(
-          color: context.colors.onSurfaceText,
-        ),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: context.texts.bodyLarge_.copyWith(
-            color: context.colors.onSurfaceText,
-          ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: context.colors.primary),
-          ),
-        ),
-        validator: _pinValidator,
-      ),
-    );
-  }
-
-  String? _pinValidator(String? value) {
-    if (value == null || value.length != 4) return 'Введите 4 цифры';
-    if (!RegExp(r'^\d{4}$').hasMatch(value)) return 'Только цифры';
-    return null;
-  }
+  State<_PinCodeField> createState() => _PinCodeFieldState();
 }
 
-/// Кнопка подтверждения
-class _ConfirmButton extends StatelessWidget {
-  final bool isLoading;
-  final VoidCallback onPressed;
+class _PinCodeFieldState extends State<_PinCodeField> {
+  late FocusNode _focusNode;
 
-  const _ConfirmButton({required this.isLoading, required this.onPressed});
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: context.colors.primary,
-        ),
-        child: isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
+    final length = widget.controller.text.length;
+
+    return GestureDetector(
+      onTap: () => _focusNode.requestFocus(),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(4, (index) {
+              final isFilled = index < length;
+              final digit = isFilled ? widget.controller.text[index] : '';
+
+              return Container(
+                width: 50,
+                height: 60,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!, width: 2.5),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              )
-            : Text(
-                context.strings.confirmButton,
-                style: context.texts.bodyLarge_.copyWith(color: Colors.white),
-              ),
+                child: Text(
+                  digit,
+                  style: context.texts.headlineSmall?.copyWith(
+                    color: context.colors.onSurfaceText,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            }),
+          ),
+          TextField(
+            controller: widget.controller,
+            focusNode: _focusNode,
+            maxLength: 4,
+            keyboardType: TextInputType.number,
+            style: const TextStyle(color: Colors.transparent),
+            cursorColor: Colors.transparent,
+            decoration: const InputDecoration(
+              counterText: '',
+              border: InputBorder.none,
+            ),
+            onChanged: (value) async {
+              setState(() {});
+
+              if (value.length == 4) {
+                // чтобы пользователь успел увидеть 4ю цифру в поле ввода
+                await Future.delayed(const Duration(milliseconds: 100));
+                if (mounted) widget.onCompleted(value);
+              }
+            },
+          ),
+        ],
       ),
     );
   }
