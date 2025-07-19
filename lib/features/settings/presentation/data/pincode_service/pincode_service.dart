@@ -2,7 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
-abstract class IPinCodeService {
+abstract class IAuthService {
   Future<void> init();
 
   Future<void> savePin(String pin);
@@ -14,16 +14,28 @@ abstract class IPinCodeService {
   Future<void> deletePin();
 
   bool get isPinSet;
+
+  bool get isBiometricEnabledCached;
+
+  Future<void> setBiometricEnabled(bool enabled);
+
+  Future<bool> isBiometricEnabled();
 }
 
-class SecurePinCodeService implements IPinCodeService {
+class SecureAuthService implements IAuthService {
   static const _pinKey = 'user_pin_hash';
+  static const _biometricFlagKey = 'biometric_enabled';
+
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   bool _isPinSet = false;
+  bool _isBiometricEnabled = false;
 
   @override
   bool get isPinSet => _isPinSet;
+
+  @override
+  bool get isBiometricEnabledCached => _isBiometricEnabled;
 
   String _hashPin(String pin) {
     final bytes = utf8.encode(pin);
@@ -34,6 +46,8 @@ class SecurePinCodeService implements IPinCodeService {
   @override
   Future<void> init() async {
     _isPinSet = await _secureStorage.containsKey(key: _pinKey);
+    final biometricValue = await _secureStorage.read(key: _biometricFlagKey);
+    _isBiometricEnabled = biometricValue == 'true';
   }
 
   @override
@@ -68,5 +82,19 @@ class SecurePinCodeService implements IPinCodeService {
   Future<void> deletePin() async {
     await _secureStorage.delete(key: _pinKey);
     _isPinSet = false;
+  }
+
+  @override
+  Future<void> setBiometricEnabled(bool enabled) async {
+    await _secureStorage.write(
+      key: _biometricFlagKey,
+      value: enabled.toString(),
+    );
+    _isBiometricEnabled = enabled;
+  }
+
+  @override
+  Future<bool> isBiometricEnabled() async {
+    return _isBiometricEnabled;
   }
 }

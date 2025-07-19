@@ -3,7 +3,7 @@ import 'package:yandex_school_homework/features/settings/presentation/data/pinco
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
 
 class PinOperationCubit extends Cubit<PinOperationState> {
-  final IPinCodeService _pinService;
+  final IAuthService _pinService;
 
   PinOperationCubit(this._pinService) : super(PinOperationInitial());
 
@@ -62,5 +62,9 @@ class PinOperationCubit extends Cubit<PinOperationState> {
     } catch (e) {
       emit(const PinError('Ошибка при обновлении PIN'));
     }
+  }
+
+  void confirmWithoutPin() {
+    emit(PinConfirmed());
   }
 }

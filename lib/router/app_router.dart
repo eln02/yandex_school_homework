@@ -8,6 +8,7 @@ import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
+import 'package:yandex_school_homework/features/settings/presentation/screens/biometrics_debug.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_screen.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_settings.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/settings_screen.dart';
@@ -155,7 +156,7 @@ class AppRouter {
                 GoRoute(
                   path: '/income_path',
                   name: 'income',
-                  builder: (context, state) => TransactionsScreen.income(),
+                  builder: (context, state) => BiometricAuthScreen(),
                   routes: [
                     GoRoute(
                       path: 'income_history',

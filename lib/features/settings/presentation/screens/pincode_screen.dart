@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_state.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
@@ -58,6 +61,14 @@ class _PinActionScreenState extends State<PinActionScreen> {
     }
   }
 
+  void _handleBiometricSuccess(BuildContext context) {
+    if (context.read<BiometricAuthCubit>().state is BiometricSuccess) {
+      context.read<PinStatusNotifier>().setPinStatus(true);
+      context.read<PinOperationCubit>().confirmWithoutPin(); // ✅ правильно
+      context.go(AppRouter.initialLocation);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,10 +96,13 @@ class _PinActionScreenState extends State<PinActionScreen> {
               break;
             case PinDeleted():
               context.read<PinStatusNotifier>().setPinStatus(false);
-              context.pop();
+              context.read<BiometricStatusNotifier>().setBiometricEnabled(
+                false,
+              );
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('Пин удален')));
+              context.pop();
               break;
             case PinError(:final message):
               ScaffoldMessenger.of(
@@ -109,49 +123,102 @@ class _PinActionScreenState extends State<PinActionScreen> {
 
           return Padding(
             padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  if (isUpdate || isDelete || isConfirm)
-                    TextFormField(
-                      controller: _pinController,
-                      obscureText: true,
-                      maxLength: 4,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Текущий PIN',
-                      ),
-                      validator: _pinValidator,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        if (isUpdate || isDelete || isConfirm)
+                          _buildPinField('Текущий PIN', _pinController),
+                        if (isSet || isUpdate)
+                          _buildPinField(
+                            'Новый PIN',
+                            isSet ? _pinController : _newPinController,
+                          ),
+                      ],
                     ),
-                  if (isSet || isUpdate)
-                    TextFormField(
-                      controller: isSet ? _pinController : _newPinController,
-                      obscureText: true,
-                      maxLength: 4,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Новый PIN'),
-                      validator: _pinValidator,
-                    ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: isLoading
-                        ? null
-                        : () => _onConfirmPressed(context),
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Подтвердить'),
                   ),
-                ],
-              ),
+                ),
+                if (isConfirm) _buildBiometricSection(context),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () => _onConfirmPressed(context),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Подтвердить'),
+                ),
+              ],
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildPinField(String label, TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      obscureText: true,
+      maxLength: 4,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(labelText: label),
+      validator: _pinValidator,
+    );
+  }
+
+  Widget _buildBiometricSection(BuildContext context) {
+    final biometricNotifier = context.watch<BiometricStatusNotifier>();
+    final isBiometricEnabled = biometricNotifier.value;
+
+    if (!isBiometricEnabled) {
+      return const SizedBox.shrink(); // Не показываем кнопку
+    }
+
+    return BlocBuilder<BiometricAuthCubit, BiometricAuthState>(
+      builder: (context, state) {
+        if (state is BiometricUnavailable || state is BiometricError) {
+          return const SizedBox.shrink();
+        }
+
+        final isAuthenticating = state is BiometricAuthenticating;
+
+        return Column(
+          children: [
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: isAuthenticating
+                  ? null
+                  : () async {
+                      // Дополнительная проверка, чтобы точно не запускать биометрию при выключенном флаге
+                      if (!biometricNotifier.value) return;
+
+                      await context.read<BiometricAuthCubit>().authenticate();
+
+                      if (context.read<BiometricAuthCubit>().state
+                          is BiometricSuccess) {
+                        _handleBiometricSuccess(context);
+                      }
+                    },
+              icon: const Icon(Icons.fingerprint),
+              label: isAuthenticating
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Войти по отпечатку'),
+            ),
+          ],
+        );
+      },
     );
   }
 

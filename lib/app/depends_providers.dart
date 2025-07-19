@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/accounts/domain/state/account_cubit.dart';
 import 'package:yandex_school_homework/features/categories/domain/state/categories_cubit.dart';
 import 'package:yandex_school_homework/features/connectivity_checker/backup_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
 import 'package:yandex_school_homework/features/transactions/domain/state/transaction/transacton_cubit.dart';
@@ -69,8 +71,16 @@ final class DependsProviders extends StatelessWidget {
           create: (_) =>
               PinStatusNotifier(isPinSet: diContainer.pinCodeService.isPinSet),
         ),
+        ChangeNotifierProvider(
+          create: (_) => BiometricStatusNotifier(diContainer.pinCodeService),
+        ),
         BlocProvider(
           create: (_) => PinOperationCubit(diContainer.pinCodeService),
+        ),
+        BlocProvider(
+          create: (_) =>
+              BiometricAuthCubit(diContainer.biometricAuthService)
+                ..checkAvailability(),
         ),
       ],
       child: child,
