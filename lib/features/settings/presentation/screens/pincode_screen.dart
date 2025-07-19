@@ -16,7 +16,8 @@ import 'package:yandex_school_homework/router/app_router.dart';
 /// Типы операций с PIN-кодом
 enum PinActionType { set, update, delete, confirm }
 
-/// Экран для выполнения операций с PIN-кодом
+enum _UpdatePinStep { validateOld, enterNew }
+
 class PinActionScreen extends StatefulWidget {
   final PinActionType actionType;
 
@@ -30,6 +31,7 @@ class _PinActionScreenState extends State<PinActionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _pinController = TextEditingController();
   final _newPinController = TextEditingController();
+  _UpdatePinStep _updateStep = _UpdatePinStep.validateOld;
 
   @override
   void initState() {
@@ -61,8 +63,13 @@ class _PinActionScreenState extends State<PinActionScreen> {
         cubit.savePin(_pinController.text);
         break;
       case PinActionType.update:
-        cubit.updatePin(_pinController.text, _newPinController.text);
+        if (_updateStep == _UpdatePinStep.validateOld) {
+          cubit.validatePin(_pinController.text);
+        } else {
+          cubit.saveUpdatedPin(_newPinController.text);
+        }
         break;
+
       case PinActionType.delete:
         cubit.validateAndDeletePin(_pinController.text);
         break;
@@ -86,6 +93,7 @@ class _PinActionScreenState extends State<PinActionScreen> {
           return _PinActionContent(
             formKey: _formKey,
             actionType: widget.actionType,
+            updateStep: _updateStep,
             isLoading: state is PinLoading,
             pinController: _pinController,
             newPinController: _newPinController,
@@ -110,8 +118,16 @@ class _PinActionScreenState extends State<PinActionScreen> {
         _showSuccessSnackbar(context, context.strings.pinUpdatedSuccess);
         context.pop();
       case PinConfirmed():
-        pinNotifier.setPinStatus(true);
-        context.go(AppRouter.initialLocation);
+        if (widget.actionType == PinActionType.update &&
+            _updateStep == _UpdatePinStep.validateOld) {
+          setState(() {
+            _updateStep = _UpdatePinStep.enterNew;
+            _pinController.clear();
+          });
+        } else {
+          pinNotifier.setPinStatus(true);
+          context.go(AppRouter.initialLocation);
+        }
       case PinDeleted():
         pinNotifier.setPinStatus(false);
         biometricNotifier.setBiometricEnabled(false);
@@ -129,7 +145,10 @@ class _PinActionScreenState extends State<PinActionScreen> {
   String _getTitle(BuildContext context, PinActionType type) {
     return switch (type) {
       PinActionType.set => context.strings.setPinTitle,
-      PinActionType.update => context.strings.updatePinTitle,
+      PinActionType.update =>
+        _updateStep == _UpdatePinStep.validateOld
+            ? context.strings.confirmPinTitle
+            : context.strings.updatePinTitle,
       PinActionType.delete => context.strings.deletePinTitle,
       PinActionType.confirm => context.strings.confirmPinTitle,
     };
@@ -152,6 +171,7 @@ class _PinActionScreenState extends State<PinActionScreen> {
 class _PinActionContent extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final PinActionType actionType;
+  final _UpdatePinStep? updateStep;
   final bool isLoading;
   final TextEditingController pinController;
   final TextEditingController newPinController;
@@ -160,6 +180,7 @@ class _PinActionContent extends StatelessWidget {
   const _PinActionContent({
     required this.formKey,
     required this.actionType,
+    this.updateStep,
     required this.isLoading,
     required this.pinController,
     required this.newPinController,
@@ -168,6 +189,8 @@ class _PinActionContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isUpdate = actionType == PinActionType.update;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -178,22 +201,22 @@ class _PinActionContent extends StatelessWidget {
               key: formKey,
               child: Column(
                 children: [
-                  if (actionType == PinActionType.update ||
+                  if (actionType == PinActionType.set)
+                    _PinInputField(
+                      label: context.strings.newPinLabel,
+                      controller: pinController,
+                    ),
+                  if (actionType == PinActionType.confirm ||
                       actionType == PinActionType.delete ||
-                      actionType == PinActionType.confirm)
+                      (isUpdate && updateStep == _UpdatePinStep.validateOld))
                     _PinInputField(
                       label: context.strings.currentPinLabel,
                       controller: pinController,
                     ),
-                  if (actionType == PinActionType.set ||
-                      actionType == PinActionType.update)
+                  if (isUpdate && updateStep == _UpdatePinStep.enterNew)
                     _PinInputField(
-                      label: actionType == PinActionType.set
-                          ? context.strings.newPinLabel
-                          : context.strings.confirmNewPinLabel,
-                      controller: actionType == PinActionType.set
-                          ? pinController
-                          : newPinController,
+                      label: context.strings.confirmNewPinLabel,
+                      controller: newPinController,
                     ),
                 ],
               ),

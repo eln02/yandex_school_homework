@@ -7,6 +7,8 @@ class PinOperationCubit extends Cubit<PinOperationState> {
 
   PinOperationCubit(this._pinService) : super(PinOperationInitial());
 
+  String? _validatedPin;
+
   Future<void> savePin(String pin) async {
     emit(PinLoading());
     try {
@@ -14,20 +16,6 @@ class PinOperationCubit extends Cubit<PinOperationState> {
       emit(PinSetSuccess());
     } catch (e) {
       emit(const PinError('Ошибка при установке PIN'));
-    }
-  }
-
-  Future<void> validatePin(String pin) async {
-    emit(PinLoading());
-    try {
-      final isValid = await _pinService.validatePin(pin);
-      if (isValid) {
-        emit(PinConfirmed());
-      } else {
-        emit(PinValidationFailed());
-      }
-    } catch (e) {
-      emit(const PinError('Ошибка при проверке PIN'));
     }
   }
 
@@ -47,24 +35,38 @@ class PinOperationCubit extends Cubit<PinOperationState> {
     }
   }
 
-  Future<void> updatePin(String oldPin, String newPin) async {
+  void confirmWithoutPin() {
+    emit(PinConfirmed());
+  }
+
+  Future<void> validatePin(String pin) async {
     emit(PinLoading());
     try {
-      final isValid = await _pinService.validatePin(oldPin);
-
-      if (!isValid) {
+      final isValid = await _pinService.validatePin(pin);
+      if (isValid) {
+        _validatedPin = pin;
+        emit(PinConfirmed());
+      } else {
         emit(PinValidationFailed());
+      }
+    } catch (e) {
+      emit(const PinError('Ошибка при проверке PIN'));
+    }
+  }
+
+  Future<void> saveUpdatedPin(String newPin) async {
+    emit(PinLoading());
+    try {
+      if (_validatedPin == null) {
+        emit(const PinError('Старый PIN не подтвержден'));
         return;
       }
-      await _pinService.updatePin(oldPin, newPin);
 
+      await _pinService.updatePin(_validatedPin!, newPin);
+      _validatedPin = null;
       emit(PinUpdated());
     } catch (e) {
       emit(const PinError('Ошибка при обновлении PIN'));
     }
-  }
-
-  void confirmWithoutPin() {
-    emit(PinConfirmed());
   }
 }
