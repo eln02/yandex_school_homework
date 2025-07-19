@@ -15,7 +15,7 @@ class PinOperationCubit extends Cubit<PinOperationState> {
       await _pinService.savePin(pin);
       emit(PinSetSuccess());
     } catch (e) {
-      emit(const PinError('Ошибка при установке PIN'));
+      emit(PinError(e.toString()));
     }
   }
 
@@ -31,7 +31,7 @@ class PinOperationCubit extends Cubit<PinOperationState> {
 
       emit(PinDeleted());
     } catch (e) {
-      emit(const PinError('Ошибка при удалении PIN'));
+      emit(PinError(e.toString()));
     }
   }
 
@@ -50,7 +50,7 @@ class PinOperationCubit extends Cubit<PinOperationState> {
         emit(PinValidationFailed());
       }
     } catch (e) {
-      emit(const PinError('Ошибка при проверке PIN'));
+      emit(PinError(e.toString()));
     }
   }
 
@@ -66,7 +66,7 @@ class PinOperationCubit extends Cubit<PinOperationState> {
       _validatedPin = null;
       emit(PinUpdated());
     } catch (e) {
-      emit(const PinError('Ошибка при обновлении PIN'));
+      emit(PinError(e.toString()));
     }
   }
 }
