@@ -78,7 +78,7 @@ class _PinActionScreenState extends State<PinActionScreen> {
       backgroundColor: context.colors.mainBackground,
       appBar: CustomAppBar(
         title: _getTitle(context, widget.actionType),
-        showBackButton: true,
+        showBackButton: widget.actionType != PinActionType.confirm,
       ),
       body: BlocConsumer<PinOperationCubit, PinOperationState>(
         listener: (context, state) => _handlePinOperationState(context, state),

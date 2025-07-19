@@ -18,7 +18,7 @@ extension AppContextExt on BuildContext {
 
   AppLocalizations get strings => AppLocalizations.of(this)!;
 
-  ThemeNotifier get _tint => watch<ThemeNotifier>();
+  ThemeNotifier get _tint => read<ThemeNotifier>();
 
   Color get primaryColor => _tint.primaryColor;
 

@@ -4,7 +4,7 @@ import 'package:yandex_school_homework/app/theme/theme_constants.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 
 extension AppTheme on BuildContext {
-  ThemeNotifier get notifier => watch<ThemeNotifier>();
+  ThemeNotifier get notifier => read<ThemeNotifier>();
 
   Color get _color => notifier.primaryColor;
 

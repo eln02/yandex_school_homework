@@ -58,9 +58,6 @@ class _ThemeSettingTile extends StatelessWidget {
         return SettingsTile(
           leading: Icon(isDarkForced ? Icons.dark_mode : Icons.light_mode),
           title: context.strings.darkThemeSetting,
-          subtitle: isDarkForced
-              ? context.strings.darkThemeEnabled
-              : context.strings.darkThemeSystem,
           trailing: CupertinoSwitch(
             value: isDarkForced,
             onChanged: (value) => themeNotifier.changeTheme(value),
@@ -84,9 +81,6 @@ class _HapticSettingTile extends StatelessWidget {
         return SettingsTile(
           leading: const Icon(Icons.vibration),
           title: context.strings.hapticFeedbackSetting,
-          subtitle: hapticNotifier.value
-              ? context.strings.hapticFeedbackEnabled
-              : context.strings.hapticFeedbackDisabled,
           trailing: CupertinoSwitch(
             value: hapticNotifier.value,
             onChanged: (value) async {

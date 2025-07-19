@@ -9,14 +9,12 @@ class SettingsTile extends StatelessWidget {
     super.key,
     required this.leading,
     required this.title,
-    this.subtitle,
     this.trailing,
     this.onTap,
   });
 
   final Widget leading;
   final String title;
-  final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -43,25 +41,11 @@ class SettingsTile extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: context.texts.bodyLarge_.copyWith(
-                      color: context.colors.onSurfaceText,
-                    ),
-                  ),
-                  if (subtitle != null) ...[
-                    Text(
-                      subtitle!,
-                      style: context.texts.bodySmall_.copyWith(
-                        color: context.colors.onSurfaceText,
-                      ),
-                    ),
-                  ],
-                ],
+              child: Text(
+                title,
+                style: context.texts.bodyLarge_.copyWith(
+                  color: context.colors.onSurfaceText,
+                ),
               ),
             ),
             if (trailing != null) trailing!,

@@ -82,11 +82,13 @@ class _PinModificationOptions extends StatelessWidget {
         SettingsTile(
           leading: const Icon(Icons.lock_reset),
           title: context.strings.changePinButton,
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           onTap: () => _navigateToPinScreen(context, PinActionType.update),
         ),
         SettingsTile(
           leading: const Icon(Icons.lock_open),
           title: context.strings.removePinButton,
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           onTap: () => _navigateToPinScreen(context, PinActionType.delete),
         ),
       ],
