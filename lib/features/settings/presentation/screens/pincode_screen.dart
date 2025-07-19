@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_cubit.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_state.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_operation_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_operation_state.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_status_notifier.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_operation_state.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 /// Типы операций с PIN-кодом

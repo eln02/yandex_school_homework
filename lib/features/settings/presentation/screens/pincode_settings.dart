@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_auth/pin_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/screens/pincode_screen.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
