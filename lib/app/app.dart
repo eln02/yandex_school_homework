@@ -5,6 +5,7 @@ import 'package:yandex_school_homework/app/depends_providers.dart';
 import 'package:yandex_school_homework/app/theme/app_theme.dart';
 import 'package:yandex_school_homework/app/theme/theme_notifier.dart';
 import 'package:yandex_school_homework/di/di_container.dart';
+import 'package:yandex_school_homework/features/common/ui/app_blur_wrapper.dart';
 import 'package:yandex_school_homework/features/common/ui/splash_screen.dart';
 import 'package:yandex_school_homework/features/error/error_screen.dart';
 
@@ -82,6 +83,8 @@ class _App extends StatelessWidget {
       darkTheme: context.dark,
       theme: context.light,
       themeMode: context.theme.themeMode,
+      builder: (context, child) =>
+          AppBlurWrapper(child: child ?? const SizedBox()),
     );
   }
 }
