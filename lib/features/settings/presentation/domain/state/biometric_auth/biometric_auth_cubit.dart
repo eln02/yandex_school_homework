@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/biometrics_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/i_biometric_auth_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_state.dart';
 
 
@@ -12,6 +12,7 @@ class BiometricAuthCubit extends Cubit<BiometricAuthState> {
     emit(BiometricChecking());
 
     try {
+      await _biometricService.init();
       if (_biometricService.isBiometricAvailable) {
         emit(BiometricAvailable());
       } else {

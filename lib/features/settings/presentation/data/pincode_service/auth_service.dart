@@ -1,35 +1,18 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-
-abstract class IAuthService {
-  Future<void> init();
-
-  Future<void> savePin(String pin);
-
-  Future<bool> validatePin(String pin);
-
-  Future<void> updatePin(String oldPin, String newPin);
-
-  Future<void> deletePin();
-
-  bool get isPinSet;
-
-  bool get isBiometricEnabledCached;
-
-  Future<void> setBiometricEnabled(bool enabled);
-
-  Future<bool> isBiometricEnabled();
-}
+import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/i_auth_service.dart';
 
 class SecureAuthService implements IAuthService {
   static const _pinKey = 'user_pin_hash';
   static const _biometricFlagKey = 'biometric_enabled';
 
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-
+  final FlutterSecureStorage _secureStorage;
   bool _isPinSet = false;
   bool _isBiometricEnabled = false;
+
+  SecureAuthService({required FlutterSecureStorage secureStorage})
+      : _secureStorage = secureStorage;
 
   @override
   bool get isPinSet => _isPinSet;

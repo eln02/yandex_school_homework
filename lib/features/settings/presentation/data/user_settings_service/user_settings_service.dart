@@ -7,13 +7,20 @@ class UserSettingsService implements IUserSettingsService {
   static const _themeModeKey = 'theme_mode';
   static const _primaryColorKey = 'primary_color';
 
-  late final SharedPreferences _prefs;
-  ThemeMode _cachedThemeMode = ThemeMode.system;
-  Color _cachedPrimaryColor = AppColors.financeGreen;
+  final SharedPreferences _prefs;
+  ThemeMode _cachedThemeMode;
+  Color _cachedPrimaryColor;
+
+  UserSettingsService({
+    required SharedPreferences prefs,
+    ThemeMode? initialThemeMode,
+    Color? initialPrimaryColor,
+  }) : _prefs = prefs,
+       _cachedThemeMode = initialThemeMode ?? ThemeMode.system,
+       _cachedPrimaryColor = initialPrimaryColor ?? AppColors.financeGreen;
 
   @override
   Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
     _cachedThemeMode = await _loadThemeMode();
     _cachedPrimaryColor = await _loadPrimaryColor();
   }

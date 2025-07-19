@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/pincode_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/i_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_operation_state.dart';
 
 class PinOperationCubit extends Cubit<PinOperationState> {
   final IAuthService _pinService;

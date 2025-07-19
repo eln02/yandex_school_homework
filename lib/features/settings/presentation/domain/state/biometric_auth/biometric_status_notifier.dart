@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/i_auth_service.dart';
 
-import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/pincode_service.dart';
 
 class BiometricStatusNotifier extends ValueNotifier<bool> {
   final IAuthService _authService;

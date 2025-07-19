@@ -1,3 +1,6 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yandex_school_homework/app/database/database_service.dart';
 import 'package:yandex_school_homework/app/database/i_database_service.dart';
 import 'package:yandex_school_homework/app/http/app_http_client.dart';
@@ -6,7 +9,9 @@ import 'package:yandex_school_homework/di/di_repositories.dart';
 import 'package:yandex_school_homework/di/di_typedefs.dart';
 import 'package:yandex_school_homework/features/debug/i_debug_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/biometrics_service.dart';
-import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/pincode_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/biometrics_service/i_biometric_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/i_auth_service.dart';
+import 'package:yandex_school_homework/features/settings/presentation/data/pincode_service/auth_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/i_user_settings_service.dart';
 import 'package:yandex_school_homework/features/settings/presentation/data/user_settings_service/user_settings_service.dart';
 
@@ -50,16 +55,19 @@ final class DiContainer {
     );
 
     onProgress('Инициализация сервиса настроек...');
-    userSettingsService = UserSettingsService();
+    userSettingsService = UserSettingsService(
+      prefs: await SharedPreferences.getInstance(),
+    );
     await userSettingsService.init();
 
-    onProgress('Инициализация сервиса пинкода...');
-    pinCodeService = SecureAuthService();
+    onProgress('Инициализация сервиса авторизации...');
+    pinCodeService = SecureAuthService(
+      secureStorage: const FlutterSecureStorage(),
+    );
     await pinCodeService.init();
 
     onProgress('Инициализация сервиса биометрии...');
-    biometricAuthService = BiometricAuthService();
-    await biometricAuthService.init();
+    biometricAuthService = BiometricAuthService(auth: LocalAuthentication());
 
     onProgress('Инициализация репозиториев...');
     repositories = DiRepositories()

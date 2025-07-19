@@ -5,8 +5,8 @@ import 'package:yandex_school_homework/features/settings/presentation/domain/sta
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_auth_state.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/biometric_auth/biometric_status_notifier.dart';
 import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_status_notifier.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_cubit.dart';
-import 'package:yandex_school_homework/features/settings/presentation/domain/state/pincode_state.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_operation_cubit.dart';
+import 'package:yandex_school_homework/features/settings/presentation/domain/state/pin_operation_state.dart';
 import 'package:yandex_school_homework/router/app_router.dart';
 
 enum PinActionType { set, update, delete, confirm }
@@ -32,6 +32,15 @@ class _PinActionScreenState extends State<PinActionScreen> {
   bool get isDelete => widget.actionType == PinActionType.delete;
 
   bool get isConfirm => widget.actionType == PinActionType.confirm;
+
+  @override
+  void initState() {
+    if (context.read<BiometricStatusNotifier>().value) {
+      context.read<BiometricAuthCubit>().checkAvailability();
+    }
+
+    super.initState();
+  }
 
   @override
   void dispose() {
